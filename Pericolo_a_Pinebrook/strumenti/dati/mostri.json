@@ -1,0 +1,130 @@
+[
+ {
+  "id": "ghiacciolo",
+  "nome": "Ghiacciolo vivente",
+  "tipo": "Elementale Piccolo",
+  "ca": 10,
+  "pf": 7,
+  "vel": "9 m",
+  "gs": "—",
+  "des": 0,
+  "taglia": 1,
+  "icona": "🧊",
+  "colore": "#5dade2",
+  "attacchi": [
+   {
+    "nome": "Artigli",
+    "bonus": 2,
+    "danni": "1d6",
+    "note": "taglienti"
+   }
+  ],
+  "tratti": [
+   {
+    "nome": "Guardiani dei troll",
+    "testo": "Con meno di 4 giocatori togline uno per ogni giocatore mancante (minimo 2). Sconfitti, si sciolgono o fuggono nelle fessure."
+   }
+  ]
+ },
+ {
+  "id": "ladro",
+  "nome": "Ladro di uova",
+  "tipo": "Mostruosità Grande",
+  "ca": 12,
+  "pf": 18,
+  "vel": "9 m",
+  "gs": "—",
+  "des": 0,
+  "taglia": 2,
+  "icona": "🐸",
+  "colore": "#d5dbdb",
+  "attacchi": [
+   {
+    "nome": "Morso",
+    "bonus": 4,
+    "danni": "1d6+2",
+    "note": "perforanti"
+   }
+  ],
+  "tratti": [
+   {
+    "nome": "Addestrati dai troll",
+    "testo": "Con 3 giocatori o meno usane 2; con 2 giocatori o meno hanno 10 PF."
+   }
+  ]
+ },
+ {
+  "id": "cucciolo",
+  "nome": "Cucciolo di drago d'argento",
+  "tipo": "Drago Piccolo, alleato",
+  "ca": 14,
+  "pf": 10,
+  "vel": "9 m",
+  "gs": "—",
+  "des": 0,
+  "taglia": 1,
+  "icona": "🐉",
+  "colore": "#aab7b8",
+  "alleato": true,
+  "attacchi": [],
+  "tratti": [
+   {
+    "nome": "Nytha",
+    "testo": "Dopo aver mangiato dice «Nytha» (= mamma, in draconico). Adora farsi grattare la pancia e piange se il gruppo litiga."
+   }
+  ]
+ },
+ {
+  "id": "kole",
+  "nome": "Capitana Emmajeen Kole",
+  "tipo": "Umanoide Medio, alleata",
+  "ca": 16,
+  "pf": 20,
+  "vel": "9 m",
+  "gs": "—",
+  "des": 0,
+  "taglia": 1,
+  "icona": "🛡️",
+  "colore": "#1f618d",
+  "alleato": true,
+  "attacchi": [
+   {
+    "nome": "Spada",
+    "bonus": 4,
+    "danni": "1d8+2",
+    "note": "solo se necessario"
+   }
+  ],
+  "tratti": [
+   {
+    "nome": "Guida pratica ai draghi",
+    "testo": "Riconosce il cucciolo d'argento e dà al gruppo la pagina con le parole in draconico (orn darastrix = drago d'argento)."
+   }
+  ]
+ },
+ {
+  "id": "rorn",
+  "nome": "Rorn (Hysvearorn)",
+  "tipo": "Drago Mastodontico (drago d'argento adulto)",
+  "ca": 19,
+  "pf": 200,
+  "vel": "12 m, volo 24 m",
+  "gs": "—",
+  "des": 0,
+  "taglia": 4,
+  "icona": "🐲",
+  "colore": "#bfc9ca",
+  "alleato": true,
+  "attacchi": [],
+  "tratti": [
+   {
+    "nome": "Non si combatte",
+    "testo": "Se attaccata ignora i colpi; se il gruppo insiste usa un soffio paralizzante innocuo e li accompagna fuori senza ricompensa."
+   },
+   {
+    "nome": "Ricompensa",
+    "testo": "Un diamante da 50 mo a testa e l'affidamento del cucciolo."
+   }
+  ]
+ }
+]

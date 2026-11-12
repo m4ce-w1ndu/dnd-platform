@@ -1,0 +1,602 @@
+[
+ {
+  "id": "rocco",
+  "nome": "Rocco Martelli",
+  "razza": "Umano",
+  "classe": "Guerriero (Campione)",
+  "background": "Soldato",
+  "livello": 3,
+  "facoltativo": false,
+  "colore": "#b03a2e",
+  "icona": "🛡️",
+  "sottotitolo": "Il più facile da giocare",
+  "chi": "Ex soldato della guardia di confine, ora proteggo le greggi di Pietracalda. Spalle larghe, barba ispida, un sorriso che si vede raramente ma vale oro.",
+  "personalita": "Leale fino all'osso. Proteggo sempre chi è più debole. Russo come un orso.",
+  "perche": "Il villaggio mi paga per scoprire chi ruba le pecore. Stasera ho trovato impronte piccole e artigliate vicino al torrente…",
+  "legame": "Il personaggio alla mia destra mi ha salvato la vita una volta. Come?",
+  "ca": 19,
+  "pf": 28,
+  "vel": "9 m",
+  "iniz": 2,
+  "dadivita": "3d10",
+  "comp": 2,
+  "car": {
+   "FOR": 16,
+   "DES": 14,
+   "COS": 15,
+   "INT": 9,
+   "SAG": 13,
+   "CAR": 11
+  },
+  "ts": [
+   "FOR",
+   "COS"
+  ],
+  "abilita": {
+   "Atletica": 5,
+   "Percezione": 3,
+   "Intuizione": 3,
+   "Intimidire": 2
+  },
+  "attacchi": [
+   {
+    "nome": "Spada lunga",
+    "bonus": 5,
+    "danni": "1d8+3",
+    "tipo": "taglienti",
+    "note": "mischia · critico con 19-20"
+   },
+   {
+    "nome": "Giavellotto",
+    "bonus": 5,
+    "danni": "1d6+3",
+    "tipo": "perforanti",
+    "note": "lancio 9 m (36 m con svantaggio) · ne hai 4"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Difesa",
+    "testo": "+1 alla CA con l'armatura (già incluso)."
+   },
+   {
+    "nome": "Recuperare energie",
+    "testo": "Azione bonus: recuperi 1d10+3 PF. Una volta per riposo breve.",
+    "tiro": "1d10+3",
+    "usi": 1
+   },
+   {
+    "nome": "Azione impetuosa",
+    "testo": "Una volta per riposo breve: nel tuo turno fai un'azione in più (es. due attacchi).",
+    "usi": 1
+   },
+   {
+    "nome": "Critico migliorato",
+    "testo": "Fai un colpo critico con 19 o 20 sul d20."
+   },
+   {
+    "nome": "Cotta di maglia",
+    "testo": "Svantaggio alle prove di Furtività."
+   }
+  ],
+  "equip": "Cotta di maglia, scudo, spada lunga, 4 giavellotti, corda (15 m), 5 torce, razioni, un fischietto da pastore, 12 mo.",
+  "consiglio": "Mettiti davanti ai compagni più fragili e attacca il nemico più grosso. Contro Vermiglia usa l'Azione impetuosa per due attacchi in un turno!"
+ },
+ {
+  "id": "brina",
+  "nome": "Sorella Brina",
+  "razza": "Mezzelfa",
+  "classe": "Chierica (Dominio della Vita)",
+  "background": "Accolita",
+  "livello": 3,
+  "facoltativo": false,
+  "colore": "#d4ac0d",
+  "icona": "✨",
+  "sottotitolo": "La guaritrice del gruppo",
+  "chi": "Sacerdotessa della Dama del Focolare, la dea della casa e del fuoco buono. Viaggio di villaggio in villaggio a benedire i forni e curare i malati. Ho i capelli argentati e le mani sempre calde.",
+  "personalita": "Gentile e paziente, ma testarda come un mulo quando qualcuno soffre. Non sopporto i prepotenti.",
+  "perche": "Sono qui per benedire la nuova fucina di Nonno Gualtiero. Tilde mi ha regalato una castagna e io le ho regalato una preghiera.",
+  "legame": "Ho curato una volta il personaggio alla mia destra. Cosa gli era successo?",
+  "ca": 18,
+  "pf": 24,
+  "vel": "9 m",
+  "iniz": 1,
+  "dadivita": "3d8",
+  "comp": 2,
+  "car": {
+   "FOR": 13,
+   "DES": 12,
+   "COS": 15,
+   "INT": 8,
+   "SAG": 16,
+   "CAR": 12
+  },
+  "ts": [
+   "SAG",
+   "CAR"
+  ],
+  "abilita": {
+   "Intuizione": 5,
+   "Medicina": 5,
+   "Percezione": 5,
+   "Persuasione": 3,
+   "Religione": 1,
+   "Storia": 1
+  },
+  "sensi": "Scurovisione 18 m. Vantaggio contro l'essere affascinata; la magia non ti addormenta.",
+  "attacchi": [
+   {
+    "nome": "Mazza",
+    "bonus": 3,
+    "danni": "1d6+1",
+    "tipo": "contundenti",
+    "note": "mischia"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Discepola della Vita",
+    "testo": "Le tue cure guariscono di più (già incluso nei numeri)."
+   },
+   {
+    "nome": "Incanalare Divinità",
+    "testo": "Una volta per riposo breve. Preservare la vita: dividi 15 PF di cure tra creature entro 9 m (fino a metà dei loro PF massimi). Oppure Scacciare non morti.",
+    "usi": 1
+   }
+  ],
+  "magia": {
+   "cd": 13,
+   "att": 5,
+   "caratteristica": "SAG",
+   "slot": {
+    "1": 4,
+    "2": 2
+   },
+   "incantesimi": [
+    {
+     "nome": "Fiamma sacra",
+     "liv": 0,
+     "testo": "Un bersaglio entro 18 m fa un TS Destrezza CD 13 o subisce 1d8 danni radiosi.",
+     "tiro": "1d8"
+    },
+    {
+     "nome": "Guida",
+     "liv": 0,
+     "testo": "Tocchi un alleato: aggiunge 1d4 a una sua prova (concentrazione).",
+     "tiro": "1d4"
+    },
+    {
+     "nome": "Luce",
+     "liv": 0,
+     "testo": "Un oggetto brilla come una torcia per un'ora."
+    },
+    {
+     "nome": "Cura ferite",
+     "liv": 1,
+     "testo": "Tocco: la creatura recupera 1d8+6 PF (2d8+7 con uno slot di 2°).",
+     "tiro": "1d8+6"
+    },
+    {
+     "nome": "Parola guaritrice",
+     "liv": 1,
+     "testo": "AZIONE BONUS, 18 m: la creatura recupera 1d4+6 PF. Perfetta per rialzare chi è a terra!",
+     "tiro": "1d4+6"
+    },
+    {
+     "nome": "Benedizione",
+     "liv": 1,
+     "testo": "Concentrazione, 1 minuto: fino a 3 alleati aggiungono 1d4 ad attacchi e tiri salvezza."
+    },
+    {
+     "nome": "Dardo tracciante",
+     "liv": 1,
+     "testo": "Attacco con incantesimo +5, 36 m: 4d6 danni radiosi; il prossimo attacco contro il bersaglio ha vantaggio.",
+     "tiro": "4d6",
+     "attacco": true
+    },
+    {
+     "nome": "Scudo della fede",
+     "liv": 1,
+     "testo": "Azione bonus, concentrazione: un alleato ha +2 alla CA per 10 minuti."
+    },
+    {
+     "nome": "Santuario",
+     "liv": 1,
+     "testo": "Azione bonus: chi vuole attaccare l'alleato protetto deve prima superare un TS Saggezza CD 13."
+    },
+    {
+     "nome": "Arma spirituale",
+     "liv": 2,
+     "testo": "Azione bonus: una mazza fluttuante attacca (+5, 1d8+3 di forza). Ogni turno la muovi e attacchi di nuovo con un'azione bonus. Dura 1 minuto.",
+     "tiro": "1d8+3",
+     "attacco": true
+    },
+    {
+     "nome": "Aiuto",
+     "liv": 2,
+     "testo": "3 alleati ottengono +5 PF massimi e attuali per 8 ore. Ottimo prima dello scontro finale!"
+    },
+    {
+     "nome": "Ristorare inferiore",
+     "liv": 2,
+     "testo": "Curi una malattia o una condizione (accecato, assordato, paralizzato, avvelenato)."
+    }
+   ]
+  },
+  "equip": "Cotta di maglia, scudo, mazza, simbolo sacro (una piccola fiamma d'ottone), kit del guaritore (10 usi), libro di preghiere, razioni, 15 mo.",
+  "consiglio": "Resta un passo dietro al guerriero. Parola guaritrice (azione bonus) + Fiamma sacra (azione) nello stesso turno è la tua combinazione migliore. Lancia Aiuto prima di entrare nella sala del drago."
+ },
+ {
+  "id": "nocciola",
+  "nome": "Nocciola Lestapiede",
+  "razza": "Halfling piedelesto",
+  "classe": "Ladra (Furfante)",
+  "background": "Criminale",
+  "livello": 3,
+  "facoltativo": false,
+  "colore": "#7d3c98",
+  "icona": "🗝️",
+  "sottotitolo": "Furba, veloce, simpatica",
+  "chi": "Alta poco più di un metro, riccioli castani, un sorriso da un milione di monete e tasche piene di cose che non sono proprio mie. Commercio in «rarità»: per lo più false.",
+  "personalita": "Allegra, chiacchierona, coraggiosa in modo un po' sconsiderato. Non lascio mai un amico nei guai (anche se poi me ne lamento).",
+  "perche": "Sono venuta alla fiera a vendere «autentiche scaglie di drago» (sono di pesce, dipinte). Stasera qualcuno potrebbe chiedermi di dimostrarlo…",
+  "legame": "Il personaggio alla mia destra mi deve dei soldi. Perché?",
+  "ca": 14,
+  "pf": 21,
+  "vel": "7,5 m",
+  "iniz": 3,
+  "dadivita": "3d8",
+  "comp": 2,
+  "car": {
+   "FOR": 8,
+   "DES": 17,
+   "COS": 13,
+   "INT": 12,
+   "SAG": 10,
+   "CAR": 15
+  },
+  "ts": [
+   "DES",
+   "INT"
+  ],
+  "abilita": {
+   "Furtività": 7,
+   "Acrobazia": 5,
+   "Rapidità di Mano": 5,
+   "Inganno": 4,
+   "Indagare": 3,
+   "Percezione": 2
+  },
+  "extra": "Attrezzi da scasso +7",
+  "attacchi": [
+   {
+    "nome": "Spada corta",
+    "bonus": 5,
+    "danni": "1d6+3",
+    "tipo": "perforanti",
+    "note": "mischia"
+   },
+   {
+    "nome": "Arco corto",
+    "bonus": 5,
+    "danni": "1d6+3",
+    "tipo": "perforanti",
+    "note": "24 m (96 m con svantaggio)"
+   },
+   {
+    "nome": "Pugnale",
+    "bonus": 5,
+    "danni": "1d4+3",
+    "tipo": "perforanti",
+    "note": "lancio 6 m · ne hai 2"
+   },
+   {
+    "nome": "Attacco furtivo",
+    "bonus": null,
+    "danni": "2d6",
+    "tipo": "extra",
+    "note": "una volta per turno, se hai vantaggio o un alleato è accanto al bersaglio"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Attacco furtivo",
+    "testo": "Una volta per turno +2d6 danni se hai vantaggio, oppure se un tuo alleato è accanto al bersaglio. Stai vicino ai compagni!",
+    "tiro": "2d6"
+   },
+   {
+    "nome": "Azione scaltra",
+    "testo": "Come azione bonus puoi Scattare, Disimpegnarti o Nasconderti."
+   },
+   {
+    "nome": "Mani veloci",
+    "testo": "Come azione bonus puoi usare un oggetto, scassinare o borseggiare."
+   },
+   {
+    "nome": "Arrampicata rapida",
+    "testo": "Arrampicarti non ti rallenta."
+   },
+   {
+    "nome": "Fortunata",
+    "testo": "Se fai 1 sul d20 (attacco, prova o tiro salvezza), ritiri."
+   },
+   {
+    "nome": "Coraggiosa",
+    "testo": "Vantaggio ai tiri salvezza contro la paura."
+   },
+   {
+    "nome": "Piccola e agile",
+    "testo": "Passi attraverso lo spazio di creature più grandi e ti nascondi dietro di loro."
+   }
+  ],
+  "equip": "Armatura di cuoio, spada corta, arco corto e 20 frecce, 2 pugnali, attrezzi da scasso, piede di porco, mantello scuro, 10 «scaglie di drago» finte, 18 mo.",
+  "consiglio": "Attacca il nemico che sta già combattendo con un compagno: ottieni l'Attacco furtivo. Sei tu a disinnescare le trappole e ad aprire le serrature. Nella sala del drago… qualcuno dovrà rubare l'uovo!"
+ },
+ {
+  "id": "bartolo",
+  "nome": "Bartolo Scintilla",
+  "razza": "Gnomo delle rocce",
+  "classe": "Mago (Scuola di Invocazione)",
+  "background": "Saggio",
+  "livello": 3,
+  "facoltativo": false,
+  "colore": "#2e86c1",
+  "icona": "🔮",
+  "sottotitolo": "Fragile ma potentissimo",
+  "chi": "Studioso di vulcani, draghi e meccanismi. Ho sessant'anni (giovanissimo, per uno gnomo), occhialini rotondi affumicati e una barba bruciacchiata da esperimenti finiti male.",
+  "personalita": "Curioso fino all'imprudenza. Parlo troppo e troppo in fretta. Adoro spiegare le cose, anche a chi non me le ha chieste.",
+  "perche": "Il Monte Fumo si è risvegliato dopo cent'anni: devo scoprire perché! Ho già riempito tre taccuini di appunti.",
+  "legame": "Il personaggio alla mia destra mi ha fatto una domanda a cui non ho saputo rispondere. Quale?",
+  "ca": 11,
+  "ca_note": "14 con Armatura magica",
+  "pf": 20,
+  "vel": "7,5 m",
+  "iniz": 1,
+  "dadivita": "3d6",
+  "comp": 2,
+  "car": {
+   "FOR": 8,
+   "DES": 13,
+   "COS": 15,
+   "INT": 17,
+   "SAG": 12,
+   "CAR": 10
+  },
+  "ts": [
+   "INT",
+   "SAG"
+  ],
+  "abilita": {
+   "Arcano": 5,
+   "Storia": 5,
+   "Indagare": 5,
+   "Intuizione": 3
+  },
+  "sensi": "Scurovisione 18 m. Vantaggio ai TS su Intelligenza, Saggezza e Carisma contro la magia.",
+  "attacchi": [
+   {
+    "nome": "Pugnale",
+    "bonus": 3,
+    "danni": "1d4+1",
+    "tipo": "perforanti",
+    "note": "se proprio devi…"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Recupero arcano",
+    "testo": "Una volta al giorno, dopo un riposo breve, recuperi 1 slot di 1° livello.",
+    "usi": 1
+   },
+   {
+    "nome": "Scolpire incantesimi",
+    "testo": "Le tue magie ad area non colpiscono gli alleati che scegli."
+   },
+   {
+    "nome": "ATTENZIONE: draghi rossi",
+    "testo": "Vermiglia è IMMUNE AL FUOCO! Contro di lei usa Raggio di gelo, Dardo incantato e Frantumare."
+   }
+  ],
+  "magia": {
+   "cd": 13,
+   "att": 5,
+   "caratteristica": "INT",
+   "slot": {
+    "1": 4,
+    "2": 2
+   },
+   "nota": "Prepari 6 incantesimi al giorno dal tuo libro.",
+   "incantesimi": [
+    {
+     "nome": "Dardo di fuoco",
+     "liv": 0,
+     "testo": "Attacco +5, 36 m: 1d10 danni da fuoco.",
+     "tiro": "1d10",
+     "attacco": true
+    },
+    {
+     "nome": "Raggio di gelo",
+     "liv": 0,
+     "testo": "Attacco +5, 18 m: 1d8 danni da freddo e il bersaglio rallenta di 3 m.",
+     "tiro": "1d8",
+     "attacco": true
+    },
+    {
+     "nome": "Mano magica",
+     "liv": 0,
+     "testo": "Una mano fantasma sposta oggetti leggeri fino a 9 m."
+    },
+    {
+     "nome": "Armatura magica",
+     "liv": 1,
+     "testo": "Dura 8 ore: la tua CA diventa 14. Lanciala prima di partire!"
+    },
+    {
+     "nome": "Dardo incantato",
+     "liv": 1,
+     "testo": "3 dardi che colpiscono SEMPRE, 1d4+1 danni da forza ciascuno.",
+     "tiro": "3d4+3"
+    },
+    {
+     "nome": "Scudo",
+     "liv": 1,
+     "testo": "Reazione: +5 alla CA fino al tuo prossimo turno."
+    },
+    {
+     "nome": "Sonno",
+     "liv": 1,
+     "testo": "27 m: tira 5d8, le creature più deboli si addormentano fino a quel totale di PF. Perfetto contro i coboldi!",
+     "tiro": "5d8"
+    },
+    {
+     "nome": "Onda tonante",
+     "liv": 1,
+     "testo": "Cubo di 4,5 m: TS Costituzione CD 13, 2d8 danni da tuono e spinta di 3 m (metà se riesce).",
+     "tiro": "2d8"
+    },
+    {
+     "nome": "Mani brucianti",
+     "liv": 1,
+     "testo": "Cono 4,5 m: TS Destrezza CD 13, 3d6 danni da fuoco.",
+     "tiro": "3d6"
+    },
+    {
+     "nome": "Raggio rovente",
+     "liv": 2,
+     "testo": "3 raggi, ognuno attacco +5 e 2d6 danni da fuoco (inutile contro Vermiglia!).",
+     "tiro": "2d6",
+     "attacco": true
+    },
+    {
+     "nome": "Frantumare",
+     "liv": 2,
+     "testo": "Sfera di 3 m a 18 m: TS Costituzione CD 13, 3d8 danni da tuono (metà se riesce).",
+     "tiro": "3d8"
+    }
+   ]
+  },
+  "equip": "Libro degli incantesimi, bastone (focus arcano), pugnale, borsa da inventore, taccuini, una bottiglietta di zolfo del Monte Fumo, 10 mo.",
+  "consiglio": "Resta lontano dai nemici: hai pochi PF. Sonno all'inizio di uno scontro con tanti coboldi; Scudo per salvarti la pelle; contro il drago niente fuoco!"
+ },
+ {
+  "id": "ilaria",
+  "nome": "Ilaria Ventofoglia",
+  "razza": "Elfa dei boschi",
+  "classe": "Ranger (Cacciatrice)",
+  "background": "Forestiera",
+  "livello": 3,
+  "facoltativo": false,
+  "colore": "#1e8449",
+  "icona": "🏹",
+  "sottotitolo": "Arciera e cacciatrice di draghi",
+  "chi": "Elfa dei boschi, cacciatrice solitaria. Parlo poco e osservo molto. Ho una cicatrice di bruciatura sul braccio sinistro e un arco di tasso più vecchio di questo villaggio.",
+  "personalita": "Silenziosa, pratica, ironica. Mi fido più degli animali che delle persone.",
+  "perche": "Da settimane seguo le tracce di un'ombra alata e rossa venuta da nord. Un drago come lei, molti anni fa, bruciò il mio bosco. Stavolta sarò pronta.",
+  "legame": "Ho guidato il personaggio alla mia destra attraverso le montagne, una volta. Cosa è andato storto?",
+  "ca": 14,
+  "pf": 25,
+  "vel": "10,5 m",
+  "iniz": 3,
+  "dadivita": "3d10",
+  "comp": 2,
+  "car": {
+   "FOR": 12,
+   "DES": 17,
+   "COS": 13,
+   "INT": 10,
+   "SAG": 15,
+   "CAR": 8
+  },
+  "ts": [
+   "FOR",
+   "DES"
+  ],
+  "abilita": {
+   "Percezione": 4,
+   "Furtività": 5,
+   "Sopravvivenza": 4,
+   "Intuizione": 4,
+   "Atletica": 3,
+   "Natura": 2
+  },
+  "sensi": "Scurovisione 18 m. Ti nascondi anche solo dietro fumo o fogliame. Vantaggio contro l'essere affascinata.",
+  "attacchi": [
+   {
+    "nome": "Arco lungo",
+    "bonus": 7,
+    "danni": "1d8+3",
+    "tipo": "perforanti",
+    "note": "45 m (180 m con svantaggio) · stile Tiro incluso"
+   },
+   {
+    "nome": "Spada corta",
+    "bonus": 5,
+    "danni": "1d6+3",
+    "tipo": "perforanti",
+    "note": "mischia"
+   },
+   {
+    "nome": "Seconda spada corta",
+    "bonus": 5,
+    "danni": "1d6",
+    "tipo": "perforanti",
+    "note": "azione bonus, dopo aver attaccato con la prima"
+   },
+   {
+    "nome": "Uccisore di colossi",
+    "bonus": null,
+    "danni": "1d8",
+    "tipo": "extra",
+    "note": "una volta per turno, se il bersaglio è già ferito"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Nemico prescelto: draghi",
+    "testo": "Vantaggio alle prove per seguirne le tracce e per ricordare cosa sai di loro (chiedi al Master!)."
+   },
+   {
+    "nome": "Esploratrice nata: montagna",
+    "testo": "In montagna il gruppo non si perde e non viene rallentato; tu non vieni sorpresa."
+   },
+   {
+    "nome": "Uccisore di colossi",
+    "testo": "Una volta per turno +1d8 danni a un bersaglio che ha già perso PF.",
+    "tiro": "1d8"
+   },
+   {
+    "nome": "Consapevolezza primordiale",
+    "testo": "Spendendo uno slot senti se ci sono draghi, non morti o altre creature speciali entro 1,5 km."
+   }
+  ],
+  "magia": {
+   "cd": 12,
+   "att": 4,
+   "caratteristica": "SAG",
+   "slot": {
+    "1": 3
+   },
+   "incantesimi": [
+    {
+     "nome": "Marchio del cacciatore",
+     "liv": 1,
+     "testo": "Azione bonus, concentrazione: il bersaglio marcato subisce +1d6 danni da ogni tuo attacco. Se muore, sposti il marchio con un'azione bonus.",
+     "tiro": "1d6"
+    },
+    {
+     "nome": "Cura ferite",
+     "liv": 1,
+     "testo": "Tocco: la creatura recupera 1d8+2 PF.",
+     "tiro": "1d8+2"
+    },
+    {
+     "nome": "Bacche benefiche",
+     "liv": 1,
+     "testo": "Crei 10 bacche: ognuna cura 1 PF e nutre per un giorno."
+    }
+   ]
+  },
+  "equip": "Armatura di cuoio, arco lungo e 30 frecce, 2 spade corte, mantello grigio, corda (15 m), kit da campeggio, una scaglia rossa trovata sulle tracce del drago, 10 mo.",
+  "consiglio": "Resta indietro e tira con l'arco. Contro Vermiglia: Marchio del cacciatore + Uccisore di colossi = tantissimi danni a ogni freccia!"
+ }
+]

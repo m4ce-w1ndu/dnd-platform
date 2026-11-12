@@ -1,0 +1,230 @@
+[
+ {
+  "id": "shalefire",
+  "nome": "Shalefire Stoutheart",
+  "razza": "Nano",
+  "classe": "Guerriero",
+  "background": "Pattuglia di Pinebrook",
+  "livello": 1,
+  "colore": "#b03a2e",
+  "icona": "🪓",
+  "sottotitolo": "Robusto e coraggioso",
+  "semplificata": true,
+  "chi": "Nano guerriero di Pinebrook, con cotta di maglia e scudo. Bravo con gli animali e a sopravvivere nella natura.",
+  "personalita": "Scegli tu: scontroso o entusiasta, trasandato o ben vestito, orgoglioso o umile.",
+  "perche": "Oggi tocca a te pattugliare la foresta con la Capitana Kole.",
+  "legame": "Chi del gruppo conosci da più tempo?",
+  "ca": 16,
+  "ca_note": "cotta di maglia e scudo",
+  "pf": 13,
+  "vel": "7,5 m",
+  "iniz": 0,
+  "dadivita": "—",
+  "comp": 2,
+  "abilita": {
+   "Addestrare Animali": 5,
+   "Atletica": 6,
+   "Percezione": 3,
+   "Sopravvivenza": 3
+  },
+  "attacchi": [
+   {
+    "nome": "Ascia",
+    "bonus": 6,
+    "danni": "1d6+4",
+    "tipo": "",
+    "note": "corpo a corpo"
+   },
+   {
+    "nome": "Arco corto",
+    "bonus": 3,
+    "danni": "1d6",
+    "tipo": "",
+    "note": "a distanza · 20 frecce"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Recuperare le forze",
+    "testo": "Una volta durante l'avventura recuperi 6 punti ferita (nel tuo turno in combattimento o alla fine di un combattimento). Non puoi superare i PF massimi.",
+    "usi": 1
+   }
+  ],
+  "equip": "Piede di porco, razioni (1 giorno), corda (15 m).",
+  "consiglio": "Mettiti davanti e proteggi il cucciolo: hai la CA più alta del gruppo."
+ },
+ {
+  "id": "noorah",
+  "nome": "Noorah Eldenfield",
+  "razza": "Halfling",
+  "classe": "Ladra",
+  "background": "Pattuglia di Pinebrook",
+  "livello": 1,
+  "colore": "#7d3c98",
+  "icona": "🗡️",
+  "sottotitolo": "Agile e furtiva",
+  "semplificata": true,
+  "chi": "Halfling ladra, piccola e velocissima, con armatura di cuoio e un kit da arrampicata.",
+  "personalita": "Scegli tu: eccitata o calma, scalza o con stivali eleganti, timida o coraggiosa.",
+  "perche": "Oggi tocca a te pattugliare la foresta con la Capitana Kole.",
+  "legame": "Cosa porti sempre con te per portafortuna?",
+  "ca": 14,
+  "ca_note": "armatura di cuoio",
+  "pf": 11,
+  "vel": "7,5 m",
+  "iniz": 0,
+  "dadivita": "—",
+  "comp": 2,
+  "abilita": {
+   "Acrobazia": 5,
+   "Indagare": 3,
+   "Percezione": 3,
+   "Furtività": 5
+  },
+  "attacchi": [
+   {
+    "nome": "Spada corta",
+    "bonus": 5,
+    "danni": "1d6+3",
+    "tipo": "",
+    "note": "corpo a corpo"
+   },
+   {
+    "nome": "Arco corto",
+    "bonus": 5,
+    "danni": "1d6+3",
+    "tipo": "",
+    "note": "a distanza · 20 frecce"
+   },
+   {
+    "nome": "Colpo d'apertura",
+    "bonus": 5,
+    "danni": "2d6+3",
+    "tipo": "",
+    "note": "usalo se colpisci nel PRIMO round di un combattimento"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Colpo d'apertura",
+    "testo": "Se colpisci con un attacco nel primo round di un combattimento, tiri 2d6 per i danni invece di 1d6 (più il tuo modificatore)."
+   },
+   {
+    "nome": "Kit da arrampicata",
+    "testo": "Ti dà vantaggio quando devi scalare (ad esempio la parete ghiacciata)."
+   }
+  ],
+  "equip": "Kit da arrampicata, razioni (1 giorno), attrezzi da ladro.",
+  "consiglio": "Attacca per prima: nel primo round fai danni doppi. Sei tu la più brava a scalare."
+ },
+ {
+  "id": "gallantine",
+  "nome": "Gallantine Birchenbough",
+  "razza": "Elfo",
+  "classe": "Mago",
+  "background": "Pattuglia di Pinebrook",
+  "livello": 1,
+  "colore": "#2e86c1",
+  "icona": "🔮",
+  "sottotitolo": "Sapiente e magico",
+  "semplificata": true,
+  "chi": "Elfo mago, senza armatura, che conosce la magia, la storia e la natura.",
+  "personalita": "Scegli tu: molto giovane o molto anziano, distratto o concentrato, voce pacata o forte.",
+  "perche": "Oggi tocca a te pattugliare la foresta con la Capitana Kole.",
+  "legame": "Quale libro stai leggendo in questi giorni?",
+  "ca": 12,
+  "ca_note": "senza armatura",
+  "pf": 9,
+  "vel": "9 m",
+  "iniz": 0,
+  "dadivita": "—",
+  "comp": 2,
+  "abilita": {
+   "Arcano": 5,
+   "Storia": 5,
+   "Natura": 5,
+   "Percezione": 3
+  },
+  "attacchi": [
+   {
+    "nome": "Dardo di fuoco",
+    "bonus": 5,
+    "danni": "7",
+    "tipo": "fuoco",
+    "note": "a distanza · 7 danni fissi"
+   },
+   {
+    "nome": "Bastone",
+    "bonus": 3,
+    "danni": "1d6",
+    "tipo": "",
+    "note": "corpo a corpo"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Missile magico",
+    "testo": "Due volte durante l'avventura, al posto di un attacco: tre missili colpiscono SEMPRE, 3 danni ciascuno (9 in totale). Puoi dividerli tra più creature.",
+    "usi": 2,
+    "tiro": "9"
+   }
+  ],
+  "equip": "Libro in bianco, inchiostro e penna, specchio, razioni (1 giorno).",
+  "consiglio": "Resta indietro e usa il Dardo di fuoco. Tieni il Missile magico per quando serve davvero."
+ },
+ {
+  "id": "evandon",
+  "nome": "Evandon Haart",
+  "razza": "Umano",
+  "classe": "Chierico",
+  "background": "Pattuglia di Pinebrook",
+  "livello": 1,
+  "colore": "#d4ac0d",
+  "icona": "✨",
+  "sottotitolo": "Il guaritore del gruppo",
+  "semplificata": true,
+  "chi": "Umano chierico con cotta di maglia e simbolo sacro. Capisce le persone e conosce gli dèi.",
+  "personalita": "Scegli tu: aggraziato o goffo, sciocco o serio, pacifico o bellicoso.",
+  "perche": "Oggi tocca a te pattugliare la foresta con la Capitana Kole.",
+  "legame": "Chi del gruppo hai già curato una volta?",
+  "ca": 14,
+  "ca_note": "cotta di maglia",
+  "pf": 11,
+  "vel": "9 m",
+  "iniz": 0,
+  "dadivita": "—",
+  "comp": 2,
+  "abilita": {
+   "Atletica": 3,
+   "Intuizione": 5,
+   "Percezione": 5,
+   "Religione": 5
+  },
+  "attacchi": [
+   {
+    "nome": "Mazza",
+    "bonus": 5,
+    "danni": "1d6+3",
+    "tipo": "",
+    "note": "corpo a corpo"
+   },
+   {
+    "nome": "Arco corto",
+    "bonus": 2,
+    "danni": "1d6",
+    "tipo": "",
+    "note": "a distanza · 20 frecce"
+   }
+  ],
+  "capacita": [
+   {
+    "nome": "Cura ferite",
+    "testo": "Due volte durante l'avventura, al posto di un attacco o alla fine di un combattimento: tu o un'altra creatura recuperate 7 punti ferita (senza superare il massimo).",
+    "usi": 2,
+    "tiro": "7"
+   }
+  ],
+  "equip": "Simbolo sacro, razioni (1 giorno), corda (15 m).",
+  "consiglio": "Sei l'unico che può curare gli altri: tieni d'occhio i punti ferita di tutti."
+ }
+]

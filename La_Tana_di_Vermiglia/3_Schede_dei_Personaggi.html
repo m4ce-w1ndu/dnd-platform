@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Tana di Vermiglia · Schede</title><meta name="description" content="Cinque personaggi di 3° livello pronti da giocare."><style>
+:root{--ink:#2a2018;--paper:#f6efdc;--card:#fffaf0;--accent:#7a2e1c;--accent2:#355e5f;--muted:#6b5c48;--box:#efe2c2;--read:#e6eef0;--rule:#c9b48a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ink:#ece3cf;--paper:#1d1a16;--card:#26221c;--accent:#e29a7d;--accent2:#8cc3c3;--muted:#b3a58c;--box:#332c22;--read:#22302f;--rule:#5c5140}}
+:root[data-theme="dark"]{--ink:#ece3cf;--paper:#1d1a16;--card:#26221c;--accent:#e29a7d;--accent2:#8cc3c3;--muted:#b3a58c;--box:#332c22;--read:#22302f;--rule:#5c5140}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0 auto;max-width:900px;padding:24px 16px 80px;background:var(--paper);color:var(--ink);font:17px/1.6 'Noto Serif','DejaVu Serif',Georgia,serif}
+h1,h2,h3,h4{font-family:'Noto Serif','DejaVu Serif',Georgia,serif;color:var(--accent);line-height:1.25}
+h1{font-size:2.3em;text-align:center;margin:.2em 0}
+h2{font-size:1.65em;border-bottom:3px double var(--rule);padding-bottom:.2em;margin-top:2.2em}
+h3{font-size:1.25em;margin-top:1.6em}
+h4{font-size:1.05em;margin:1.2em 0 .3em;color:var(--accent2)}
+a{color:var(--accent2)}
+.copertina{text-align:center;padding:40px 0 20px;border-bottom:3px double var(--rule)}
+.copertina .sotto{font-style:italic;color:var(--muted);font-size:1.15em}
+.copertina .info{display:inline-block;margin-top:1em;padding:.6em 1.2em;border:1px solid var(--rule);border-radius:8px;background:var(--card)}
+.indice{columns:2;column-gap:2em;background:var(--card);border:1px solid var(--rule);padding:1em 1.5em;border-radius:8px}
+.indice a{text-decoration:none}
+.leggi{background:var(--read);border-left:6px solid var(--accent2);padding:.8em 1.1em;margin:1em 0;font-style:italic;border-radius:0 6px 6px 0}
+.leggi::before{content:"📜 Leggi ad alta voce";display:block;font-style:normal;font-weight:bold;font-size:.8em;letter-spacing:.05em;color:var(--accent2);margin-bottom:.3em}
+.nota{background:var(--box);border:1px solid var(--rule);padding:.8em 1.1em;margin:1em 0;border-radius:6px}
+.nota>b:first-child,.consiglio>b:first-child{color:var(--accent)}
+.consiglio{background:var(--card);border:2px dashed var(--accent2);padding:.8em 1.1em;margin:1em 0;border-radius:6px}
+.consiglio::before{content:"💡 Consiglio per chi fa il Master per la prima volta";display:block;font-weight:bold;font-size:.85em;color:var(--accent2);margin-bottom:.3em}
+.sei{background:var(--card);border-left:6px solid #a8822c;padding:.5em 1em;margin:.8em 0;border-radius:0 6px 6px 0}
+.sei::before{content:"👥 Con 6 giocatori: ";font-weight:bold;color:#a8822c}
+.scontro{border:2px solid var(--accent);border-radius:8px;padding:.6em 1em;margin:1em 0;background:var(--card)}
+.scontro .tit{font-weight:bold;color:var(--accent)}
+.scontro .diff{float:right;font-size:.85em;padding:.1em .6em;border-radius:20px;background:var(--box)}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.93em;background:var(--card)}
+th,td{border:1px solid var(--rule);padding:.35em .55em;vertical-align:top;text-align:left}
+th{background:var(--box)}
+.stat{background:var(--card);border-top:5px solid var(--accent);border-bottom:5px solid var(--accent);padding:.7em 1em;margin:1.2em 0;font-size:.93em;break-inside:avoid;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.stat h4{margin:0;font-size:1.3em;color:var(--accent)}
+.stat .tipo{font-style:italic;color:var(--muted);margin-bottom:.4em}
+.stat .car{display:grid;grid-template-columns:repeat(6,1fr);text-align:center;border-top:1px solid var(--accent);border-bottom:1px solid var(--accent);margin:.5em 0;padding:.3em 0}
+.stat .car b{display:block;color:var(--accent)}
+.stat p{margin:.3em 0}
+.mappa{margin:1.2em 0;text-align:center;break-inside:avoid}
+.mappa img{max-width:100%;border:1px solid var(--rule);background:#efe3c4}
+.mappa figcaption{font-style:italic;color:var(--muted);font-size:.9em}
+.chiave dt{font-weight:bold;color:var(--accent);margin-top:.8em}
+.chiave dd{margin:0 0 0 1.2em}
+.handout{background:#f3e6c3;color:#3b2a18;border:1px solid #b59a64;padding:1.4em 1.8em;margin:1.2em 0;font-family:'Noto Serif','DejaVu Serif',Georgia,serif;font-style:italic;box-shadow:2px 3px 8px rgba(0,0,0,.25);transform:rotate(-.4deg);break-inside:avoid}
+.clessidra{display:flex;gap:6px;margin:.6em 0}
+.clessidra span{width:44px;height:44px;border:2px solid var(--ink);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.scheda{background:var(--card);border:2px solid var(--accent);border-radius:10px;padding:1em 1.3em;margin:1.5em 0;break-inside:avoid-page}
+.scheda .intest{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5em;border-bottom:2px solid var(--accent);padding-bottom:.4em;margin-bottom:.6em}
+.scheda .nome{font-size:1.6em;font-weight:bold;color:var(--accent)}
+.scheda .cl{font-style:italic;color:var(--muted)}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin:.6em 0}
+.big div{border:2px solid var(--ink);border-radius:8px;text-align:center;padding:.3em}
+.big b{display:block;font-size:1.5em}
+.big small{display:block;font-size:.75em;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.2em}
+.chip{display:inline-block;background:var(--box);border-radius:20px;padding:0 .6em;margin:.1em;font-size:.88em}
+@media (max-width:640px){.indice{columns:1}.cols{grid-template-columns:1fr}.stat .car{grid-template-columns:repeat(3,1fr)}body{font-size:16px}}
+@media print{
+ :root{--ink:#2a2018;--paper:#fff;--card:#fff;--accent:#7a2e1c;--accent2:#355e5f;--muted:#5a4c3a;--box:#f1e7cf;--read:#e9f0f1;--rule:#bfa77a}
+ body{max-width:none;padding:0;font-size:11pt}
+ h2{break-before:page}
+ h2.nobreak{break-before:auto}
+ .scheda{break-before:page;border:none;padding:0}
+ .scheda.prima{break-before:auto}
+ .mappa{break-before:page}
+ .mappa img{max-height:24cm}
+ a{color:inherit;text-decoration:none}
+ .nostampa{display:none}
+}
+@page{size:A4;margin:1.6cm}
+</style></head>
+<body>
+<div class="copertina"><h1>La Tana di Vermiglia</h1><div class="sotto">Schede dei Personaggi · 3° livello</div>
+<div class="info">Cinque eroi pronti da giocare.<br>Cambia pure nome, aspetto e genere del tuo personaggio.</div></div>
+<div class="nota"><b>Come leggere la scheda.</b> I numeri con il «+» si aggiungono al d20. <b>CA</b> = quanto è difficile colpirti. <b>PF</b> = Punti Ferita. Tieni il conto di PF e slot a matita!</div>
+<div class="scheda prima">
+<div class="intest"><div><div class="nome">🛡️ Rocco Martelli</div><div class="cl">Umano · Guerriero (Campione) · Soldato</div></div><div><b>Livello 3</b><br><small>Il più facile da giocare</small></div></div>
+<p><b>Chi sono.</b> Ex soldato della guardia di confine, ora proteggo le greggi di Pietracalda. Spalle larghe, barba ispida, un sorriso che si vede raramente ma vale oro.</p>
+<p><b>Personalità.</b> Leale fino all&#x27;osso. Proteggo sempre chi è più debole. Russo come un orso.</p>
+<p><b>Perché sono alla locanda.</b> Il villaggio mi paga per scoprire chi ruba le pecore. Stasera ho trovato impronte piccole e artigliate vicino al torrente…</p>
+<p><b>Legame</b> (presentazioni): <i>«Il personaggio alla mia destra mi ha salvato la vita una volta. Come?»</i></p>
+<div class="big"><div><small>CA</small><b>19</b></div><div><small>Punti Ferita</small><b>28</b></div><div><small>Velocità</small><b>9 m</b></div><div><small>Iniziativa</small><b>+2</b></div><div><small>Dadi Vita</small><b>3d10</b></div></div>
+<table><tr><th>FOR</th><th>DES</th><th>COS</th><th>INT</th><th>SAG</th><th>CAR</th></tr><tr><td>16 (<b>+3</b>)</td><td>14 (<b>+2</b>)</td><td>15 (<b>+2</b>)</td><td>9 (<b>−1</b>)</td><td>13 (<b>+1</b>)</td><td>11 (<b>+0</b>)</td></tr>
+<tr><td colspan="6"><b>Tiri salvezza:</b> Forza +5, Destrezza +2, Costituzione +4, Intelligenza −1, Saggezza +1, Carisma +0</td></tr></table>
+<p><b>Abilità</b> (in grassetto quelle in cui sei addestrato): <span class="chip">Acrobazia +2</span><span class="chip">Addestrare Animali +1</span><span class="chip">Arcano −1</span><span class="chip"><b>Atletica +5</b></span><span class="chip">Furtività +2</span><span class="chip">Indagare −1</span><span class="chip">Inganno +0</span><span class="chip"><b>Intimidire +2</b></span><span class="chip">Intrattenere +0</span><span class="chip"><b>Intuizione +3</b></span><span class="chip">Medicina +1</span><span class="chip">Natura −1</span><span class="chip"><b>Percezione +3</b></span><span class="chip">Persuasione +0</span><span class="chip">Rapidità di Mano +2</span><span class="chip">Religione −1</span><span class="chip">Storia −1</span><span class="chip">Sopravvivenza +1</span> · Percezione passiva 13.</p>
+
+<table><tr><th>Attacco</th><th>Per colpire</th><th>Danni</th><th>Note</th></tr><tr><td>Spada lunga</td><td>+5</td><td>1d8+3 taglienti</td><td>mischia · critico con 19-20</td></tr><tr><td>Giavellotto</td><td>+5</td><td>1d6+3 perforanti</td><td>lancio 9 m (36 m con svantaggio) · ne hai 4</td></tr></table>
+<h4>Cosa so fare</h4><ul><li><b>Difesa.</b> +1 alla CA con l&#x27;armatura (già incluso).</li><li><b>Recuperare energie.</b> Azione bonus: recuperi 1d10+3 PF. Una volta per riposo breve.</li><li><b>Azione impetuosa.</b> Una volta per riposo breve: nel tuo turno fai un&#x27;azione in più (es. due attacchi).</li><li><b>Critico migliorato.</b> Fai un colpo critico con 19 o 20 sul d20.</li><li><b>Cotta di maglia.</b> Svantaggio alle prove di Furtività.</li></ul>
+
+<p><b>Equipaggiamento:</b> Cotta di maglia, scudo, spada lunga, 4 giavellotti, corda (15 m), 5 torce, razioni, un fischietto da pastore, 12 mo.</p>
+<p><b>Come giocarlo:</b> Mettiti davanti ai compagni più fragili e attacca il nemico più grosso. Contro Vermiglia usa l&#x27;Azione impetuosa per due attacchi in un turno!</p>
+<p><b>PF attuali:</b> ______ &nbsp; <b>Note:</b> ____________________________________________</p>
+</div>
+<div class="scheda">
+<div class="intest"><div><div class="nome">✨ Sorella Brina</div><div class="cl">Mezzelfa · Chierica (Dominio della Vita) · Accolita</div></div><div><b>Livello 3</b><br><small>La guaritrice del gruppo</small></div></div>
+<p><b>Chi sono.</b> Sacerdotessa della Dama del Focolare, la dea della casa e del fuoco buono. Viaggio di villaggio in villaggio a benedire i forni e curare i malati. Ho i capelli argentati e le mani sempre calde.</p>
+<p><b>Personalità.</b> Gentile e paziente, ma testarda come un mulo quando qualcuno soffre. Non sopporto i prepotenti.</p>
+<p><b>Perché sono alla locanda.</b> Sono qui per benedire la nuova fucina di Nonno Gualtiero. Tilde mi ha regalato una castagna e io le ho regalato una preghiera.</p>
+<p><b>Legame</b> (presentazioni): <i>«Ho curato una volta il personaggio alla mia destra. Cosa gli era successo?»</i></p>
+<div class="big"><div><small>CA</small><b>18</b></div><div><small>Punti Ferita</small><b>24</b></div><div><small>Velocità</small><b>9 m</b></div><div><small>Iniziativa</small><b>+1</b></div><div><small>Dadi Vita</small><b>3d8</b></div></div>
+<table><tr><th>FOR</th><th>DES</th><th>COS</th><th>INT</th><th>SAG</th><th>CAR</th></tr><tr><td>13 (<b>+1</b>)</td><td>12 (<b>+1</b>)</td><td>15 (<b>+2</b>)</td><td>8 (<b>−1</b>)</td><td>16 (<b>+3</b>)</td><td>12 (<b>+1</b>)</td></tr>
+<tr><td colspan="6"><b>Tiri salvezza:</b> Forza +1, Destrezza +1, Costituzione +2, Intelligenza −1, Saggezza +5, Carisma +3</td></tr></table>
+<p><b>Abilità</b> (in grassetto quelle in cui sei addestrato): <span class="chip">Acrobazia +1</span><span class="chip">Addestrare Animali +3</span><span class="chip">Arcano −1</span><span class="chip">Atletica +1</span><span class="chip">Furtività +1</span><span class="chip">Indagare −1</span><span class="chip">Inganno +1</span><span class="chip">Intimidire +1</span><span class="chip">Intrattenere +1</span><span class="chip"><b>Intuizione +5</b></span><span class="chip"><b>Medicina +5</b></span><span class="chip">Natura −1</span><span class="chip"><b>Percezione +5</b></span><span class="chip"><b>Persuasione +3</b></span><span class="chip">Rapidità di Mano +1</span><span class="chip"><b>Religione +1</b></span><span class="chip"><b>Storia +1</b></span><span class="chip">Sopravvivenza +3</span> · Percezione passiva 15.</p>
+<p><b>Sensi e tratti:</b> Scurovisione 18 m. Vantaggio contro l&#x27;essere affascinata; la magia non ti addormenta.</p>
+<table><tr><th>Attacco</th><th>Per colpire</th><th>Danni</th><th>Note</th></tr><tr><td>Mazza</td><td>+3</td><td>1d6+1 contundenti</td><td>mischia</td></tr></table>
+<h4>Cosa so fare</h4><ul><li><b>Discepola della Vita.</b> Le tue cure guariscono di più (già incluso nei numeri).</li><li><b>Incanalare Divinità.</b> Una volta per riposo breve. Preservare la vita: dividi 15 PF di cure tra creature entro 9 m (fino a metà dei loro PF massimi). Oppure Scacciare non morti.</li></ul>
+<h4>Magia · CD 13 · attacco con incantesimi +5</h4>
+<p><b>Slot:</b> 1° livello: ☐ ☐ ☐ ☐ · 2° livello: ☐ ☐ <small>(si recuperano con il riposo lungo)</small></p><ul><li><b>Fiamma sacra</b> <small>(trucchetto)</small>: Un bersaglio entro 18 m fa un TS Destrezza CD 13 o subisce 1d8 danni radiosi.</li><li><b>Guida</b> <small>(trucchetto)</small>: Tocchi un alleato: aggiunge 1d4 a una sua prova (concentrazione).</li><li><b>Luce</b> <small>(trucchetto)</small>: Un oggetto brilla come una torcia per un&#x27;ora.</li><li><b>Cura ferite</b> <small>(1° liv.)</small>: Tocco: la creatura recupera 1d8+6 PF (2d8+7 con uno slot di 2°).</li><li><b>Parola guaritrice</b> <small>(1° liv.)</small>: AZIONE BONUS, 18 m: la creatura recupera 1d4+6 PF. Perfetta per rialzare chi è a terra!</li><li><b>Benedizione</b> <small>(1° liv.)</small>: Concentrazione, 1 minuto: fino a 3 alleati aggiungono 1d4 ad attacchi e tiri salvezza.</li><li><b>Dardo tracciante</b> <small>(1° liv.)</small>: Attacco con incantesimo +5, 36 m: 4d6 danni radiosi; il prossimo attacco contro il bersaglio ha vantaggio.</li><li><b>Scudo della fede</b> <small>(1° liv.)</small>: Azione bonus, concentrazione: un alleato ha +2 alla CA per 10 minuti.</li><li><b>Santuario</b> <small>(1° liv.)</small>: Azione bonus: chi vuole attaccare l&#x27;alleato protetto deve prima superare un TS Saggezza CD 13.</li><li><b>Arma spirituale</b> <small>(2° liv.)</small>: Azione bonus: una mazza fluttuante attacca (+5, 1d8+3 di forza). Ogni turno la muovi e attacchi di nuovo con un&#x27;azione bonus. Dura 1 minuto.</li><li><b>Aiuto</b> <small>(2° liv.)</small>: 3 alleati ottengono +5 PF massimi e attuali per 8 ore. Ottimo prima dello scontro finale!</li><li><b>Ristorare inferiore</b> <small>(2° liv.)</small>: Curi una malattia o una condizione (accecato, assordato, paralizzato, avvelenato).</li></ul>
+<p><b>Equipaggiamento:</b> Cotta di maglia, scudo, mazza, simbolo sacro (una piccola fiamma d&#x27;ottone), kit del guaritore (10 usi), libro di preghiere, razioni, 15 mo.</p>
+<p><b>Come giocarlo:</b> Resta un passo dietro al guerriero. Parola guaritrice (azione bonus) + Fiamma sacra (azione) nello stesso turno è la tua combinazione migliore. Lancia Aiuto prima di entrare nella sala del drago.</p>
+<p><b>PF attuali:</b> ______ &nbsp; <b>Note:</b> ____________________________________________</p>
+</div>
+<div class="scheda">
+<div class="intest"><div><div class="nome">🗝️ Nocciola Lestapiede</div><div class="cl">Halfling piedelesto · Ladra (Furfante) · Criminale</div></div><div><b>Livello 3</b><br><small>Furba, veloce, simpatica</small></div></div>
+<p><b>Chi sono.</b> Alta poco più di un metro, riccioli castani, un sorriso da un milione di monete e tasche piene di cose che non sono proprio mie. Commercio in «rarità»: per lo più false.</p>
+<p><b>Personalità.</b> Allegra, chiacchierona, coraggiosa in modo un po&#x27; sconsiderato. Non lascio mai un amico nei guai (anche se poi me ne lamento).</p>
+<p><b>Perché sono alla locanda.</b> Sono venuta alla fiera a vendere «autentiche scaglie di drago» (sono di pesce, dipinte). Stasera qualcuno potrebbe chiedermi di dimostrarlo…</p>
+<p><b>Legame</b> (presentazioni): <i>«Il personaggio alla mia destra mi deve dei soldi. Perché?»</i></p>
+<div class="big"><div><small>CA</small><b>14</b></div><div><small>Punti Ferita</small><b>21</b></div><div><small>Velocità</small><b>7,5 m</b></div><div><small>Iniziativa</small><b>+3</b></div><div><small>Dadi Vita</small><b>3d8</b></div></div>
+<table><tr><th>FOR</th><th>DES</th><th>COS</th><th>INT</th><th>SAG</th><th>CAR</th></tr><tr><td>8 (<b>−1</b>)</td><td>17 (<b>+3</b>)</td><td>13 (<b>+1</b>)</td><td>12 (<b>+1</b>)</td><td>10 (<b>+0</b>)</td><td>15 (<b>+2</b>)</td></tr>
+<tr><td colspan="6"><b>Tiri salvezza:</b> Forza −1, Destrezza +5, Costituzione +1, Intelligenza +3, Saggezza +0, Carisma +2</td></tr></table>
+<p><b>Abilità</b> (in grassetto quelle in cui sei addestrato): <span class="chip"><b>Acrobazia +5</b></span><span class="chip">Addestrare Animali +0</span><span class="chip">Arcano +1</span><span class="chip">Atletica −1</span><span class="chip"><b>Furtività +7</b></span><span class="chip"><b>Indagare +3</b></span><span class="chip"><b>Inganno +4</b></span><span class="chip">Intimidire +2</span><span class="chip">Intrattenere +2</span><span class="chip">Intuizione +0</span><span class="chip">Medicina +0</span><span class="chip">Natura +1</span><span class="chip"><b>Percezione +2</b></span><span class="chip">Persuasione +2</span><span class="chip"><b>Rapidità di Mano +5</b></span><span class="chip">Religione +1</span><span class="chip">Storia +1</span><span class="chip">Sopravvivenza +0</span> <span class="chip"><b>Attrezzi da scasso +7</b></span> · Percezione passiva 12.</p>
+
+<table><tr><th>Attacco</th><th>Per colpire</th><th>Danni</th><th>Note</th></tr><tr><td>Spada corta</td><td>+5</td><td>1d6+3 perforanti</td><td>mischia</td></tr><tr><td>Arco corto</td><td>+5</td><td>1d6+3 perforanti</td><td>24 m (96 m con svantaggio)</td></tr><tr><td>Pugnale</td><td>+5</td><td>1d4+3 perforanti</td><td>lancio 6 m · ne hai 2</td></tr><tr><td>Attacco furtivo</td><td>—</td><td>2d6 extra</td><td>una volta per turno, se hai vantaggio o un alleato è accanto al bersaglio</td></tr></table>
+<h4>Cosa so fare</h4><ul><li><b>Attacco furtivo.</b> Una volta per turno +2d6 danni se hai vantaggio, oppure se un tuo alleato è accanto al bersaglio. Stai vicino ai compagni!</li><li><b>Azione scaltra.</b> Come azione bonus puoi Scattare, Disimpegnarti o Nasconderti.</li><li><b>Mani veloci.</b> Come azione bonus puoi usare un oggetto, scassinare o borseggiare.</li><li><b>Arrampicata rapida.</b> Arrampicarti non ti rallenta.</li><li><b>Fortunata.</b> Se fai 1 sul d20 (attacco, prova o tiro salvezza), ritiri.</li><li><b>Coraggiosa.</b> Vantaggio ai tiri salvezza contro la paura.</li><li><b>Piccola e agile.</b> Passi attraverso lo spazio di creature più grandi e ti nascondi dietro di loro.</li></ul>
+
+<p><b>Equipaggiamento:</b> Armatura di cuoio, spada corta, arco corto e 20 frecce, 2 pugnali, attrezzi da scasso, piede di porco, mantello scuro, 10 «scaglie di drago» finte, 18 mo.</p>
+<p><b>Come giocarlo:</b> Attacca il nemico che sta già combattendo con un compagno: ottieni l&#x27;Attacco furtivo. Sei tu a disinnescare le trappole e ad aprire le serrature. Nella sala del drago… qualcuno dovrà rubare l&#x27;uovo!</p>
+<p><b>PF attuali:</b> ______ &nbsp; <b>Note:</b> ____________________________________________</p>
+</div>
+<div class="scheda">
+<div class="intest"><div><div class="nome">🔮 Bartolo Scintilla</div><div class="cl">Gnomo delle rocce · Mago (Scuola di Invocazione) · Saggio</div></div><div><b>Livello 3</b><br><small>Fragile ma potentissimo</small></div></div>
+<p><b>Chi sono.</b> Studioso di vulcani, draghi e meccanismi. Ho sessant&#x27;anni (giovanissimo, per uno gnomo), occhialini rotondi affumicati e una barba bruciacchiata da esperimenti finiti male.</p>
+<p><b>Personalità.</b> Curioso fino all&#x27;imprudenza. Parlo troppo e troppo in fretta. Adoro spiegare le cose, anche a chi non me le ha chieste.</p>
+<p><b>Perché sono alla locanda.</b> Il Monte Fumo si è risvegliato dopo cent&#x27;anni: devo scoprire perché! Ho già riempito tre taccuini di appunti.</p>
+<p><b>Legame</b> (presentazioni): <i>«Il personaggio alla mia destra mi ha fatto una domanda a cui non ho saputo rispondere. Quale?»</i></p>
+<div class="big"><div><small>CA</small><b>11</b><small>14 con Armatura magica</small></div><div><small>Punti Ferita</small><b>20</b></div><div><small>Velocità</small><b>7,5 m</b></div><div><small>Iniziativa</small><b>+1</b></div><div><small>Dadi Vita</small><b>3d6</b></div></div>
+<table><tr><th>FOR</th><th>DES</th><th>COS</th><th>INT</th><th>SAG</th><th>CAR</th></tr><tr><td>8 (<b>−1</b>)</td><td>13 (<b>+1</b>)</td><td>15 (<b>+2</b>)</td><td>17 (<b>+3</b>)</td><td>12 (<b>+1</b>)</td><td>10 (<b>+0</b>)</td></tr>
+<tr><td colspan="6"><b>Tiri salvezza:</b> Forza −1, Destrezza +1, Costituzione +2, Intelligenza +5, Saggezza +3, Carisma +0</td></tr></table>
+<p><b>Abilità</b> (in grassetto quelle in cui sei addestrato): <span class="chip">Acrobazia +1</span><span class="chip">Addestrare Animali +1</span><span class="chip"><b>Arcano +5</b></span><span class="chip">Atletica −1</span><span class="chip">Furtività +1</span><span class="chip"><b>Indagare +5</b></span><span class="chip">Inganno +0</span><span class="chip">Intimidire +0</span><span class="chip">Intrattenere +0</span><span class="chip"><b>Intuizione +3</b></span><span class="chip">Medicina +1</span><span class="chip">Natura +3</span><span class="chip">Percezione +1</span><span class="chip">Persuasione +0</span><span class="chip">Rapidità di Mano +1</span><span class="chip">Religione +3</span><span class="chip"><b>Storia +5</b></span><span class="chip">Sopravvivenza +1</span> · Percezione passiva 11.</p>
+<p><b>Sensi e tratti:</b> Scurovisione 18 m. Vantaggio ai TS su Intelligenza, Saggezza e Carisma contro la magia.</p>
+<table><tr><th>Attacco</th><th>Per colpire</th><th>Danni</th><th>Note</th></tr><tr><td>Pugnale</td><td>+3</td><td>1d4+1 perforanti</td><td>se proprio devi…</td></tr></table>
+<h4>Cosa so fare</h4><ul><li><b>Recupero arcano.</b> Una volta al giorno, dopo un riposo breve, recuperi 1 slot di 1° livello.</li><li><b>Scolpire incantesimi.</b> Le tue magie ad area non colpiscono gli alleati che scegli.</li><li><b>ATTENZIONE: draghi rossi.</b> Vermiglia è IMMUNE AL FUOCO! Contro di lei usa Raggio di gelo, Dardo incantato e Frantumare.</li></ul>
+<h4>Magia · CD 13 · attacco con incantesimi +5</h4>
+<p><b>Slot:</b> 1° livello: ☐ ☐ ☐ ☐ · 2° livello: ☐ ☐ <small>(si recuperano con il riposo lungo)</small> · Prepari 6 incantesimi al giorno dal tuo libro.</p><ul><li><b>Dardo di fuoco</b> <small>(trucchetto)</small>: Attacco +5, 36 m: 1d10 danni da fuoco.</li><li><b>Raggio di gelo</b> <small>(trucchetto)</small>: Attacco +5, 18 m: 1d8 danni da freddo e il bersaglio rallenta di 3 m.</li><li><b>Mano magica</b> <small>(trucchetto)</small>: Una mano fantasma sposta oggetti leggeri fino a 9 m.</li><li><b>Armatura magica</b> <small>(1° liv.)</small>: Dura 8 ore: la tua CA diventa 14. Lanciala prima di partire!</li><li><b>Dardo incantato</b> <small>(1° liv.)</small>: 3 dardi che colpiscono SEMPRE, 1d4+1 danni da forza ciascuno.</li><li><b>Scudo</b> <small>(1° liv.)</small>: Reazione: +5 alla CA fino al tuo prossimo turno.</li><li><b>Sonno</b> <small>(1° liv.)</small>: 27 m: tira 5d8, le creature più deboli si addormentano fino a quel totale di PF. Perfetto contro i coboldi!</li><li><b>Onda tonante</b> <small>(1° liv.)</small>: Cubo di 4,5 m: TS Costituzione CD 13, 2d8 danni da tuono e spinta di 3 m (metà se riesce).</li><li><b>Mani brucianti</b> <small>(1° liv.)</small>: Cono 4,5 m: TS Destrezza CD 13, 3d6 danni da fuoco.</li><li><b>Raggio rovente</b> <small>(2° liv.)</small>: 3 raggi, ognuno attacco +5 e 2d6 danni da fuoco (inutile contro Vermiglia!).</li><li><b>Frantumare</b> <small>(2° liv.)</small>: Sfera di 3 m a 18 m: TS Costituzione CD 13, 3d8 danni da tuono (metà se riesce).</li></ul>
+<p><b>Equipaggiamento:</b> Libro degli incantesimi, bastone (focus arcano), pugnale, borsa da inventore, taccuini, una bottiglietta di zolfo del Monte Fumo, 10 mo.</p>
+<p><b>Come giocarlo:</b> Resta lontano dai nemici: hai pochi PF. Sonno all&#x27;inizio di uno scontro con tanti coboldi; Scudo per salvarti la pelle; contro il drago niente fuoco!</p>
+<p><b>PF attuali:</b> ______ &nbsp; <b>Note:</b> ____________________________________________</p>
+</div>
+<div class="scheda">
+<div class="intest"><div><div class="nome">🏹 Ilaria Ventofoglia</div><div class="cl">Elfa dei boschi · Ranger (Cacciatrice) · Forestiera</div></div><div><b>Livello 3</b><br><small>Arciera e cacciatrice di draghi</small></div></div>
+<p><b>Chi sono.</b> Elfa dei boschi, cacciatrice solitaria. Parlo poco e osservo molto. Ho una cicatrice di bruciatura sul braccio sinistro e un arco di tasso più vecchio di questo villaggio.</p>
+<p><b>Personalità.</b> Silenziosa, pratica, ironica. Mi fido più degli animali che delle persone.</p>
+<p><b>Perché sono alla locanda.</b> Da settimane seguo le tracce di un&#x27;ombra alata e rossa venuta da nord. Un drago come lei, molti anni fa, bruciò il mio bosco. Stavolta sarò pronta.</p>
+<p><b>Legame</b> (presentazioni): <i>«Ho guidato il personaggio alla mia destra attraverso le montagne, una volta. Cosa è andato storto?»</i></p>
+<div class="big"><div><small>CA</small><b>14</b></div><div><small>Punti Ferita</small><b>25</b></div><div><small>Velocità</small><b>10,5 m</b></div><div><small>Iniziativa</small><b>+3</b></div><div><small>Dadi Vita</small><b>3d10</b></div></div>
+<table><tr><th>FOR</th><th>DES</th><th>COS</th><th>INT</th><th>SAG</th><th>CAR</th></tr><tr><td>12 (<b>+1</b>)</td><td>17 (<b>+3</b>)</td><td>13 (<b>+1</b>)</td><td>10 (<b>+0</b>)</td><td>15 (<b>+2</b>)</td><td>8 (<b>−1</b>)</td></tr>
+<tr><td colspan="6"><b>Tiri salvezza:</b> Forza +3, Destrezza +5, Costituzione +1, Intelligenza +0, Saggezza +2, Carisma −1</td></tr></table>
+<p><b>Abilità</b> (in grassetto quelle in cui sei addestrato): <span class="chip">Acrobazia +3</span><span class="chip">Addestrare Animali +2</span><span class="chip">Arcano +0</span><span class="chip"><b>Atletica +3</b></span><span class="chip"><b>Furtività +5</b></span><span class="chip">Indagare +0</span><span class="chip">Inganno −1</span><span class="chip">Intimidire −1</span><span class="chip">Intrattenere −1</span><span class="chip"><b>Intuizione +4</b></span><span class="chip">Medicina +2</span><span class="chip"><b>Natura +2</b></span><span class="chip"><b>Percezione +4</b></span><span class="chip">Persuasione −1</span><span class="chip">Rapidità di Mano +3</span><span class="chip">Religione +0</span><span class="chip">Storia +0</span><span class="chip"><b>Sopravvivenza +4</b></span> · Percezione passiva 14.</p>
+<p><b>Sensi e tratti:</b> Scurovisione 18 m. Ti nascondi anche solo dietro fumo o fogliame. Vantaggio contro l&#x27;essere affascinata.</p>
+<table><tr><th>Attacco</th><th>Per colpire</th><th>Danni</th><th>Note</th></tr><tr><td>Arco lungo</td><td>+7</td><td>1d8+3 perforanti</td><td>45 m (180 m con svantaggio) · stile Tiro incluso</td></tr><tr><td>Spada corta</td><td>+5</td><td>1d6+3 perforanti</td><td>mischia</td></tr><tr><td>Seconda spada corta</td><td>+5</td><td>1d6 perforanti</td><td>azione bonus, dopo aver attaccato con la prima</td></tr><tr><td>Uccisore di colossi</td><td>—</td><td>1d8 extra</td><td>una volta per turno, se il bersaglio è già ferito</td></tr></table>
+<h4>Cosa so fare</h4><ul><li><b>Nemico prescelto: draghi.</b> Vantaggio alle prove per seguirne le tracce e per ricordare cosa sai di loro (chiedi al Master!).</li><li><b>Esploratrice nata: montagna.</b> In montagna il gruppo non si perde e non viene rallentato; tu non vieni sorpresa.</li><li><b>Uccisore di colossi.</b> Una volta per turno +1d8 danni a un bersaglio che ha già perso PF.</li><li><b>Consapevolezza primordiale.</b> Spendendo uno slot senti se ci sono draghi, non morti o altre creature speciali entro 1,5 km.</li></ul>
+<h4>Magia · CD 12 · attacco con incantesimi +4</h4>
+<p><b>Slot:</b> 1° livello: ☐ ☐ ☐ <small>(si recuperano con il riposo lungo)</small></p><ul><li><b>Marchio del cacciatore</b> <small>(1° liv.)</small>: Azione bonus, concentrazione: il bersaglio marcato subisce +1d6 danni da ogni tuo attacco. Se muore, sposti il marchio con un&#x27;azione bonus.</li><li><b>Cura ferite</b> <small>(1° liv.)</small>: Tocco: la creatura recupera 1d8+2 PF.</li><li><b>Bacche benefiche</b> <small>(1° liv.)</small>: Crei 10 bacche: ognuna cura 1 PF e nutre per un giorno.</li></ul>
+<p><b>Equipaggiamento:</b> Armatura di cuoio, arco lungo e 30 frecce, 2 spade corte, mantello grigio, corda (15 m), kit da campeggio, una scaglia rossa trovata sulle tracce del drago, 10 mo.</p>
+<p><b>Come giocarlo:</b> Resta indietro e tira con l&#x27;arco. Contro Vermiglia: Marchio del cacciatore + Uccisore di colossi = tantissimi danni a ogni freccia!</p>
+<p><b>PF attuali:</b> ______ &nbsp; <b>Note:</b> ____________________________________________</p>
+</div>
+</body></html>

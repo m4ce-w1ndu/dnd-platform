@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Tavolo Virtuale</title>
+<meta name="description" content="Tavolo virtuale per D&D: mappe, pedine, nebbia di guerra, dadi e schede in tempo reale.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>">
+<link rel="stylesheet" href="style.css?v=__VERSIONE__">
+</head>
+<body>
+
+<!-- ===================== INGRESSO ===================== -->
+<div id="ingresso" class="modale aperta">
+  <div class="card ingresso-card">
+    <div class="logo">🐉</div>
+    <h1 id="in-titolo">Tavolo Virtuale</h1>
+    <p class="sotto" id="in-sotto">Accedi per sederti al tavolo.</p>
+
+    <!-- passo 1: chi sei? -->
+    <div id="passo-login">
+      <div id="in-oauth" class="oauth"></div>
+      <div id="in-ospite">
+        <div id="in-oppure" class="oppure"><span>oppure entra come ospite</span></div>
+        <label>Il tuo nome<input id="in-nome" maxlength="30" placeholder="es. Giulia" autocomplete="nickname"></label>
+        <label id="in-pw-gioc" hidden>Password del tavolo<input id="in-pwg" type="password" placeholder="chiedila al Master"></label>
+        <button id="in-ospite-btn" class="primario grande">Entra come ospite</button>
+      </div>
+      <details id="in-admin" class="admin-box">
+        <summary>🔑 Accesso amministratore</summary>
+        <label>Utente <small class="aiuto">(di solito: admin)</small><input id="in-utente" value="admin" autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+        <label>Password
+          <span class="pw-riga"><input id="in-pw" type="password" autocomplete="current-password" autocapitalize="none" spellcheck="false"><button type="button" id="in-pw-vedi" title="Mostra la password">👁</button></span>
+        </label>
+        <p class="aiuto" style="margin:0">Se il browser compila da solo questi campi con dati sbagliati, svuotali e scrivili a mano.</p>
+        <button id="in-admin-btn" class="primario">Accedi</button>
+      </details>
+    </div>
+
+    <!-- passo 2: come ti siedi? -->
+    <div id="passo-scelta" hidden>
+      <div id="in-account" class="account"></div>
+      <div id="in-chiuso" class="chiuso-box" hidden></div>
+      <div id="in-scelta">
+        <div class="ruoli" id="in-ruoli">
+          <button class="ruolo attivo" data-ruolo="giocatore">🎲 Giocatore</button>
+          <button class="ruolo" data-ruolo="master">📜 Master</button>
+        </div>
+        <div id="in-giocatore">
+          <div class="etichetta">Scegli il tuo personaggio</div>
+          <div id="in-pg" class="pg-griglia"></div>
+        </div>
+        <div class="etichetta">Il tuo colore</div>
+        <div id="in-colori" class="colori"></div>
+        <button id="in-entra" class="primario grande">Siediti al tavolo ⚔</button>
+      </div>
+    </div>
+    <div id="in-errore" class="errore"></div>
+    <button id="in-sono-admin" class="link" hidden>🔑 Sono l'amministratore</button>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app" hidden>
+  <header id="barra">
+    <div class="titolo-scena"><span id="nome-scena">—</span><span id="stato-conn" class="conn" title="connessione"></span></div>
+    <div class="strumenti" id="strumenti">
+      <button data-tool="muovi" class="attivo" title="Muovi pedine / sposta la mappa (V)">✋<span>Muovi</span></button>
+      <button data-tool="righello" title="Misura le distanze (R)">📏<span>Righello</span></button>
+      <button data-tool="ping" title="Segnala un punto a tutti (P)">📍<span>Ping</span></button>
+      <button data-tool="nebbia" class="solo-master" title="Nebbia di guerra (F)">🌫️<span>Nebbia</span></button>
+      <span class="sep"></span>
+      <button id="zoom-meno" title="Rimpicciolisci (-)">−</button>
+      <button id="zoom-adatta" title="Adatta la mappa allo schermo (0)">⤢</button>
+      <button id="zoom-piu" title="Ingrandisci (+)">+</button>
+    </div>
+    <div class="destra">
+      <button id="btn-pausa" class="solo-master" title="Torna alla sala d'attesa" hidden>⏸</button>
+      <button id="btn-suono" title="Suoni on/off">🔊</button>
+      <button id="btn-logout" class="logout" title="Esci da questo account"><span id="btn-logout-nome"></span>🚪<span class="testo">Esci</span></button>
+      <button id="btn-pannello" class="solo-mobile" title="Mostra pannello">☰</button>
+    </div>
+  </header>
+
+  <main id="corpo">
+    <section id="viewport">
+      <div id="mondo">
+        <img id="mappa" alt="" draggable="false">
+        <canvas id="griglia-cv"></canvas>
+        <canvas id="nebbia-cv"></canvas>
+        <div id="pedine"></div>
+        <svg id="sovra" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div id="nebbia-strumenti" class="flottante" hidden>
+        <b>🌫️ Nebbia</b>
+        <label class="switch"><input type="checkbox" id="nb-attiva"> attiva su questa mappa</label>
+        <div class="gruppo-btn" id="nb-modo">
+          <button data-m="rivela" class="attivo">Rivela</button><button data-m="copri">Copri</button>
+        </div>
+        <div class="gruppo-btn" id="nb-forma">
+          <button data-f="1" class="attivo">● 1</button><button data-f="3">● 3</button><button data-f="5">● 5</button><button data-f="rett">▭ area</button>
+        </div>
+        <div class="gruppo-btn"><button id="nb-copri-tutto">Copri tutto</button></div>
+      </div>
+      <div id="pannello-pedina" class="flottante" hidden></div>
+      <div id="dadi-anim"></div>
+      <div id="avviso-turno" hidden></div>
+      <div id="sala" hidden></div>
+    </section>
+
+    <aside id="laterale">
+      <nav id="schede-nav">
+        <button data-tab="dadi" class="attivo">🎲<span>Dadi</span></button>
+        <button data-tab="scheda">📜<span>Scheda</span></button>
+        <button data-tab="iniziativa">⚔️<span>Turni</span></button>
+        <button data-tab="gruppo">👥<span>Gruppo</span></button>
+        <button data-tab="master" class="solo-master">👑<span>Master</span></button>
+        <button data-tab="impostazioni" class="solo-admin">⚙️<span>Impost.</span></button>
+      </nav>
+
+      <!-- DADI -->
+      <div class="tab attivo" id="tab-dadi">
+        <div class="vassoio">
+          <div class="dadi-bottoni" id="dadi-bottoni"></div>
+          <div class="pool">
+            <div id="pool-espr" class="pool-espr">Clicca i dadi per comporre un tiro</div>
+            <div class="pool-mod">
+              <button id="mod-meno">−</button><span id="mod-val">+0</span><button id="mod-piu">+</button>
+            </div>
+          </div>
+          <div class="riga">
+            <div class="gruppo-btn adv" id="adv">
+              <button data-adv="dis" title="Svantaggio: tira 2d20 e tieni il più basso">Svantaggio</button>
+              <button data-adv="" class="attivo">Normale</button>
+              <button data-adv="adv" title="Vantaggio: tira 2d20 e tieni il più alto">Vantaggio</button>
+            </div>
+          </div>
+          <div class="riga">
+            <label class="switch"><input type="checkbox" id="tiro-segreto"> <span id="segreto-lbl">tiro segreto</span></label>
+            <button id="pool-svuota" class="link">svuota</button>
+            <button id="pool-tira" class="primario">TIRA 🎲</button>
+          </div>
+        </div>
+        <div id="log" class="log"></div>
+        <form id="chat-form" class="chat">
+          <input id="chat-in" placeholder="Scrivi… oppure /r 2d6+3" autocomplete="off">
+          <button class="primario">➤</button>
+        </form>
+      </div>
+
+      <!-- SCHEDA -->
+      <div class="tab" id="tab-scheda">
+        <div id="scheda-scelta" class="solo-master riga"></div>
+        <div id="scheda"></div>
+      </div>
+
+      <!-- INIZIATIVA -->
+      <div class="tab" id="tab-iniziativa">
+        <div class="ini-testa">
+          <div><b>Round <span id="ini-round">1</span></b></div>
+          <div class="gruppo-btn">
+            <button id="ini-tira" class="primario">🎲 Tira iniziativa</button>
+          </div>
+        </div>
+        <ol id="ini-lista" class="ini-lista"></ol>
+        <div class="solo-master ini-master">
+          <div class="gruppo-btn">
+            <button id="ini-prec">◀ Indietro</button>
+            <button id="ini-pross" class="primario">Prossimo turno ▶</button>
+          </div>
+          <div class="gruppo-btn">
+            <button id="ini-mostri">+ Mostri sulla mappa</button>
+            <button id="ini-svuota">Fine scontro</button>
+          </div>
+          <form id="ini-form" class="riga">
+            <input id="ini-nome" placeholder="Nome">
+            <input id="ini-val" type="number" placeholder="Val." style="width:70px">
+            <button>+</button>
+          </form>
+        </div>
+        <p class="aiuto">Chi ha il valore più alto agisce per primo. Nel tuo turno: <b>movimento</b> + <b>un'azione</b> (+ eventuale azione bonus).</p>
+      </div>
+
+      <!-- GRUPPO -->
+      <div class="tab" id="tab-gruppo">
+        <h3>📖 Avventura</h3>
+        <div id="documenti" class="documenti"></div>
+        <div class="riga"><span id="io-chi" class="aiuto" style="flex:1"></span><button id="btn-esci" class="link">Esci / cambia account</button></div>
+        <h3>Al tavolo</h3>
+        <ul id="online" class="online"></ul>
+        <h3>Il gruppo</h3>
+        <div id="party"></div>
+        <h3>Guida rapida</h3>
+        <div class="aiuto">
+          <p><b>Muovere la mappa:</b> trascina lo sfondo · rotellina o due dita per lo zoom.</p>
+          <p><b>Muovere la tua pedina:</b> trascinala; si aggancia alla griglia e vedi quanti metri hai fatto (velocità tipica 9 m = 6 quadretti).</p>
+          <p><b>Tirare i dadi:</b> nella scheda clicca su qualsiasi abilità, attacco o incantesimo, oppure usa il vassoio dei dadi.</p>
+          <p><b>Scorciatoie:</b> V muovi · R righello · P ping · frecce per spostare la pedina selezionata.</p>
+        </div>
+      </div>
+
+      <!-- MASTER -->
+      <div class="tab" id="tab-master">
+        <details open><summary>📚 Avventure</summary>
+          <div id="m-avventure"></div>
+          <div class="riga"><input id="av-file" type="file" accept=".zip,application/zip" style="flex:1"><button id="av-carica" class="primario">Carica</button></div>
+          <button id="m-chiudi" class="pericolo" style="width:100%;margin:4px 0">🔒 Chiudi il tavolo</button>
+          <p class="aiuto">Carica un pacchetto avventura (.zip): compare subito nell'elenco. Se ha lo stesso id di una esistente, la aggiorna mantenendo la partita.</p>
+        </details>
+        <details open><summary>🗺️ Mappe</summary>
+          <div id="m-scene"></div>
+          <label class="switch"><input type="checkbox" id="m-porta" checked> porta le pedine dei personaggi nella nuova mappa</label>
+        </details>
+        <details open><summary>🐉 Bestiario</summary>
+          <label class="switch"><input type="checkbox" id="m-nascosto"> aggiungi nascosti (solo tu li vedi)</label>
+          <div id="m-bestiario" class="bestiario"></div>
+          <form id="m-custom" class="riga custom">
+            <input id="mc-nome" placeholder="Pedina libera" style="flex:2">
+            <input id="mc-icona" placeholder="🙂" style="width:52px">
+            <input id="mc-pf" type="number" placeholder="PF" style="width:60px">
+            <button>+</button>
+          </form>
+        </details>
+        <details><summary>📐 Griglia della mappa</summary>
+          <p class="aiuto">Per le mappe caricate: regola la dimensione del quadretto e lo scostamento finché la griglia combacia.</p>
+          <div class="riga"><label>Quadretto px <input id="g-cella" type="number" step="0.5"></label></div>
+          <div class="riga"><label>Inizio X <input id="g-ox" type="number" step="0.5"></label><label>Inizio Y <input id="g-oy" type="number" step="0.5"></label></div>
+          <div class="riga"><label class="switch"><input type="checkbox" id="g-mostra"> disegna la griglia</label><button id="g-salva" class="primario">Salva</button></div>
+        </details>
+        <details><summary>⬆️ Carica una mappa</summary>
+          <input id="up-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+          <div class="riga"><input id="up-titolo" placeholder="Titolo della mappa"><input id="up-cella" type="number" value="70" title="pixel per quadretto" style="width:80px"></div>
+          <button id="up-invia" class="primario">Carica</button>
+          <p class="aiuto">PNG, JPG, WEBP o SVG. Viene aggiunta all'avventura in gioco. Il numero è la dimensione in pixel di un quadretto (0 = senza griglia); puoi correggerla dopo in «Griglia della mappa».</p>
+        </details>
+        <details><summary>📝 Appunti segreti</summary>
+          <textarea id="m-note" rows="8" placeholder="Solo tu vedi questi appunti."></textarea>
+        </details>
+        <details><summary>💾 Salvataggio</summary>
+          <div class="gruppo-btn col">
+            <a id="m-esporta" class="btn" href="#">Scarica salvataggio</a>
+            <label class="btn">Carica salvataggio<input id="m-importa" type="file" accept="application/json" hidden></label>
+            <button id="m-pulisci">Togli i mostri da questa mappa</button>
+            <button id="m-svuota-log">Svuota la cronologia</button>
+            <button id="m-reset" class="pericolo">Ricomincia questa avventura</button>
+          </div>
+        </details>
+      </div>
+      <!-- IMPOSTAZIONI (solo admin) -->
+      <div class="tab" id="tab-impostazioni">
+        <details open><summary>🏰 Generale</summary>
+          <label>Nome del tavolo<input id="i-nome" name="nome-tavolo" autocomplete="off"></label>
+          <label>Indirizzo pubblico (per l'accesso con account)<input id="i-url" name="indirizzo-pubblico" type="url" inputmode="url" autocomplete="url" placeholder="https://dnd.immovilli.trade"></label>
+          <p class="aiuto">Lascia vuoto per usare l'indirizzo con cui apri la pagina. Va impostato se usi l'accesso con account dietro un proxy.</p>
+        </details>
+        <details open><summary>🚪 Accesso dei giocatori</summary>
+          <label class="switch"><input type="checkbox" id="i-ospiti"> ammetti ospiti (senza account, solo il nome)</label>
+          <label>Password del tavolo (facoltativa)<input id="i-pwg" name="password-tavolo" autocomplete="off" placeholder="vuota = nessuna password"></label>
+          <p class="aiuto">Se attivi un provider e disattivi gli ospiti, si entra solo con Discord/Google/GitHub.</p>
+        </details>
+        <details open><summary>🔑 Accesso con account (OAuth)</summary>
+          <div id="i-oauth"></div>
+        </details>
+        <details open><summary>👑 Account amministratore</summary>
+          <label>Nome utente<input id="i-adm-utente" name="admin-utente" autocomplete="off" data-lpignore="true"></label>
+          <label>Nuova password (almeno 8 caratteri)<input id="i-adm-nuova" type="password" autocomplete="new-password"></label>
+          <label>Ripeti la nuova password<input id="i-adm-nuova2" type="password" autocomplete="new-password"></label>
+          <label>Password attuale (per confermare)<input id="i-adm-attuale" type="password" autocomplete="current-password"></label>
+          <button id="i-adm-salva" class="primario">Aggiorna account admin</button>
+        </details>
+        <details open><summary>👥 Utenti</summary>
+          <p class="aiuto">Abilita come Master chi deve poter condurre le partite: entrerà come Master senza password.</p>
+          <div id="i-utenti"></div>
+        </details>
+        <details><summary>💾 Dati e partite salvate</summary>
+          <p class="aiuto">Tutto è salvato nel database <code>dati/tavolo.db</code> (SQLite): partite, utenti, impostazioni.</p>
+          <div id="i-partite"></div>
+          <a id="i-backup" class="btn" href="#" style="display:block;margin-top:8px">⬇️ Scarica backup del database</a>
+        </details>
+        <button id="i-salva" class="primario grande">💾 Salva impostazioni</button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div id="toast"></div>
+<script src="app.js?v=__VERSIONE__"></script>
+</body>
+</html>

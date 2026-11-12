@@ -1,0 +1,24 @@
+# /etc/containers/systemd/tavolo-virtuale/tavolo.container
+# Tavolo Virtuale D&D (mappe, pedine, dadi). Aggiornamento: deploy/aggiorna.sh dal PC.
+[Unit]
+Description=Tavolo Virtuale D&D
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+ContainerName=tavolo-virtuale
+Image=tavolo.build
+# Nessun file d'ambiente: account admin, OAuth, ospiti e password si gestiscono dal browser (⚙️ Impostazioni).
+# Al primo avvio la password admin iniziale viene stampata nel registro (journalctl -u tavolo).
+StopTimeout=10
+# Pubblicata su tutte le interfacce come shout (bind su 127.0.0.1 non funziona con Netavark rootful).
+PublishPort=8095:8000
+Volume=/var/lib/tavolo-virtuale/dati:/app/dati:Z
+Volume=/var/lib/tavolo-virtuale/avventure:/app/avventure:Z
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target

@@ -1,0 +1,58 @@
+{
+ "01_sentiero_nel_bosco": {
+  "titolo": "Il sentiero nel bosco",
+  "ordine": 1,
+  "griglia": {
+   "cella": 32,
+   "ox": 40,
+   "oy": 92
+  },
+  "inizio": [
+   1,
+   16
+  ],
+  "note_master": "B1: partenza con la Capitana Kole. B2: il cucciolo esce dal sottobosco spinoso (Percezione CD 10 per sentirlo). B3: impronte di troll del ghiaccio coperte di brina."
+ },
+ "02_ingresso_della_caverna": {
+  "titolo": "L'ingresso della caverna",
+  "ordine": 2,
+  "griglia": {
+   "cella": 32,
+   "ox": 40,
+   "oy": 92
+  },
+  "inizio": [
+   13,
+   19
+  ],
+  "note_master": "C1: 5 ghiaccioli viventi tra i frammenti di ghiaccio (CA 10, PF 7, artigli +2, 1d6). C2: zaino logoro (carne essiccata, 5 torce, acciarino, 12 mo). C3: disegni a gesso dei troll; il tunnel sale verso la tana."
+ },
+ "03_i_tunnel_della_tana": {
+  "titolo": "I tunnel della tana",
+  "ordine": 3,
+  "griglia": {
+   "cella": 32,
+   "ox": 40,
+   "oy": 92
+  },
+  "inizio": [
+   3,
+   24
+  ],
+  "note_master": "T1: scalare la parete (Atletica o Acrobazia CD 10, fallimento 1d6; il kit di Noorah dà vantaggio; con la corda gli altri salgono senza tiro). T2: specchio di Bahamut, risposta «orn darastrix» = cura completa + vantaggio al primo tiro della prova seguente; rompere lo specchio = 1d6 e niente cura. T3: la scarpata crolla, scegliere lo scivolo (Indagare o Percezione CD 10; altrimenti Acrobazia/Atletica CD 15 o 1d6). T4: fondo della caverna."
+ },
+ "04_la_caverna_delle_uova": {
+  "titolo": "La caverna delle uova",
+  "ordine": 4,
+  "griglia": {
+   "cella": 32,
+   "ox": 40,
+   "oy": 92
+  },
+  "inizio": [
+   1,
+   11
+  ],
+  "note_master": "U2: due uova intatte, un guscio rotto (il cucciolo) e un posto vuoto (uovo rubato dai troll). 3 ladri di uova (CA 12, PF 18, morso +4, 1d6+2). U3: alla fine Rorn sfonda il ghiaccio del soffitto e atterra davanti al gruppo."
+ }
+}

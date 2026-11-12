@@ -1,0 +1,7 @@
+# /etc/containers/systemd/tavolo-virtuale/tavolo.build
+# Costruisce l'immagine dai sorgenti copiati in /opt/tavolo-virtuale.
+[Build]
+ImageTag=localhost/tavolo-virtuale:latest
+SetWorkingDirectory=/opt/tavolo-virtuale
+File=Containerfile
+Network=host

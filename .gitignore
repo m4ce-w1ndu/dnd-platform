@@ -1,0 +1,47 @@
+# ---------------------------------------------------------------
+# Materiale protetto da copyright: solo per uso personale, NON va
+# nel repository (va messo a mano nelle cartelle, vedi README.md)
+# ---------------------------------------------------------------
+# PDF ufficiale di «Peril in Pinebrook» (Wizards of the Coast)
+Pericolo_a_Pinebrook/documenti/*.pdf
+# Mappe di Calos Pro Maps
+Pericolo_a_Pinebrook/mappe/*.webp
+# file originali scaricati, se finiscono qui per sbaglio
+*.dd2vtt
+calospromaps-*.zip
+Peril_in_Pinebrook*.pdf
+
+# ---------------------------------------------------------------
+# File generati (si ricreano con gli script)
+# ---------------------------------------------------------------
+# pacchetti avventura .zip  →  python3 Tavolo_Virtuale/strumenti/crea_pacchetto.py <progetto>
+Tavolo_Virtuale/pacchetti/
+# esportazioni PNG delle mappe  →  strumenti/genera_mappe.py
+**/mappe/png/
+
+# ---------------------------------------------------------------
+# Dati locali del Tavolo Virtuale (partite, utenti, chiavi OAuth!)
+# ---------------------------------------------------------------
+Tavolo_Virtuale/dati/
+Tavolo_Virtuale/avventure/
+*.db
+*.db-shm
+*.db-wal
+*.migrato
+*.migrate/
+
+# ---------------------------------------------------------------
+# Python, editor, sistema
+# ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.log
+*.pid
+.venv/
+node_modules/
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
