@@ -1,0 +1,100 @@
+{
+ "id": "brumaria",
+ "titolo": "Le Campane di Brumaria",
+ "sottotitolo": "Campagna breve, livelli 1-4",
+ "descrizione": "Le campane che tengono lontana la nebbia sono state zittite. Campagna di 8 sessioni. Schede interattive non ancora incluse: usate le schede stampabili.",
+ "livello": "1-4",
+ "giocatori": "5 (+1 facoltativo)",
+ "durata": "8 sessioni",
+ "documenti": [
+  {
+   "file": "1_Manuale_del_Master.html",
+   "titolo": "Manuale del Master",
+   "solo_master": true
+  },
+  {
+   "file": "2_Guida_del_Giocatore.html",
+   "titolo": "Guida del Giocatore"
+  },
+  {
+   "file": "3_Schede_dei_Personaggi.html",
+   "titolo": "Schede stampabili"
+  }
+ ],
+ "mappe_cartella": "../../asset/mappe/brumaria",
+ "mappe": {
+  "01_valle_di_brumaria": {
+   "titolo": "Valle di Brumaria",
+   "ordine": 1
+  },
+  "02_brumaria": {
+   "titolo": "Borgo di Brumaria",
+   "ordine": 2
+  },
+  "03_campanile": {
+   "titolo": "Il Campanile",
+   "ordine": 3,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    5,
+    4
+   ]
+  },
+  "04_mulino": {
+   "titolo": "Il Mulino della Palude Lenta",
+   "ordine": 4,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    0,
+    19
+   ]
+  },
+  "05_miniera": {
+   "titolo": "La Miniera di Ferrocupo",
+   "ordine": 5,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    3,
+    26
+   ]
+  },
+  "06_abbazia": {
+   "titolo": "L'Abbazia di San Velio",
+   "ordine": 6,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    3,
+    20
+   ]
+  },
+  "07_isola_del_fonditore": {
+   "titolo": "L'Isola del Fonditore",
+   "ordine": 7,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    16,
+    24
+   ]
+  }
+ }
+}

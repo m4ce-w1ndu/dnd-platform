@@ -1,0 +1,73 @@
+{
+ "id": "pinebrook",
+ "titolo": "Pericolo a Pinebrook",
+ "sottotitolo": "Avventura introduttiva ufficiale · regole semplificate",
+ "descrizione": "Il gruppo trova un cucciolo di drago d'argento appena nato e deve riportarlo nella tana della madre, minacciata dai troll del ghiaccio. Mappe di Calos Pro Maps. Uso personale: non ridistribuire.",
+ "livello": "1 (semplificato)",
+ "giocatori": "4 (da 1 a 5)",
+ "durata": "60-90 minuti",
+ "personaggi": "strumenti/dati/personaggi.json",
+ "mostri": "strumenti/dati/mostri.json",
+ "documenti": [
+  {
+   "file": "documenti/Pericolo_a_Pinebrook_completo.pdf",
+   "titolo": "Avventura completa (PDF)",
+   "solo_master": true
+  },
+  {
+   "file": "documenti/Schede_e_regole_per_i_giocatori.pdf",
+   "titolo": "Schede e foglio di riferimento"
+  },
+  {
+   "file": "documenti/Pagina_della_guida_ai_draghi.pdf",
+   "titolo": "Pagina della guida ai draghi (consegnata da Kole)"
+  }
+ ],
+ "mappe_cartella": "../../asset/mappe/pinebrook",
+ "mappe": {
+  "01_sentiero_nel_bosco": {
+   "titolo": "Il sentiero nel bosco",
+   "ordine": 1,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    1,
+    16
+   ],
+   "note_master": "B1: partenza con la Capitana Kole. B2: il cucciolo esce dal sottobosco spinoso (Percezione CD 10 per sentirlo). B3: impronte di troll del ghiaccio coperte di brina."
+  },
+  "02_la_tana_di_rorn": {
+   "titolo": "La tana di Rorn",
+   "ordine": 2,
+   "griglia": {
+    "cella": 100,
+    "ox": 0,
+    "oy": 0,
+    "mostra": false
+   },
+   "inizio": [
+    3,
+    31
+   ],
+   "note_master": "Mappa di Calos Pro Maps (40×35, 1 quadretto = 1,5 m). In basso a sinistra il bosco innevato e l'ingresso: 5 ghiaccioli viventi tra i cristalli di ghiaccio (CA 10, PF 7, artigli +2, 1d6). Appena dentro, lo zaino logoro (carne essiccata, 5 torce, acciarino, 12 mo). Il tunnel sale verso nord: la cascata di ghiaccio in alto a sinistra è la parete da scalare (Atletica/Acrobazia CD 10, fallimento 1d6; kit di Noorah = vantaggio; corda = niente tiro). Lo specchio di Bahamut sbarra il passaggio verso il lago ghiacciato: «orn darastrix» = cura completa + vantaggio. A destra la grande caverna: dalla scarpata si scende con gli scivoli (vedi mappa successiva). In basso a destra il nido con le uova: 3 ladri di uova (CA 12, PF 18, morso +4, 1d6+2), poi arriva Rorn. Usa la nebbia di guerra per rivelare le zone man mano."
+  },
+  "03_la_tana_di_rorn_scivoli": {
+   "titolo": "La tana di Rorn · gli scivoli",
+   "ordine": 3,
+   "griglia": {
+    "cella": 100,
+    "ox": 0,
+    "oy": 0,
+    "mostra": false
+   },
+   "inizio": [
+    31,
+    13
+   ],
+   "note_master": "Stessa mappa con gli scivoli in vista. La scarpata crolla: Indagare o Percezione CD 10 per lo scivolo sicuro, altrimenti Acrobazia/Atletica CD 15 o 1d6 danni. In fondo, il nido con le uova (3 ladri di uova); infine Rorn sfonda il ghiaccio e atterra."
+  }
+ }
+}

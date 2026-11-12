@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manuale del Master</title>
+<meta name="description" content="Le Campane di Brumaria: avventura completa di D&D 5e per 5-6 giocatori principianti.">
+<style>
+:root{--ink:#2a2018;--paper:#f6efdc;--card:#fffaf0;--accent:#7a2e1c;--accent2:#355e5f;--muted:#6b5c48;--box:#efe2c2;--read:#e6eef0;--rule:#c9b48a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ink:#ece3cf;--paper:#1d1a16;--card:#26221c;--accent:#e29a7d;--accent2:#8cc3c3;--muted:#b3a58c;--box:#332c22;--read:#22302f;--rule:#5c5140}}
+:root[data-theme="dark"]{--ink:#ece3cf;--paper:#1d1a16;--card:#26221c;--accent:#e29a7d;--accent2:#8cc3c3;--muted:#b3a58c;--box:#332c22;--read:#22302f;--rule:#5c5140}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0 auto;max-width:900px;padding:24px 16px 80px;background:var(--paper);color:var(--ink);font:17px/1.6 'Noto Serif','DejaVu Serif',Georgia,serif}
+h1,h2,h3,h4{font-family:'Noto Serif','DejaVu Serif',Georgia,serif;color:var(--accent);line-height:1.25}
+h1{font-size:2.3em;text-align:center;margin:.2em 0}
+h2{font-size:1.65em;border-bottom:3px double var(--rule);padding-bottom:.2em;margin-top:2.2em}
+h3{font-size:1.25em;margin-top:1.6em}
+h4{font-size:1.05em;margin:1.2em 0 .3em;color:var(--accent2)}
+a{color:var(--accent2)}
+.copertina{text-align:center;padding:40px 0 20px;border-bottom:3px double var(--rule)}
+.copertina .sotto{font-style:italic;color:var(--muted);font-size:1.15em}
+.copertina .info{display:inline-block;margin-top:1em;padding:.6em 1.2em;border:1px solid var(--rule);border-radius:8px;background:var(--card)}
+.indice{columns:2;column-gap:2em;background:var(--card);border:1px solid var(--rule);padding:1em 1.5em;border-radius:8px}
+.indice a{text-decoration:none}
+.leggi{background:var(--read);border-left:6px solid var(--accent2);padding:.8em 1.1em;margin:1em 0;font-style:italic;border-radius:0 6px 6px 0}
+.leggi::before{content:"📜 Leggi ad alta voce";display:block;font-style:normal;font-weight:bold;font-size:.8em;letter-spacing:.05em;color:var(--accent2);margin-bottom:.3em}
+.nota{background:var(--box);border:1px solid var(--rule);padding:.8em 1.1em;margin:1em 0;border-radius:6px}
+.nota>b:first-child,.consiglio>b:first-child{color:var(--accent)}
+.consiglio{background:var(--card);border:2px dashed var(--accent2);padding:.8em 1.1em;margin:1em 0;border-radius:6px}
+.consiglio::before{content:"💡 Consiglio per chi fa il Master per la prima volta";display:block;font-weight:bold;font-size:.85em;color:var(--accent2);margin-bottom:.3em}
+.sei{background:var(--card);border-left:6px solid #a8822c;padding:.5em 1em;margin:.8em 0;border-radius:0 6px 6px 0}
+.sei::before{content:"👥 Con 6 giocatori: ";font-weight:bold;color:#a8822c}
+.scontro{border:2px solid var(--accent);border-radius:8px;padding:.6em 1em;margin:1em 0;background:var(--card)}
+.scontro .tit{font-weight:bold;color:var(--accent)}
+.scontro .diff{float:right;font-size:.85em;padding:.1em .6em;border-radius:20px;background:var(--box)}
+table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.93em;background:var(--card)}
+th,td{border:1px solid var(--rule);padding:.35em .55em;vertical-align:top;text-align:left}
+th{background:var(--box)}
+.stat{background:var(--card);border-top:5px solid var(--accent);border-bottom:5px solid var(--accent);padding:.7em 1em;margin:1.2em 0;font-size:.93em;break-inside:avoid;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.stat h4{margin:0;font-size:1.3em;color:var(--accent)}
+.stat .tipo{font-style:italic;color:var(--muted);margin-bottom:.4em}
+.stat .car{display:grid;grid-template-columns:repeat(6,1fr);text-align:center;border-top:1px solid var(--accent);border-bottom:1px solid var(--accent);margin:.5em 0;padding:.3em 0}
+.stat .car b{display:block;color:var(--accent)}
+.stat p{margin:.3em 0}
+.mappa{margin:1.2em 0;text-align:center;break-inside:avoid}
+.mappa img{max-width:100%;border:1px solid var(--rule);background:#efe3c4}
+.mappa figcaption{font-style:italic;color:var(--muted);font-size:.9em}
+.chiave dt{font-weight:bold;color:var(--accent);margin-top:.8em}
+.chiave dd{margin:0 0 0 1.2em}
+.handout{background:#f3e6c3;color:#3b2a18;border:1px solid #b59a64;padding:1.4em 1.8em;margin:1.2em 0;font-family:'Noto Serif','DejaVu Serif',Georgia,serif;font-style:italic;box-shadow:2px 3px 8px rgba(0,0,0,.25);transform:rotate(-.4deg);break-inside:avoid}
+.clessidra{display:flex;gap:6px;margin:.6em 0}
+.clessidra span{width:44px;height:44px;border:2px solid var(--ink);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.scheda{background:var(--card);border:2px solid var(--accent);border-radius:10px;padding:1em 1.3em;margin:1.5em 0;break-inside:avoid-page}
+.scheda .intest{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5em;border-bottom:2px solid var(--accent);padding-bottom:.4em;margin-bottom:.6em}
+.scheda .nome{font-size:1.6em;font-weight:bold;color:var(--accent)}
+.scheda .cl{font-style:italic;color:var(--muted)}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin:.6em 0}
+.big div{border:2px solid var(--ink);border-radius:8px;text-align:center;padding:.3em}
+.big b{display:block;font-size:1.5em}
+.big small{display:block;font-size:.75em;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.2em}
+.chip{display:inline-block;background:var(--box);border-radius:20px;padding:0 .6em;margin:.1em;font-size:.88em}
+@media (max-width:640px){.indice{columns:1}.cols{grid-template-columns:1fr}.stat .car{grid-template-columns:repeat(3,1fr)}body{font-size:16px}}
+@media print{
+ :root{--ink:#2a2018;--paper:#fff;--card:#fff;--accent:#7a2e1c;--accent2:#355e5f;--muted:#5a4c3a;--box:#f1e7cf;--read:#e9f0f1;--rule:#bfa77a}
+ body{max-width:none;padding:0;font-size:11pt}
+ h2{break-before:page}
+ h2.nobreak{break-before:auto}
+ .scheda{break-before:page;border:none;padding:0}
+ .scheda.prima{break-before:auto}
+ .mappa{break-before:page}
+ .mappa img{max-height:24cm}
+ a{color:inherit;text-decoration:none}
+ .nostampa{display:none}
+}
+@page{size:A4;margin:1.6cm}
+</style>
+</head>
+<body>
+<div class="copertina">
+<h1>Le Campane di Brumaria</h1>
+<div class="sotto">Una campagna breve e completa per Dungeons &amp; Dragons 5ª edizione</div>
+<div class="info">
+<b>Manuale del Master</b><br>
+5 giocatori + 1 facoltativo · personaggi dal 1° al 4° livello<br>
+8 sessioni da circa 3 ore · pensata per <b>giocatori e Master alle prime armi</b>
+</div>
+</div>
+
+<div class="nota nostampa"><b>Come stampare.</b> Apri questo file con Firefox o Chrome → <i>Stampa</i> → <i>Salva come PDF</i> (spunta «Stampa sfondi»). Le mappe sono anche nella cartella <code>asset/mappe/brumaria/</code> del repository: in SVG (si stampano nitide a qualsiasi grandezza) e in PNG dentro <code>png/</code> (pronte per Roll20, Foundry o Owlbear Rodeo, circa 64 pixel per quadretto).</div>
+
+<h2 class="nobreak">Indice</h2>
+<div class="indice">
+<a href="#uso">0. Come usare questo manuale</a><br>
+<a href="#storia">1. La storia in breve (segreta!)</a><br>
+<a href="#png">2. I personaggi del Master (PNG)</a><br>
+<a href="#regole">3. Regole speciali della campagna</a><br>
+<a href="#zero">4. Sessione zero</a><br>
+<a href="#atto1">5. Atto I · La notte senza rintocchi</a><br>
+<a href="#atto2">6. Atto II · Le tre voci</a><br>
+<a href="#mulino">6a. Il Mulino della Palude Lenta</a><br>
+<a href="#miniera">6b. La Miniera di Ferrocupo</a><br>
+<a href="#abbazia">6c. L'Abbazia di San Velio</a><br>
+<a href="#atto3">7. Atto III · L'Isola del Fonditore</a><br>
+<a href="#epilogo">8. Epilogo e finali possibili</a><br>
+<a href="#bestiario">9. Bestiario</a><br>
+<a href="#tesori">10. Tesori e oggetti magici</a><br>
+<a href="#tabelle">11. Tabelle di supporto</a><br>
+<a href="#handout">12. Documenti da consegnare ai giocatori</a><br>
+<a href="#mappe">13. Tutte le mappe</a><br>
+<a href="#schermo">14. Schermo del Master (riassunto da tenere davanti)</a>
+</div>
+
+<!-- ===================================================================== -->
+<h2 id="uso">0. Come usare questo manuale</h2>
+<p>Benvenuto, Master! Questa avventura è stata scritta pensando a <b>un gruppo che gioca per la prima volta</b> e a <b>un Master che non ha mai condotto</b>. Non devi imparare tutto a memoria: segui il manuale sessione per sessione, leggi i riquadri azzurri ad alta voce e usa i consigli tratteggiati quando hai un dubbio.</p>
+
+<h3>Cosa ti serve</h3>
+<ul>
+<li>Questo manuale, la <b>Guida del Giocatore</b> (una copia da far girare al tavolo) e le <b>Schede dei Personaggi</b> stampate.</li>
+<li>Un set di dadi per giocatore (d4, d6, d8, d10, d12, d20). Se mancano, va bene anche un'app.</li>
+<li>Le mappe stampate o su schermo. Per i combattimenti bastano un foglio a quadretti e qualche segnalino (monete, pedine, tappi).</li>
+<li>Matite, gomme, e un segnalino per la <b>Clessidra della Bruma</b> (vedi capitolo 3).</li>
+</ul>
+
+<h3>Come sono organizzati i capitoli</h3>
+<ul>
+<li><span style="background:var(--read);border-left:4px solid var(--accent2);padding:0 .4em"><b>Riquadro azzurro</b></span>: testo da <b>leggere ad alta voce</b> ai giocatori.</li>
+<li><b>Riquadro beige</b>: informazioni solo per te (segreti, regole, cosa succede).</li>
+<li><b>Riquadro rosso «Scontro»</b>: un combattimento, con i mostri e quanto è difficile.</li>
+<li><b>Riquadro dorato «Con 6 giocatori»</b>: cosa aggiungere se gioca anche il sesto personaggio.</li>
+</ul>
+
+<h3>Le tre regole d'oro del Master principiante</h3>
+<ol>
+<li><b>Se non sai una regola, decidi tu e vai avanti.</b> Fai tirare un d20: con 10 o più riesce, con meno fallisce. La regola esatta la controlli dopo la partita. Il ritmo conta più della precisione.</li>
+<li><b>Chiedi «Cosa fai?».</b> Descrivi la scena in due o tre frasi, poi passa la parola ai giocatori. Non c'è bisogno di sapere tutto in anticipo: reagisci a quello che fanno.</li>
+<li><b>Dì «sì, ma…» invece di «no».</b> Se un giocatore ha un'idea creativa (spingere un carrello addosso ai goblin, convincere la megera, travestirsi), premiala. Fai tirare un dado e lascia che il mondo reagisca.</li>
+</ol>
+
+<div class="consiglio">I combattimenti di questa avventura sono stati calibrati per essere <b>facili o medi</b>. Se i personaggi sono in difficoltà, i mostri possono fuggire, arrendersi o sbagliare. Se invece il gruppo vince troppo facilmente, aggiungi un nemico dal riquadro «Con 6 giocatori». Nessuno ti controlla i dadi: puoi tirarli dietro uno schermo e «aggiustare» il risultato per il bene della storia. In questa avventura <b>un personaggio non dovrebbe mai morire per sfortuna nella prima sessione</b>.</div>
+
+<h3>Struttura della campagna</h3>
+<table>
+<tr><th>Sessione</th><th>Cosa succede</th><th>Livello PG</th><th>Mappe</th></tr>
+<tr><td>0</td><td>Sessione zero: si scelgono i personaggi e si fa una prova delle regole (30 minuti)</td><td>1</td><td>Valle</td></tr>
+<tr><td>1</td><td>Atto I: la Festa della Bruma, le campane tacciono, primo scontro, il campanile</td><td>1</td><td>Brumaria, Campanile</td></tr>
+<tr><td>2</td><td>Atto I: indagine in paese, l'inseguimento di Fosco, la missione → <b>passaggio al 2° livello</b></td><td>1 → 2</td><td>Brumaria</td></tr>
+<tr><td>3</td><td>Atto II: il Mulino della Palude Lenta (voce «Aurora»)</td><td>2</td><td>Mulino</td></tr>
+<tr><td>4-5</td><td>Atto II: la Miniera di Ferrocupo (voce «Vespro») → <b>3° livello</b></td><td>2 → 3</td><td>Miniera</td></tr>
+<tr><td>6</td><td>Atto II: l'Abbazia di San Velio (voce «Lucia») → <b>4° livello</b></td><td>3 → 4</td><td>Abbazia</td></tr>
+<tr><td>7-8</td><td>Atto III: la traversata del lago, l'Isola del Fonditore, il finale e l'epilogo</td><td>4</td><td>Isola</td></tr>
+</table>
+<p>L'ordine dei tre luoghi dell'Atto II è libero, ma quello consigliato è <b>Mulino → Miniera → Abbazia</b>: la difficoltà cresce gradualmente. Se il gruppo sceglie un altro ordine, nessun problema: ogni luogo ha una nota su come renderlo più facile o più difficile.</p>
+
+<!-- ===================================================================== -->
+<h2 id="storia">1. La storia in breve <small>(solo per il Master!)</small></h2>
+
+<h3>Il segreto di Brumaria</h3>
+<p><b>Brumaria</b> è un borgo di pescatori e artigiani sulla riva del <b>Lago Brumo</b>. Da secoli, nelle notti d'autunno, dal lago sale <b>la Bruma</b>: una nebbia fredda e grigia che non viene dal nostro mondo ma dall'<b>Oltrenebbia</b>, un luogo di anime perdute. Chi resta fuori dalle mura quando la Bruma è piena viene <i>smarrito</i>: il suo nome svanisce dalla memoria di tutti e la sua anima diventa uno <b>Smarrito</b>, un'ombra grigia che vaga nella nebbia.</p>
+<p>A tenere lontana la Bruma ci pensano <b>le cinque campane del campanile</b>, fuse duecento anni fa dal fondatore del borgo, <b>Maestro Anselmo Corvo</b>. Ogni notte di Bruma, a mezzanotte, il campanaro suona il <b>Rintocco</b> e la nebbia arretra. Ogni campana ha un batacchio speciale, chiamato <b>«voce»</b>, forgiato con un frammento di ferro di stella:</p>
+<table>
+<tr><th>Campana</th><th>Posizione</th><th>Significato</th><th>Dov'è ora la sua voce</th></tr>
+<tr><td><b>Aurora</b></td><td>nord</td><td>la campana del mattino</td><td>Mulino della Palude Lenta (acqua)</td></tr>
+<tr><td><b>Vespro</b></td><td>est</td><td>la campana della sera</td><td>Miniera di Ferrocupo (terra)</td></tr>
+<tr><td><b>Lucia</b></td><td>ovest</td><td>la campana delle feste</td><td>Abbazia di San Velio (ossa)</td></tr>
+<tr><td><b>Ombra</b></td><td>sud</td><td>la campana dei morti</td><td><b>ancora al suo posto</b> (vedi «L'indizio dell'Ombra» più avanti)</td></tr>
+<tr><td><b>Madre Nona</b></td><td>centro</td><td>la campana maggiore</td><td>Isola del Fonditore (fuoco). Si chiama «Voce Madre».</td></tr>
+</table>
+
+<h3>Vent'anni fa</h3>
+<p>Una sera d'autunno <b>Neve Corvo</b>, bambina di nove anni e figlia della fonditrice <b>Ilvane Corvo</b>, uscì a raccogliere ninfee sulla riva. La Bruma salì prima del solito. Ilvane supplicò il Consiglio di ritardare il Rintocco finché non avessero trovato la figlia. Ma la legge era chiara, e il giovane consigliere <b>Ermanno Valli</b> ordinò al campanaro <b>Tobia</b> di suonare a mezzanotte. La Bruma si ritirò, e Neve con lei.</p>
+<p>Ilvane non perdonò mai il borgo. Si ritirò sull'<b>Isola del Fonditore</b>, nella vecchia fonderia di famiglia. Per vent'anni ha sentito in sogno la voce di Neve che la chiamava: <i>«Mamma, fai tacere le campane e potrò tornare a casa.»</i></p>
+
+<h3>La verità</h3>
+<p>Quella voce non è davvero di Neve. È il <b>Pastore Grigio</b>, lo spirito che nell'Oltrenebbia raduna gli Smarriti come un gregge. Neve <b>esiste ancora</b>, prigioniera nella nebbia: è la sua «agnella» preferita e non è invecchiata di un giorno. Il Pastore ha promesso a Ilvane che, se tutte le voci delle campane verranno <b>distrutte nella notte della Luna Vuota</b>, Neve tornerà. In realtà, senza campane la Bruma inghiottirà Brumaria e tutti i suoi abitanti diventeranno parte del gregge.</p>
+
+<h3>Cosa è appena successo (l'inizio dell'avventura)</h3>
+<p>Ilvane ha radunato i <b>Senzavoce</b>, un piccolo gruppo di abitanti che hanno perso qualcuno nella Bruma e che indossano maschere di cera grigia. Tra loro c'è <b>Fosco</b>, l'apprendista del campanaro. Durante la <b>Festa della Bruma</b> Fosco ha aperto la porta del campanile ai Senzavoce. Tobia li ha sorpresi, c'è stata una colluttazione e il vecchio è morto cadendo contro una campana. Fosco non voleva che accadesse e ne è sconvolto.</p>
+<p>I Senzavoce hanno rubato quattro voci su cinque. Per «spegnerle» per sempre, Ilvane deve tenere ognuna in un luogo legato a uno dei quattro elementi fino alla Luna Vuota:</p>
+<ul>
+<li><b>Aurora</b> è affidata all'acqua, nella gora del mulino. La custodisce <b>Comare Gracida</b>, una megera della palude.</li>
+<li><b>Vespro</b> è affidata alla terra, nel fondo della miniera. La custodisce <b>Ugo il Grosso</b>, un bugbear pagato in argento.</li>
+<li><b>Lucia</b> è affidata alle ossa, nella cripta dell'abbazia. La custodisce lo spirito inquieto dell'<b>Abate Ruggero</b>.</li>
+<li>La <b>Voce Madre</b> è affidata al fuoco: Ilvane la fonderà nel suo crogiolo.</li>
+</ul>
+<p>Finché la Luna Vuota non arriva, le voci possono essere recuperate e funzionano ancora. Ogni voce riportata al campanile indebolisce la Bruma.</p>
+
+<div class="nota"><b>L'indizio dell'Ombra.</b> Ilvane ha ordinato di <b>non toccare la campana Ombra</b>, quella che si suona per i morti, perché <i>«Neve non è morta»</i>. È un indizio importante per i giocatori: chi ha rubato le voci aveva un motivo personale, e conosceva bene le campane.</div>
+
+<h3>Il tema della storia</h3>
+<p>Non c'è un «cattivo» puro. Ilvane ha sofferto un'ingiustizia vera. Il Podestà ha fatto una scelta terribile ma forse necessaria. I Senzavoce sono persone ferite. L'unico vero nemico è il Pastore Grigio, che si nutre del dolore di tutti. I giocatori possono vincere con le armi, ma il finale migliore arriva con <b>la compassione</b>: dire la verità, ricordare i nomi degli smarriti e riportare a casa Neve.</p>
+
+<!-- ===================================================================== -->
+<h2 id="png">2. I personaggi del Master (PNG)</h2>
+<p>Per ogni personaggio trovi un trucco per interpretarlo: una voce, un gesto, una frase tipica. Non serve recitare bene: basta un dettaglio per farlo ricordare.</p>
+<table>
+<tr><th>Nome</th><th>Chi è</th><th>Cosa vuole</th><th>Come interpretarlo</th></tr>
+<tr><td><b>Ermanno Valli</b></td><td>Podestà di Brumaria, sessantenne, barba bianca curata</td><td>Salvare il borgo e tenere nascosta la sua colpa</td><td>Parla in modo solenne, si aggiusta sempre la catena d'oro della carica. Diventa nervoso se si nomina «Neve».</td></tr>
+<tr><td><b>Madre Orsola</b></td><td>Sacerdotessa della Dama del Rintocco, anziana, quasi cieca</td><td>Proteggere il borgo e i suoi fedeli. È l'alleata principale del gruppo.</td><td>Voce bassa e calma, tiene le mani di chi le parla. «La nebbia ha paura di chi ricorda.»</td></tr>
+<tr><td><b>Gemma Lanterna</b></td><td>Locandiera della «Lanterna Annegata», robusta e allegra</td><td>Che i clienti paghino e che la Festa sia un successo</td><td>Ride forte, chiama tutti «tesoro», sa tutti i pettegolezzi.</td></tr>
+<tr><td><b>Capitano Dario Brenna</b></td><td>Capo della guardia, con un occhio solo, onesto ma con pochi uomini</td><td>Ordine; non si fida degli stranieri</td><td>Frasi brevi, braccia conserte. Si ammorbidisce se qualcuno lo aiuta.</td></tr>
+<tr><td><b>Fosco</b></td><td>Apprendista campanaro, 17 anni, magro, occhi rossi di pianto</td><td>Rivedere il fratello Lino, smarrito due anni fa. Ora vuole solo essere perdonato.</td><td>Balbetta, guarda per terra, si tormenta le mani.</td></tr>
+<tr><td><b>Nonna Pia</b></td><td>La più vecchia del borgo, cantastorie</td><td>Che qualcuno la ascolti</td><td>Parla per proverbi e filastrocche. Conosce la leggenda del Pastore Grigio.</td></tr>
+<tr><td><b>Mastro Corrado</b></td><td>Fabbro, gigante buono</td><td>Aiutare; si offre di rimontare le voci recuperate</td><td>Voce tonante, mani nere di fuliggine, ride di gusto.</td></tr>
+<tr><td><b>Ilvane Corvo</b></td><td>Fonditrice di campane, 50 anni, capelli grigi raccolti, mani bruciate</td><td>Riavere sua figlia Neve, a qualsiasi prezzo</td><td>Fredda, precisa, parla come un'insegnante. Crolla solo davanti alla verità su Neve.</td></tr>
+<tr><td><b>Neve Corvo</b></td><td>Bambina di 9 anni, pallida, avvolta nella nebbia, scalza</td><td>Tornare dalla mamma, ma il Pastore la tiene stretta</td><td>Canticchia una ninna nanna. Parla poco: «Ho freddo… dov'è la mamma?»</td></tr>
+<tr><td><b>Il Pastore Grigio</b></td><td>Spirito dell'Oltrenebbia: figura altissima e incappucciata, col bastone da pastore e un volto senza lineamenti</td><td>Ingrandire il suo gregge di anime</td><td>Parla con le voci dei morti dei personaggi, ripete le parole altrui. È calmo, mellifluo, terrificante.</td></tr>
+</table>
+
+<h3>I segreti dei personaggi giocanti</h3>
+<p>Ogni scheda ha un «segreto» che lega il personaggio alla storia. I giocatori lo conoscono, gli altri no (a meno che non lo raccontino!). Ecco come farli emergere:</p>
+<table>
+<tr><th>Personaggio</th><th>Segreto</th><th>Quando farlo pesare</th></tr>
+<tr><td>Bruno</td><td>Suo padre trattenne Ilvane alla porta la notte in cui Neve si smarrì.</td><td>Con Ilvane nel finale: le scuse di Bruno valgono 1 successo per convincerla.</td></tr>
+<tr><td>Sorella Alba</td><td>Sogna una bambina che canta nella nebbia: è Neve, che chiede aiuto.</td><td>Ogni volta che il gruppo riposa, Alba può ricevere un frammento di sogno (un indizio a tua scelta).</td></tr>
+<tr><td>Pip</td><td>Ha venduto lui la cera per le maschere dei Senzavoce e sa dov'è l'isola.</td><td>Al ritrovamento del frammento di maschera (A2). Pip conosce anche un approdo nascosto sull'isola.</td></tr>
+<tr><td>Ottavio</td><td>È stato apprendista di Ilvane e costruì il carillon di Neve.</td><td>All'Abbazia (V12) riconosce il carillon. Con Ilvane: «Maestra, si ricorda di me?» vale 1 successo.</td></tr>
+<tr><td>Eryn</td><td>Vent'anni fa vide Neve portata via dal Pastore Grigio.</td><td>Quando qualcuno nomina il Pastore. La sua testimonianza conferma che Neve non è morta, ma prigioniera.</td></tr>
+<tr><td>Leonida (facoltativo)</td><td>Era con Neve quella sera e scappò. Conosce la sua ninna nanna.</td><td>Nel finale può suonarla per liberare Neve. Neve lo riconosce: «Leo? Sei diventato grande!»</td></tr>
+</table>
+
+<!-- ===================================================================== -->
+<h2 id="regole">3. Regole speciali della campagna</h2>
+
+<h3>3.1 La Clessidra della Bruma</h3>
+<p>La Clessidra è un modo semplice per mostrare ai giocatori che il tempo stringe. Disegna sei caselle su un foglio ben visibile al tavolo:</p>
+<div class="clessidra"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+<ul>
+<li><b>Alla fine dell'Atto I</b> annerisci <b>3 caselle</b>.</li>
+<li><b>Annerisci 1 casella</b> quando il gruppo perde molto tempo, per esempio torna indietro a metà di un luogo e riparte dopo giorni, oppure fallisce un obiettivo importante (lascia fuggire Fosco, si fa rubare una voce già recuperata).</li>
+<li><b>Cancella 1 casella</b> ogni volta che una voce viene riportata a Brumaria e suonata.</li>
+</ul>
+<p>La Clessidra <b>non fa mai perdere la partita</b>, ma rende più difficile il finale. Ogni casella annerita all'inizio dell'Atto III dà al Pastore Grigio <b>+10 punti ferita</b>. Inoltre:</p>
+<table>
+<tr><th>Caselle annerite</th><th>Cosa si vede a Brumaria</th></tr>
+<tr><td>0-1</td><td>La Bruma resta sul lago. Il borgo festeggia gli eroi.</td></tr>
+<tr><td>2-3</td><td>Di notte la nebbia lambisce le mura. La gente si chiude in casa e i bambini non escono.</td></tr>
+<tr><td>4-5</td><td>Di notte la nebbia scivola per le strade e si sentono voci chiamare dei nomi. Durante il riposo in paese, una notte su due tre Smarriti tentano di entrare in una casa.</td></tr>
+<tr><td>6</td><td>Il borgo è assediato. Nel finale appaiono 2 Smarriti in più.</td></tr>
+</table>
+
+<div class="consiglio">Il tempo è volutamente «morbido». Non contare i giorni di viaggio con precisione: annerisci una casella solo quando ti sembra giusto dal punto di vista della storia, e dillo ad alta voce: «Mentre riposate, sentite le campane rimaste suonare più deboli… la Bruma avanza». Funziona benissimo per creare tensione.</div>
+
+<h3>3.2 Riportare le voci a casa</h3>
+<p>Quando il gruppo riporta una voce a Brumaria, Mastro Corrado la rimonta e Madre Orsola la benedice. A mezzanotte la campana torna a suonare. Oltre a cancellare una casella della Clessidra, ogni voce dà al gruppo un <b>dono</b> fino alla fine della campagna:</p>
+<table>
+<tr><th>Voce</th><th>Dono (per tutto il gruppo)</th></tr>
+<tr><td><b>Aurora</b></td><td><b>Risveglio.</b> Una volta per riposo lungo, quando un personaggio scende a 0 punti ferita, può invece restare a 1 punto ferita.</td></tr>
+<tr><td><b>Vespro</b></td><td><b>Cuore saldo.</b> I personaggi hanno vantaggio ai tiri salvezza per non essere spaventati.</td></tr>
+<tr><td><b>Lucia</b></td><td><b>Luce nei ricordi.</b> Il gruppo scopre il vero nome del Pastore Grigio: <b>Ombrevallo</b>. Nel finale, pronunciarlo con un'azione rende il Pastore <i>stordito</i> fino alla fine del suo prossimo turno (funziona una sola volta).</td></tr>
+</table>
+<p>Inoltre, nel finale, <b>ogni voce recuperata toglie 10 punti ferita al Pastore Grigio</b>, perché le campane del borgo suonano lontane e lo indeboliscono.</p>
+
+<h3>3.3 Gli Smarriti e le campanelle</h3>
+<p>Madre Orsola dà a ogni personaggio una <b>campanella benedetta</b> (vedi Atto I). Con un'azione, un personaggio può suonarla: tutti gli Smarriti entro 9 metri devono superare un tiro salvezza su Saggezza (CD 10), altrimenti nel loro prossimo turno fuggono. Usare le campanelle è un modo semplice, e molto scenografico, per insegnare ai principianti che in D&D si può fare di più che attaccare.</p>
+
+<h3>3.4 Giocare in 5 o in 6</h3>
+<p>L'avventura è scritta per <b>5 giocatori</b>. Il sesto personaggio, <b>Leonida il bardo</b>, è <b>facoltativo</b>:</p>
+<ul>
+<li>Se gioca, in ogni scontro aggiungi quanto indicato nel riquadro <span class="chip">Con 6 giocatori</span>.</li>
+<li>Leonida ha un legame con la storia: conosce la <b>ninna nanna di Neve</b>. Se Leonida non gioca, la stessa melodia si trova nel <b>carillon d'argento</b> della tomba dell'Abate (Abbazia, V12). La storia funziona benissimo in entrambi i casi.</li>
+<li>Se un giocatore manca per una sessione, il suo personaggio «resta indietro» per una buona ragione (aiuta Madre Orsola, fa la guardia alla barca…). Puoi anche farlo muovere a un altro giocatore.</li>
+</ul>
+
+<h3>3.5 Salire di livello (milestone)</h3>
+<p>Niente conti dei punti esperienza: i personaggi salgono di livello in momenti precisi della storia. Ogni scheda personaggio spiega <b>esattamente</b> cosa cambia a ogni livello, e non ci sono scelte complicate da fare.</p>
+<ul>
+<li><b>2° livello</b>: alla fine dell'Atto I.</li>
+<li><b>3° livello</b>: dopo il secondo luogo dell'Atto II.</li>
+<li><b>4° livello</b>: dopo il terzo luogo dell'Atto II, prima della traversata del lago.</li>
+</ul>
+
+<h3>3.6 Le CD (Classi Difficoltà) in breve</h3>
+<table>
+<tr><th>Molto facile</th><th>Facile</th><th>Media</th><th>Difficile</th><th>Molto difficile</th></tr>
+<tr><td>5</td><td>10</td><td>12</td><td>15</td><td>20</td></tr>
+</table>
+<p>Usa quasi sempre <b>10 o 12</b>. Riserva il 15 alle cose davvero difficili. Non chiedere tiri per azioni che riuscirebbero comunque (aprire una porta normale, camminare per strada).</p>
+
+<!-- ===================================================================== -->
+<h2 id="zero">4. Sessione zero (circa 1 ora)</h2>
+<ol>
+<li><b>Presentazioni (5 min).</b> Spiega che D&amp;D è una storia raccontata insieme: tu descrivi il mondo, i giocatori dicono cosa fanno i loro personaggi, e i dadi decidono quando l'esito è incerto.</li>
+<li><b>Scelta dei personaggi (15 min).</b> Distribuisci le sei schede pronte. Leggi a voce alta solo il «Chi sono» di ognuna e lascia scegliere. Ogni giocatore può cambiare nome, aspetto e genere del proprio personaggio.</li>
+<li><b>I legami (10 min).</b> Ogni scheda ha una domanda «Legame». Fate un giro: ogni giocatore risponde guardando il personaggio alla sua destra. In questo modo il gruppo si conosce già all'inizio.</li>
+<li><b>Le regole di sicurezza (5 min).</b> Chiedete se c'è qualcosa che nessuno vuole vedere al tavolo, per esempio ragni, violenza su bambini o altro. Mettete una <b>carta X</b> al centro del tavolo: chi la tocca, senza dover spiegare, fa saltare la scena in corso. L'avventura parla di lutto e di una bambina perduta, ma senza scene crude.</li>
+<li><b>Prova delle regole (25 min).</b> Fate un mini-scontro con <b>2 Smarriti</b> su un foglio a quadretti, «per finta», nella palestra della caserma. Mostra come si tira l'iniziativa, si attacca e si lancia un incantesimo. Poi fai fare a tutti una prova di abilità (per esempio «Chi riesce a sollevare la botte?»).</li>
+</ol>
+<div class="consiglio">Durante la prova rispondi a una domanda alla volta e lascia la Guida del Giocatore al centro del tavolo. Va benissimo se alla prima partita ci si confonde: entro la terza sessione tutti avranno imparato.</div>
+
+<!-- ===================================================================== -->
+<h2 id="atto1">5. Atto I · La notte senza rintocchi</h2>
+<p><b>Livello dei personaggi:</b> 1 · <b>Durata:</b> 2 sessioni · <b>Mappe:</b> Brumaria, Campanile</p>
+
+<h3>Perché i personaggi sono a Brumaria</h3>
+<p>Ogni scheda personaggio ha già un motivo pronto. In sintesi:</p>
+<ul>
+<li><b>Bruno</b> è una guardia del borgo e oggi è di turno alla Festa.</li>
+<li><b>Sorella Alba</b> serve nel tempio della Dama del Rintocco.</li>
+<li><b>Pip</b> è venuto a vendere merce di contrabbando durante la Festa.</li>
+<li><b>Ottavio</b> studia la storia delle campane e voleva intervistare Tobia.</li>
+<li><b>Eryn</b> fa la guida nella palude e ha appena accompagnato in paese dei mercanti.</li>
+<li><b>Leonida</b>, se gioca, è il menestrello ingaggiato per la Festa.</li>
+</ul>
+
+<h3>Scena 1 · La Festa della Bruma</h3>
+<div class="leggi">È l'ultima sera d'ottobre e Brumaria è in festa. La Piazza del Rintocco è illuminata da centinaia di lanterne di carta. Si sentono l'odore di castagne arrosto e di pesce fritto, e i bambini corrono con le maschere da Smarrito fatte di stracci grigi. Sopra la piazza si alza il campanile di pietra scura. Ai piedi della torre, Madre Orsola benedice chi passa. Dal lago, lentamente, sale una nebbia sottile e argentata. È la Bruma. Tutti la guardano e sorridono: tra poco, a mezzanotte, le campane la ricacceranno indietro, come ogni anno.</div>
+<p>Lascia che i giocatori si muovano liberamente per la Festa e presentino i loro personaggi. Ecco alcune attività (fai tirare un d20, e con 10 o più vincono):</p>
+<ul>
+<li><b>La gara del palo unto</b> (Atletica): in cima c'è un prosciutto.</li>
+<li><b>Il lancio dei cerchi</b> (Destrezza): il premio è una lanterna di carta.</li>
+<li><b>La gara di racconti di Nonna Pia</b> (Intrattenere o Carisma): Nonna Pia racconta la leggenda del Pastore Grigio. Leggi il riquadro qui sotto.</li>
+<li><b>Il banco di Gemma</b>: vino caldo e chiacchiere. Gemma dice che «da qualche settimana l'apprendista Fosco è strano: piange da solo e parla di suo fratello».</li>
+</ul>
+<div class="leggi">Nonna Pia stringe lo scialle e abbassa la voce: «Nella nebbia c'è un pastore, alto come un pioppo, col bastone e senza faccia. Raduna chi si perde e se lo porta via. Lo chiamano il Pastore Grigio, ma il suo vero nome nessuno lo ricorda più. E sapete perché? Perché chi lo dimentica non può chiamarlo, e chi non può chiamarlo non può nemmeno cacciarlo via!»</div>
+
+<h3>Scena 2 · Mezzanotte</h3>
+<div class="leggi">La folla tace e tutti alzano gli occhi al campanile. Il primo rintocco… non arriva. Passa un minuto, poi un altro. Qualcuno ride nervoso. Poi le lanterne di carta cominciano a spegnersi una dopo l'altra, come soffiate da un respiro gelido. La nebbia, che fino a un attimo fa stava sul lago, scavalca il molo e invade la piazza. Nel grigio si muovono delle sagome, e non sono bambini in maschera.</div>
+
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro 1 · Gli Smarriti in piazza</span><br>
+<b>Nemici:</b> 4 Smarriti (vedi Bestiario).<br>
+<b>Mappa:</b> non serve. Disegna la piazza come un cerchio, con il campanile al centro e qualche bancarella.<br>
+<b>Tattica:</b> gli Smarriti si dirigono verso i cittadini più vicini, uno per ogni personaggio. Lasciano perdere chi suona una campana o chi tiene una torcia.<br>
+<b>Aiuto:</b> Madre Orsola grida «Le campanelle! Suonate le campanelle!» e lancia ai personaggi le campanelle benedette dal tempio (vedi 3.3).<br>
+<b>Fine:</b> quando restano 1 o 2 Smarriti, la nebbia si ritira da sola.</div>
+<div class="sei">aggiungi 1 Smarrito.</div>
+<div class="consiglio">Questo è il primo combattimento: vai piano. Spiega l'iniziativa, chiedi a ogni giocatore cosa fa nel suo turno e descrivi colpi e mancati in modo vivace («la tua spada attraversa il fumo grigio e la creatura urla senza voce!»). Uno Smarrito sconfitto si dissolve lasciando sul selciato un piccolo oggetto: un bottone, un fermaglio, un giocattolo. Qualcuno tra la folla riconosce l'oggetto di una persona cara scomparsa.</div>
+
+<h3>Scena 3 · Il campanile</h3>
+<p>Dopo lo scontro, Madre Orsola o il Capitano Brenna chiedono ai personaggi di salire sulla torre: «Tobia non risponde! Qualcuno deve suonare quelle campane!» La porta del campanile è aperta e la serratura non è forzata. Usa la mappa <b>03 · Il Campanile</b>.</p>
+<dl class="chiave">
+<dt>A1 · Il portone</dt><dd>È aperto, con la chiave ancora nella serratura dall'interno: chi è entrato aveva una chiave. Sui gradini ci sono impronte di <b>argilla grigia e umida</b>. Con <b>Natura CD 10</b> si capisce che è argilla da fonderia, quella che si trova solo sull'isola del lago.</dd>
+<dt>A2 · L'atrio</dt><dd>Al centro c'è una fonte d'acqua benedetta. Dal soffitto pendono corde tagliate di netto. Per terra, con <b>Percezione CD 10</b>, si trova un <b>frammento di maschera di cera grigia</b> (è dei Senzavoce).</dd>
+<dt>A3 · La sacrestia</dt><dd>Contiene paramenti, candele e un forziere aperto e vuoto: era quello delle chiavi. Con <b>Indagare CD 12</b> si nota che è stato aperto con la chiave e non scassinato.</dd>
+<dt>A4 · La scala a chiocciola</dt><dd>Sale fino alla sala delle corde, a 9 metri d'altezza.</dd>
+<dt>A5 · L'alloggio di Tobia</dt><dd>La porta è chiusa a chiave (si apre con gli attrezzi da scasso e <b>Destrezza CD 10</b>, o con una spallata e <b>Atletica CD 12</b>). Dentro ci sono un letto e un tavolo con il <b>diario di Tobia</b> (Documento 1, capitolo 12). L'ultima pagina parla della «vecchia fonditrice», di «quella notte di vent'anni fa» e di «Fosco che fa domande strane sulle campane».</dd>
+<dt>B1-B2 · La sala delle corde</dt><dd>Le cinque corde delle campane sono state recise. Dietro le botti del ripostiglio (B3) si nascondono due Senzavoce, rimasti indietro per bruciare il diario di Tobia. Credono che sia in questa stanza e non sanno che è giù in A5.</dd>
+<dt>B4 · Botola e scala a pioli</dt><dd>Portano alla cella campanaria.</dd>
+<dt>B5 · Il balcone</dt><dd>Ha una ringhiera bassa e affaccia sulla piazza. Un Senzavoce che scappa può tentare di calarsi da qui con una corda.</dd>
+<dt>C1 · La cella campanaria</dt><dd>Le cinque campane sono al loro posto, ma quattro sono <b>senza batacchio</b>: le hanno svuotate. Solo <b>Ombra</b>, la campana dei morti, ha ancora la sua voce.</dd>
+<dt>C2 · Il corpo di Tobia</dt><dd>Il vecchio giace accanto alla campana Ombra, con una ferita alla testa. Con <b>Medicina CD 10</b> si capisce che è caduto e ha battuto la testa: è stato un incidente durante una lotta, non un omicidio. Stringe nel pugno un <b>bottone d'ottone</b> con il simbolo di una campanella: è il bottone della giacca da apprendista di <b>Fosco</b>.</dd>
+<dt>C3 · Le arcate</dt><dd>Sono aperte sul vuoto, a 18 metri dal suolo. Da qui si vede la Bruma ritirarsi verso il lago e, lontano, <b>un bagliore rosso sull'isola</b>, come di una fornace accesa.</dd>
+<dt>C4 · La botola</dt><dd>Collega la cella alla sala delle corde.</dd>
+</dl>
+
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro 2 · I Senzavoce nel campanile</span><br>
+<b>Nemici:</b> 2 Senzavoce (vedi Bestiario).<br>
+<b>Dove:</b> sala delle corde (B2-B3).<br>
+<b>Tattica:</b> se vengono scoperti, uno attacca mentre l'altro cerca di fuggire dal balcone (B5). Se perdono metà dei punti ferita si arrendono subito: non sono assassini, sono persone disperate.<br>
+<b>Interrogatorio:</b> un Senzavoce catturato si chiama <b>Marta la cestaia</b>, e sua madre è stata smarrita tre inverni fa. Con <b>Persuasione CD 10</b> o <b>Intimidire CD 12</b> confessa: «La Maestra ci ha promesso che i nostri cari torneranno… Fosco ci ha aperto la porta. Tobia non doveva morire!» Non sa dove siano le voci, solo che «la Maestra le ha date a dei custodi». Dice anche che Fosco è scappato «verso la vecchia casa dei Corvo».</div>
+<div class="sei">aggiungi 1 Senzavoce.</div>
+
+<p><b>Suonare la campana Ombra.</b> Se un personaggio suona l'unica campana rimasta, la Bruma rallenta, ma non basta. Madre Orsola sale e spiega: «Ombra è la campana dei morti. Da sola tiene lontana la nebbia solo per poche notti. Ci servono le altre voci.»</p>
+
+<h3>Scena 4 · Il Consiglio (mattina dopo)</h3>
+<p>Il Podestà Ermanno Valli convoca i personaggi nel Palazzo del Consiglio (mappa di Brumaria, n. 3). Ci sono anche Madre Orsola e il Capitano Brenna.</p>
+<div class="leggi">Il Palazzo del Consiglio odora di cera e di legno vecchio. Il Podestà Valli, pallido, si aggiusta la catena d'oro sul petto. «Avete visto con i vostri occhi cosa è successo. Senza le voci delle campane, la Bruma tornerà ogni notte, sempre più forte. La guardia è troppo piccola per cercare dappertutto. Vi offro cento monete d'oro per ogni voce che riporterete a questo campanile. E la gratitudine eterna di Brumaria.»</div>
+<ul>
+<li><b>Ricompensa:</b> 100 mo per ogni voce, pagate al ritorno. Con <b>Persuasione CD 12</b> il Podestà offre in anticipo 50 mo e 2 pozioni di guarigione.</li>
+<li><b>Se qualcuno nomina Ilvane Corvo o Neve</b>, il Podestà impallidisce. Con <b>Intuizione CD 12</b> si capisce che nasconde qualcosa. Ammetterà la verità solo più avanti, oppure se messo alle strette (Persuasione o Intimidire CD 15): «Fui io a ordinare il Rintocco quella notte. Neve era là fuori. Ho salvato il borgo… e ho condannato una bambina.»</li>
+<li><b>Madre Orsola</b> regala al gruppo le <b>campanelle benedette</b> (se non le hanno già), 2 <b>fiaschette di acqua santa</b> e una mappa della valle (dai ai giocatori la mappa <b>01 · La Valle di Brumaria</b>). Spiega anche dove sono state portate le voci: «Ho pregato tutta la notte. La Dama mi ha mostrato tre luoghi: acqua ferma che gira, ferro sotto la montagna, ossa sotto la pietra santa.» Sono il Mulino, la Miniera e l'Abbazia.</li>
+</ul>
+<div class="consiglio">Se i giocatori non capiscono le visioni di Madre Orsola, aiutali senza problemi. Eryn conosce il mulino della palude, Ottavio sa della miniera abbandonata e Sorella Alba conosce l'abbazia. Oppure è Nonna Pia a risolvere l'enigma. Non bloccare mai la storia su un indovinello.</div>
+
+<h3>Scena 5 · La casa dei Corvo e Fosco</h3>
+<p>La casa abbandonata dei Corvo (mappa di Brumaria, n. 11) è in riva al lago, con le finestre sbarrate e l'edera sui muri. Dentro ci sono mobili coperti da lenzuola, una stanzetta da bambina rimasta intatta da vent'anni e un piccolo laboratorio con stampi da campana.</p>
+<div class="leggi">Nella stanzetta ci sono un lettino con una coperta ricamata a fiocchi di neve, una bambola di pezza e dei disegni appesi al muro: una donna e una bambina che si tengono per mano davanti a un campanile. Seduto sul pavimento, un ragazzo magro singhiozza con la faccia tra le mani. Sulla sua giacca da apprendista manca un bottone.</div>
+<p><b>Fosco</b> non combatte. Se i personaggi sono gentili racconta tutto quello che sa (con Persuasione CD 10, o senza tiro se gli parlano con compassione):</p>
+<ul>
+<li>La «Maestra» è <b>Ilvane Corvo</b>, che vive sull'Isola del Fonditore.</li>
+<li>Ilvane sente la voce di sua figlia Neve nei sogni. Ha promesso che, quando le campane taceranno per sempre, tutti gli smarriti torneranno, anche Lino, il fratello di Fosco.</li>
+<li>Le voci devono essere «spente» nei quattro elementi entro la notte della <b>Luna Vuota</b>. La <b>Voce Madre</b> se l'è portata Ilvane sull'isola.</li>
+<li>Per arrivare all'isola servono una barca e un modo per attraversare la Bruma: «La Maestra ci dava delle maschere di cera. Con quelle la nebbia non ti vede.» Fosco ne ha una e può <b>regalarla</b> al gruppo (vedi Tesori).</li>
+</ul>
+<div class="nota"><b>Se i personaggi sono minacciosi o violenti,</b> Fosco scappa dalla finestra verso il lago. Annerisci 1 casella della Clessidra: Fosco corre ad avvertire Ilvane, che si prepara meglio. Il gruppo potrà comunque ritrovarlo più avanti, sull'isola.</div>
+<div class="nota"><b>Cosa fare di Fosco.</b> Il Capitano Brenna vorrebbe arrestarlo. Madre Orsola chiede pietà: «È un ragazzo che ha perso suo fratello.» Lascia decidere ai giocatori. Se lo perdonano, Fosco diventa un alleato prezioso e nell'Atto III può guidare la barca.</div>
+
+<h3>Fine dell'Atto I</h3>
+<div class="leggi">Quella notte la campana Ombra suona da sola, con un rintocco lento e triste. La Bruma si ferma alle porte di Brumaria, ma non torna sul lago. Resta lì, ad aspettare. Domani si parte.</div>
+<p>✅ <b>I personaggi salgono al 2° livello.</b> Annerisci <b>3 caselle</b> della Clessidra della Bruma.</p>
+
+<h3>Viaggiare nella valle</h3>
+<p>Usa la mappa <b>01 · La Valle di Brumaria</b>. Non serve contare il cibo o le ore: basta descrivere il viaggio in un paio di frasi. Durante ogni viaggio, tira <b>1d6</b>. Con <b>1-2</b> c'è un incontro: tira sulla tabella del capitolo 11, oppure scegline uno adatto.</p>
+<ul>
+<li><b>Mulino della Palude Lenta:</b> 1 giorno a piedi verso sud-ovest. Eryn conosce la strada.</li>
+<li><b>Miniera di Ferrocupo:</b> 2 giorni a piedi verso nord, oppure 1 giorno in chiatta risalendo il fiume Lenta (il barcaiolo Gaspare chiede 5 mo).</li>
+<li><b>Abbazia di San Velio:</b> 1 giorno a piedi verso est, lungo la riva e poi nel bosco.</li>
+</ul>
+
+
+<!-- ===================================================================== -->
+<h2 id="atto2">6. Atto II · Le tre voci</h2>
+<p>I tre luoghi possono essere visitati <b>in qualsiasi ordine</b>. Dopo ognuno, il gruppo torna di solito a Brumaria a riportare la voce: è un buon momento per riposare, comprare equipaggiamento e parlare con i PNG.</p>
+<div class="nota"><b>Ritorni a Brumaria.</b> A ogni ritorno, scegli una piccola scena:
+<ul>
+<li>il Podestà paga la ricompensa, ma evita lo sguardo dei personaggi;</li>
+<li>Nonna Pia racconta un pezzo della storia di Neve («Era la bambina più allegra del borgo. Cantava sempre una ninna nanna inventata da sua madre…»);</li>
+<li>un cittadino ringrazia i personaggi perché il suono di una campana gli ha fatto tornare in mente il nome di una persona smarrita;</li>
+<li>Mastro Corrado rimonta la voce e invita tutti a sentire il rintocco di mezzanotte.</li>
+</ul></div>
+<div class="nota"><b>Cosa si compra a Brumaria.</b> Pozione di guarigione: 50 mo (Madre Orsola ne ha 4). Fiaschetta d'acqua santa: 25 mo. Frecce (20): 1 mo. Torce, corde, lanterne: prezzi della Guida del Giocatore. Mastro Corrado ripara gratis armi e armature corrose.</div>
+
+<!-- ======================= MULINO ======================= -->
+<h3 id="mulino">6a. Il Mulino della Palude Lenta <small>(voce «Aurora» · acqua)</small></h3>
+<p><b>Livello consigliato:</b> 2 · <b>Mappa:</b> 04 · Il Mulino · <b>Durata:</b> 1 sessione</p>
+<div class="nota"><b>In breve.</b> Il vecchio mulino ad acqua nella palude è abbandonato da anni. Ora ci vive <b>Comare Gracida</b>, una megera che si fa venerare da una tribù di <b>uomini-rana</b>. Ilvane le ha affidato la voce Aurora: è incatenata sotto la ruota del mulino, immersa nell'acqua che gira senza sosta. Gracida <b>non è interessata alla Bruma</b>. Vuole solo cose rare per la sua collezione, quindi <b>si può trattare con lei</b>.</div>
+
+<div class="leggi">La strada diventa sentiero, il sentiero diventa fango, e il fango diventa una passerella di assi marce sospesa sopra un'acqua scura e immobile. Le canne sono più alte di voi e frusciano anche senza vento. In lontananza si sente un cigolio lento e regolare: una grande ruota di legno che gira, gira, gira. Tra la nebbia bassa compare il profilo storto di un mulino.</div>
+
+<h4>Regole del luogo</h4>
+<ul>
+<li><b>Acqua bassa e fango</b> (tutto il verde scuro della mappa): terreno difficile, cioè ogni metro costa il doppio.</li>
+<li><b>Canale del mulino</b> (blu scuro): è profondo e bisogna nuotare. Si attraversa con una prova di <b>Atletica CD 10</b>; chi fallisce viene trascinato 3 metri a valle.</li>
+<li>Eryn ha il vantaggio <b>Esploratore nato (palude)</b>: guida il gruppo senza perdersi e non può essere sorpresa qui.</li>
+</ul>
+
+<dl class="chiave">
+<dt>M1 · L'isola dei giunchi</dt>
+<dd>La prima isola dopo la passerella. Tre uomini-rana sono nascosti nell'acqua bassa, mimetizzati tra le canne.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Agguato degli uomini-rana</span><br>
+<b>Nemici:</b> 3 Uomini-rana.<br>
+<b>Sorpresa:</b> chi ha Percezione passiva 12 o più li nota prima che attacchino.<br>
+<b>Tattica:</b> saltano fuori dall'acqua, colpiscono con le lance e cercano di spingere un personaggio in acqua (prova contrapposta di Atletica). Se due di loro vengono sconfitti, il terzo fugge verso il villaggio (M2) gracidando l'allarme.<br>
+<b>Parlare:</b> gli uomini-rana parlano un italiano stentato. Se catturati, rivelano che «la Grande Madre» vive nella «casa che gira» e che ha «un dono luccicante sotto la ruota».</div>
+<div class="sei">aggiungi 1 Uomo-rana.</div></dd>
+
+<dt>M2 · Il villaggio degli uomini-rana</dt>
+<dd>Quattro capanne di fango attorno a un fuoco fumoso. Ci vivono <b>Re Gluglù</b> (un uomo-rana grasso con una corona di ami da pesca) e la sua tribù: 4 guerrieri, più femmine e girini che non combattono. Gli uomini-rana sono <b>vanitosi e pavidi</b>. Se vengono chiamati «Maestà» e ricevono un dono luccicante (un oggetto da almeno 5 mo, o una prova di <b>Persuasione CD 10</b>), il Re racconta tutto su Gracida e offre una guida fino al mulino. Se vengono attaccati, fuggono in acqua: non c'è bisogno di combattere qui.</dd>
+
+<dt>M7 · La piana di fango</dt>
+<dd>Una distesa fangosa davanti al mulino. Nel fango è sepolta una <b>rana gigante</b>, l'animale da guardia di Gracida. Attacca chi passa nel mezzo. Si può evitare camminando sulle passerelle.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · La rana gigante</span><br>
+<b>Nemici:</b> 1 Rana gigante. Afferra con la lingua e cerca di trascinare la preda in acqua. Fugge se perde metà dei punti ferita.</div>
+<div class="sei">aggiungi una seconda Rana gigante.</div></dd>
+
+<dt>M3 · La sala della macina</dt>
+<dd>Una grande macina di pietra gira lentamente, mossa dall'albero di trasmissione della ruota esterna. Ci sono sacchi di farina ammuffita, botti e casse. Vicino alla macina c'è una <b>leva del freno</b>, arrugginita: per tirarla serve <b>Atletica CD 12</b>, o due personaggi insieme senza tiro. Il freno ferma la ruota (vedi M5).</dd>
+
+<dt>M4 · La tana di Comare Gracida</dt>
+<dd>Ci sono un letto fatto di reti da pesca, un calderone che borbotta e scaffali pieni di barattoli: occhi di rana, capelli intrecciati, conchiglie… e <b>ricordi in bottiglia</b>, piccole luci che sussurrano. Gracida accoglie il gruppo con la sua <b>illusione</b>: una vecchina gentile con il grembiule infarinato, che offre biscotti (fatti di fango).
+<div class="leggi">«Oh, che bei giovanotti! Visite, visite! Nessuno viene mai a trovare la povera Gracida. Volete un biscotto, tesorini? Sedetevi, sedetevi…» La vecchina sorride, ma i suoi occhi sono gialli come quelli di un rospo, e per un istante la sua ombra sul muro ha le dita troppo lunghe.</div>
+<p><b>Cosa sa e cosa vuole Gracida.</b> Ammette senza problemi di custodire la voce: «Una signora triste me l'ha portata. Mi ha pagata con una cosa preziosa… un ricordo felice di sua figlia». Mostra una bottiglia con una lucina dorata: è il <b>ricordo di Ilvane</b> (vedi più sotto). Gracida è disposta a cedere la voce <b>in cambio di qualcosa di altrettanto prezioso</b>. Lascia scegliere ai giocatori:</p>
+<ul>
+<li><b>Un ricordo:</b> un personaggio le racconta un suo ricordo felice e lo dimentica fino alla fine della campagna. È una bella occasione di gioco di ruolo, e il ricordo tornerà nell'epilogo.</li>
+<li><b>Una voce:</b> un personaggio le cede la sua voce fino all'alba successiva. Resta muto: niente incantesimi con componente verbale e niente conversazioni.</li>
+<li><b>Una storia triste</b> raccontata bene: prova di <b>Intrattenere o Persuasione CD 12</b>. Gracida colleziona dolori e piange lacrime di fango.</li>
+<li><b>Un inganno:</b> prova di <b>Inganno CD 14</b> (per esempio, spacciare un oggetto qualsiasi per un tesoro magico). Se fallisce, Gracida si offende e attacca.</li>
+</ul>
+<p>Se l'accordo va in porto, Gracida tira fuori la catena e la voce dalla gora (M5) senza combattere. È anche disposta a vendere il <b>ricordo di Ilvane</b> per 50 mo, o in cambio di un altro favore. Questo ricordo è utilissimo nel finale (vedi Atto III).</p>
+<div class="scontro"><span class="diff">Media</span><span class="tit">⚔ Scontro · Comare Gracida</span><br>
+<b>Nemici:</b> Comare Gracida (vedi Bestiario). Se lo scontro avviene vicino al villaggio, si aggiungono 2 Uomini-rana.<br>
+<b>Tattica:</b> lascia cadere l'illusione e si mostra com'è davvero: pelle verde, capelli di alghe, artigli neri. Combatte imitando le voci dei personaggi per confonderli. Quando ha <b>15 punti ferita o meno</b> si tuffa nel canale e sparisce. Lascia dietro di sé la tana e il suo tesoro, ma <b>non</b> la voce, che resta incatenata sotto la ruota (M5).</div>
+<div class="sei">aggiungi 1 Uomo-rana.</div></dd>
+
+<dt>M5 · La gora e la ruota</dt>
+<dd>La voce Aurora, un batacchio di bronzo e ferro lungo come un braccio, è <b>incatenata sott'acqua</b> sotto la ruota del mulino. Si vede brillare debolmente nell'acqua scura. Per recuperarla:
+<ul>
+<li><b>Fermare la ruota:</b> con il freno in M3, oppure infilando una trave tra le pale (<b>Atletica CD 12</b>).</li>
+<li><b>Tuffarsi:</b> se la ruota è ferma basta una prova di <b>Atletica CD 10</b>. Se la ruota gira, chi fallisce la prova viene colpito dalle pale (1d6 danni contundenti) e deve riprovare.</li>
+<li><b>Spezzare la catena:</b> CA 15, 10 punti ferita. Oppure si apre il lucchetto con gli attrezzi da scasso (<b>Destrezza CD 12</b>).</li>
+</ul></dd>
+
+<dt>M6 · L'isolotto delle offerte</dt>
+<dd>Un albero morto da cui pendono gabbie di vimini. In una c'è un prigioniero, <b>Beppe il pescatore</b>, che Gracida voleva «tenere per l'inverno». È vivo, affamato e terrorizzato. Si raggiunge camminando sul tronco caduto (<b>Acrobazia CD 10</b>; chi fallisce cade nel canale). Se viene liberato, Beppe promette ai personaggi <b>la sua barca</b> per arrivare all'isola nell'Atto III.</dd>
+</dl>
+<div class="nota"><b>Tesoro del Mulino.</b> Nella tana di Gracida ci sono 60 mo in monete antiche, 2 <b>pozioni di guarigione</b> e un <b>Mantello elfico</b> (perfetto per Pip o Eryn) piegato in un baule. Tra i barattoli c'è un <b>Amuleto della rana</b> (vedi Tesori). Nella gabbia di Beppe c'è anche una <b>lettera di Ilvane</b> (Documento 5) che Gracida usava come foglio per avvolgere le ossa.</div>
+<p><b>Se affrontato per ultimo</b> (al 3° livello): Gracida ha 60 punti ferita e in M1 ci sono 4 uomini-rana.</p>
+
+<!-- ======================= MINIERA ======================= -->
+<h3 id="miniera">6b. La Miniera di Ferrocupo <small>(voce «Vespro» · terra)</small></h3>
+<p><b>Livello consigliato:</b> 2 (si sale al 3° alla fine, se è il secondo luogo) · <b>Mappa:</b> 05 · La Miniera · <b>Durata:</b> 1-2 sessioni</p>
+<div class="nota"><b>In breve.</b> La miniera di ferro, chiusa da trent'anni, è occupata dal clan goblin dei <b>Mordiferro</b>, guidato dal bugbear <b>Ugo il Grosso</b>. Ilvane ha pagato Ugo in argento perché custodisse la voce Vespro nella <b>vena più profonda</b>. Ma laggiù vive un <b>divoraferro</b>, un mostro che mangia il metallo, e i goblin hanno troppa paura per tornarci. I goblin sono stanchi di Ugo e affamati: <b>sono facili da corrompere</b>. Nella miniera è prigioniero <b>Fulvio</b>, uno gnomo cercatore che conosce i passaggi segreti.</div>
+
+<div class="leggi">Il sentiero di montagna termina davanti a una bocca nera nella roccia, sostenuta da travi annerite. Sopra l'ingresso, una vecchia insegna di ferro dice «FERROCUPO» … ma qualcuno ha cancellato metà delle lettere e ha scritto sotto, con il carbone, «MORDIFERRO — VIA!». Dall'interno arrivano odore di fumo e il ticchettio di dadi su un sasso.</div>
+
+<dl class="chiave">
+<dt>F1 · Il pendio e l'ingresso</dt>
+<dd>Due goblin di guardia giocano a dadi appena dentro la galleria e non stanno attenti: si possono sorprendere con <b>Furtività CD 10</b> (prova di gruppo: se riesce almeno metà del gruppo, va tutto bene). Si possono anche <b>corrompere</b>: 5 mo o del cibo, e i goblin «non hanno visto niente».
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Le sentinelle</span><br>
+<b>Nemici:</b> 2 Goblin. Se uno dei due fugge, corre in F2 a dare l'allarme.</div></dd>
+
+<dt>F2 · Il posto di guardia</dt>
+<dd>C'è un tavolo con resti di cena, un fuoco e un <b>gong</b> fatto con una pentola. Due goblin sonnecchiano qui. Se suonano il gong, i goblin di F6 sono pronti quando il gruppo arriva (niente sorpresa possibile), ma non accorrono. A nord parte la galleria verso F8 (acqua alla vita), a est la galleria dei carrelli.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Il posto di guardia</span><br>
+<b>Nemici:</b> 2 Goblin. Combattono solo se non possono scappare.</div>
+<div class="sei">aggiungi 1 Goblin qui e 1 in F1.</div></dd>
+
+<dt>F3 · Il dormitorio dei minatori</dt>
+<dd>È chiuso da una porta. Dentro ci sono vecchie brande e una gabbia vuota. Due <b>lupi</b> legati a catene lunghe 3 metri fanno la guardia ai sacchi di provviste dei goblin. Se ricevono cibo (anche una razione), con <b>Addestrare Animali CD 10</b> si calmano. Altrimenti attaccano chi si avvicina, ma non possono uscire dalla stanza.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · I lupi (evitabile)</span><br>
+<b>Nemici:</b> 2 Lupi, trattenuti dalle catene.</div>
+<p>Sotto una branda c'è un sacchetto con <b>30 mo in argento</b>: è la paga di Ugo, che lui nasconde ai goblin.</p></dd>
+
+<dt>F4 · La galleria dei carrelli</dt>
+<dd>Una galleria in salita, con rotaie e un vecchio carrello. È una <b>trappola</b>: quando sentono arrivare qualcuno, i goblin di F5 spingono un secondo carrello pieno di pietre lungo la discesa.
+<div class="nota"><b>Trappola · Il carrello impazzito.</b> Il rumore è ben udibile (con Percezione CD 10 si sente qualche secondo prima). Chi è sulle rotaie fa un tiro salvezza su <b>Destrezza CD 12</b>: se fallisce subisce 2d6 danni contundenti, se riesce metà. Il carrello si schianta contro il primo carrello fermo. <b>Idea per i giocatori:</b> si può usare il carrello fermo come scudo, oppure spingerlo in salita contro i goblin.</div></dd>
+
+<dt>F5 · Il baratro</dt>
+<dd>Una grotta tagliata in due da un crepaccio profondo 18 metri. Lo attraversa un <b>ponte di corde</b> che oscilla: chi lo attraversa camminando non ha problemi, chi corre o combatte sul ponte deve fare una prova di <b>Acrobazia CD 10</b>. Sull'altro lato, dietro una roccia, ci sono 2 goblin arcieri. Il cunicolo stretto a ovest porta in F9: ci passano solo creature piccole (Pip, Ottavio) o chi supera <b>Acrobazia CD 12</b>.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Arcieri sul baratro</span><br>
+<b>Nemici:</b> 2 Goblin con l'arco, in copertura (+2 CA). Minacciano di tagliare il ponte, ma <b>non lo fanno</b>: è l'unica via d'uscita anche per loro. Se uno cade, l'altro si arrende.</div></dd>
+
+<dt>F6 · L'accampamento</dt>
+<dd>Una grande caverna con quattro tende, un falò e casse di provviste. Ci sono <b>4 goblin</b> affamati che si lamentano di Ugo («Lui mangia tutto! Noi solo ossa!»). In una gabbia appesa c'è <b>Fulvio</b>, uno gnomo cercatore di gemme catturato una settimana fa.
+<ul>
+<li><b>Trattare:</b> con del cibo, del denaro (10 mo) o una prova di <b>Persuasione CD 12</b>, i goblin lasciano passare il gruppo e magari si uniscono alla «rivolta» contro Ugo. Possono anche consegnare Fulvio.</li>
+<li><b>Fulvio</b> è chiacchierone e riconoscente. Se viene liberato, spiega che la voce è nella vena profonda (F9) e che «la bestia mangiaferro ci dorme sopra come una gallina sulle uova». Conosce la strada dalla galleria allagata (F8) e il trucco per distrarre il mostro: «Gli butti un po' di ferro e quello impazzisce!»</li>
+</ul>
+<div class="scontro"><span class="diff">Media</span><span class="tit">⚔ Scontro · L'accampamento</span><br>
+<b>Nemici:</b> 4 Goblin. Quando due di loro cadono, gli altri si arrendono e implorano pietà.</div>
+<div class="sei">aggiungi 1 Goblin.</div></dd>
+
+<dt>F7 · La tana di Ugo il Grosso</dt>
+<dd>Una caverna con un «trono» fatto di un carrello rovesciato, un giaciglio di pelli e due bauli. <b>Ugo il Grosso</b> è un bugbear enorme e pigro, ha con sé il suo lupo «Briciola» e rosicchia un osso di montone.
+<div class="leggi">Una montagna di pelo rossiccio si alza dal trono di legno. Due occhi gialli vi squadrano dall'alto in basso. «Ospiti! Ugo non ha ordinato ospiti.» Si gratta la pancia con la mazza ferrata. «Siete venuti per il batacchio, eh? La donna grigia ha pagato Ugo. Ugo è un bugbear d'onore… più o meno.»</div>
+<p>Ugo è <b>avido e ama le sfide</b>. Ci sono tre modi pacifici per ottenere la voce:</p>
+<ul>
+<li><b>Pagarlo di più:</b> Ilvane gli ha dato 50 mo d'argento, e lui ne vuole 60. Con <b>Persuasione CD 12</b> si accontenta di 40.</li>
+<li><b>Una sfida a braccio di ferro:</b> prova contrapposta di <b>Atletica</b> contro Ugo (+4). Al meglio di tre. Ugo rispetta il risultato.</li>
+<li><b>Dirgli la verità:</b> la voce è nella vena profonda, con il divoraferro. Anche Ugo ha paura di andarci, e se il gruppo lo «libera» dal mostro lascia loro il batacchio volentieri. «Basta che non lo dite alla donna grigia.»</li>
+</ul>
+<div class="scontro"><span class="diff">Media</span><span class="tit">⚔ Scontro · Ugo il Grosso</span><br>
+<b>Nemici:</b> Ugo il Grosso e 1 Lupo (Briciola).<br>
+<b>Tattica:</b> Ugo attacca il personaggio più grosso, «per rispetto». Quando scende sotto 10 punti ferita si arrende e offre il suo tesoro.</div>
+<div class="sei">aggiungi 1 Goblin (la guardia del corpo di Ugo).</div>
+<p><b>Tesoro:</b> nei bauli ci sono 120 mo in monete d'argento, 2 <b>pozioni di guarigione</b> e una <b>Spada lunga +1</b> chiamata «Rintocco», trovata da Ugo in miniera (perfetta per Bruno).</p></dd>
+
+<dt>F8 · La galleria allagata</dt>
+<dd>L'acqua arriva alla vita: è terreno difficile, e le creature piccole devono nuotare. È tutto buio, servono luce o scurovisione. Sulle pareti ci sono vecchi segni dei minatori: una freccia e la scritta «VENA → FESSURA». Una fessura stretta ma percorribile porta in F9.</dd>
+
+<dt>F9 · La vena profonda</dt>
+<dd>Una caverna scintillante di cristalli azzurri. Al centro, su un nido di ferro rosicchiato, dorme il <b>divoraferro</b>: un insetto grande come un cane, con la coda a pala e lunghe antenne piumate. Sotto di lui c'è la voce Vespro, che il mostro lecca come una caramella.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Il divoraferro</span><br>
+<b>Nemici:</b> 1 Divoraferro.<br>
+<b>Soluzione furba:</b> se qualcuno lancia oggetti di ferro (chiodi, pentole, armi vecchie dei goblin) lontano dal nido, il divoraferro li insegue e li mangia, e per <b>3 turni</b> ignora tutto il resto. È il momento giusto per prendere la voce.<br>
+<b>Attenzione:</b> le sue antenne corrodono il metallo. Rassicura i giocatori: Mastro Corrado ripara tutto gratis a Brumaria.</div>
+<div class="sei">il divoraferro ha 36 punti ferita.</div></dd>
+</dl>
+<p><b>Se affrontato per ultimo</b> (al 3° livello): Ugo ha 45 punti ferita e in F6 ci sono 5 goblin.</p>
+
+<!-- ======================= ABBAZIA ======================= -->
+<h3 id="abbazia">6c. L'Abbazia di San Velio <small>(voce «Lucia» · ossa)</small></h3>
+<p><b>Livello consigliato:</b> 3 · <b>Mappa:</b> 06 · L'Abbazia · <b>Durata:</b> 1 sessione</p>
+<div class="nota"><b>In breve.</b> L'abbazia, abbandonata da un secolo, fu la casa dei monaci che scrissero la <b>Legge del Rintocco</b>: «A mezzanotte si suona, senza indugio e senza pietà.» Il suo autore, l'<b>Abate Ruggero</b>, non ha mai trovato pace per i tanti smarriti che la sua legge ha causato. Ilvane ha risvegliato il suo spirito e gli ha affidato la voce Lucia, convincendolo che «tacere le campane è l'unico modo per espiare». Nella cripta c'è anche il <b>carillon d'argento</b> di Neve, che Ilvane ha lasciato lì perché non riusciva più ad ascoltarlo.</div>
+
+<div class="leggi">Sulla collina, tra querce nere, si alza ciò che resta dell'Abbazia di San Velio: un campanile spezzato a metà, un tetto sfondato, mura coperte d'edera. Centinaia di corvi stanno appollaiati sui cornicioni, in silenzio. Nessuno gracchia. Quando mettete piede sul sagrato, si alzano in volo tutti insieme, senza un suono, e la porta della chiesa si apre da sola, cigolando.</div>
+
+<dl class="chiave">
+<dt>V1 · Il sagrato</dt>
+<dd>Su una lapide rotta si legge: <i>«Qui riposa chi ha custodito il sonno dei giusti.»</i> È un indizio per l'enigma.</dd>
+
+<dt>V2 · La navata</dt>
+<dd>File di panche marce e colonne. La luce entra dal tetto sfondato. Quando qualcuno raggiunge il centro della navata, <b>quattro scheletri di monaci</b> si alzano dalle panche.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · I monaci scheletro</span><br>
+<b>Nemici:</b> 4 Scheletri. Sono vulnerabili ai danni contundenti (mazze, martelli, bastoni).<br>
+<b>Aiuto:</b> Sorella Alba può usare <b>Incanalare Divinità: Scacciare Non Morti</b>, ed è il momento perfetto per mostrarlo.</div>
+<div class="sei">aggiungi 1 Scheletro.</div></dd>
+
+<dt>V3 · Il presbiterio e la scala</dt>
+<dd>Un altare di pietra con il simbolo della Dama del Rintocco. Chi prega qui per un minuto (<b>Religione CD 10</b>, oppure Sorella Alba senza tiro) riceve una benedizione: tutti i presenti ottengono <b>1d8 punti ferita temporanei</b>, una sola volta. Dietro l'altare una scala scende alla cripta (V9).</dd>
+
+<dt>V4 · Il chiostro</dt>
+<dd>Un giardino incolto con un pozzo al centro. Accanto al pozzo appare il fantasma gentile di <b>Fra' Tommaso</b>, un giovane novizio. È innocuo e si sente solo.
+<div class="leggi">Una figura trasparente, con la tonaca e la tonsura, sta seduta sul bordo del pozzo a dondolare le gambe. «Oh! Siete vivi? Che bello! Qui sono tutti morti da tanto, e quelli sotto sono così noiosi…» Poi si fa serio. «Siete qui per il batacchio d'oro, vero? L'Abate lo tiene stretto stretto. Poverino. Non ha mai smesso di sentirsi in colpa.»</div>
+<p>Fra' Tommaso racconta la storia dell'Abate Ruggero e della Legge. Dice che per aprire la tomba bisogna «far cantare i Tre Santi nell'ordine dell'inno», e che l'inno si trova in biblioteca (V7). Aggiunge che «se l'Abate sente l'inno, si ricorda di quando era buono».</p></dd>
+
+<dt>V5 · Il refettorio</dt>
+<dd>Tavoli lunghi e ciotole di legno. Due <b>monaci zombi</b> sono ancora seduti a «mangiare» polvere. Si alzano solo se vengono disturbati, e sono lenti.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Gli zombi a tavola (evitabile)</span><br>
+<b>Nemici:</b> 2 Zombi.</div></dd>
+
+<dt>V6 · Il dormitorio</dt>
+<dd>Brande e un crollo di macerie. Tra le travi vive uno <b>sciame di pipistrelli</b> che si alza se si fa luce o rumore. Sotto le macerie (<b>Indagare CD 12</b>, oppure un'ora di scavo) c'è il forziere del priore: dentro una <b>Bacchetta dei dardi incantati</b> e 40 mo.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · I pipistrelli</span><br>
+<b>Nemici:</b> 1 Sciame di pipistrelli. Fugge se viene colpito con il fuoco.</div></dd>
+
+<dt>V7 · La biblioteca (sala capitolare)</dt>
+<dd>Scaffali crollati, pergamene ammuffite. Su un leggio, sotto una teca di vetro rotta, c'è un libro aperto con l'<b>Inno dei Tre Santi</b> (Documento 2): è la soluzione dell'enigma. Con <b>Storia CD 12</b> si trova anche il registro dell'abbazia, che racconta come l'Abate Ruggero scrisse la Legge del Rintocco dopo una notte in cui la Bruma uccise metà del borgo. Il registro riporta anche il suo pentimento: «Dio mi perdoni, ho scritto una legge senza pietà».</dd>
+
+<dt>V8 · Il campanile in rovina</dt>
+<dd>Una scala di legno marcio sale fino alla cima (<b>Atletica CD 10</b>). Lassù c'è un nido di corvi con <b>2 pozioni di guarigione</b> rubate chissà dove, e una vista su tutta la valle: si vede il Lago Brumo e un filo di fumo rosso che sale dall'isola.</dd>
+
+<dt>V9 · L'anticripta</dt>
+<dd>La scala termina in una stanzetta fredda. Sull'arco è inciso: <i>«Lucia apre gli occhi al giorno. Vespro lo accompagna al riposo. Velio veglia sul sonno dei giusti.»</i> È la soluzione dell'enigma, nel caso il gruppo non abbia trovato la biblioteca.</dd>
+
+<dt>V10 · L'ossario e il Coro Muto</dt>
+<dd>Le pareti sono coperte di nicchie piene di teschi. Al centro ci sono tre statue di santi, ognuna con una piccola campana di bronzo in mano, senza batacchio: <b>Santa Lucia</b> (con una lanterna), <b>San Vespro</b> (con una stella), <b>San Velio</b> (con un bastone da pastore). A est c'è una porta di pietra sigillata.
+<div class="nota"><b>L'enigma del Coro Muto.</b> Bisogna far suonare le tre campanelle (toccandole con un'arma o con le campanelle benedette) <b>nell'ordine dell'inno: Lucia → Vespro → Velio</b>.
+<ul>
+<li><b>Ordine giusto:</b> la porta sigillata si apre con un sospiro di pietra. Le tre statue «cantano» l'inno con voci lontane, e l'Abate nella tomba lo sente: nello scontro ha <b>svantaggio ai tiri per colpire</b>.</li>
+<li><b>Ordine sbagliato:</b> due scheletri escono dalle nicchie e attaccano. Dopo lo scontro si può riprovare.</li>
+<li>Se proprio non ci arrivano, Fra' Tommaso appare e canticchia l'inno.</li>
+</ul></div></dd>
+
+<dt>V11 · La sala dei sarcofagi</dt>
+<dd>Sei sarcofagi di monaci. Se qualcuno fa rumore, per esempio combattendo o aprendo un sarcofago, <b>3 zombi</b> sollevano i coperchi. Con <b>Percezione CD 13</b> si trova una <b>porta segreta</b> a est che conduce direttamente alla tomba dell'Abate (V12): è un'alternativa se l'enigma non viene risolto.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · I sarcofagi (evitabile)</span><br>
+<b>Nemici:</b> 3 Zombi.</div></dd>
+
+<dt>V12 · La tomba dell'Abate Ruggero</dt>
+<dd>Una sala con quattro colonne e fuochi fatui azzurri che galleggiano negli angoli. Al centro c'è un grande sarcofago con la statua dell'Abate. Sopra il sarcofago, tra le mani di pietra, c'è la <b>voce Lucia</b>. Su un altarino votivo è posato un <b>carillon d'argento</b>.
+<div class="leggi">Il coperchio del sarcofago scivola di lato con un rumore di macina. Una figura si alza: è un vecchio in tonaca e cotta di maglia arrugginita, con occhi che brillano come braci azzurre. Tiene in pugno una mazza da guerra. «La Legge… dev'essere rispettata. Senza indugio. Senza pietà.» Poi abbassa lo sguardo sul batacchio d'oro. «Ma lei ha detto… che se tacciono, nessuno sarà più smarrito… È vero? Ditemi che è vero.»</div>
+<p><b>L'Abate si può convincere.</b> È un'anima tormentata, non malvagia. Se il gruppo gli spiega la verità (le campane proteggono, e senza di loro tutti verrebbero smarriti) e gli promette che <b>la Legge verrà cambiata</b>, con una prova di <b>Persuasione CD 13</b> (CD 10 se l'enigma è stato risolto, perché ha sentito l'inno) l'Abate consegna la voce e trova pace. Si dissolve in luce, sussurrando il <b>vero nome del Pastore Grigio: Ombrevallo</b>. Il gruppo lo impara subito, anche prima di portare la voce a casa.</p>
+<div class="scontro"><span class="diff">Media</span><span class="tit">⚔ Scontro · L'Abate Ruggero</span><br>
+<b>Nemici:</b> l'Abate Ruggero (vedi Bestiario). Ha svantaggio ai tiri per colpire se l'enigma è stato risolto.<br>
+<b>Fine:</b> quando arriva a 0 punti ferita si inginocchia e trova pace: «Grazie… ditegli il mio nome… Ruggero… e chiamatelo con il suo: Ombrevallo.»</div>
+<div class="sei">aggiungi 2 Scheletri che escono dalle colonne.</div>
+<p><b>Il carillon d'argento.</b> Se viene aperto suona una ninna nanna dolcissima: è la <b>ninna nanna di Neve</b> (Documento 3). Dentro il coperchio è inciso: <i>«Per Neve, da mamma. Quando hai paura, ascolta e torna a casa.»</i> Se Leonida è nel gruppo, riconosce subito la melodia: gliel'aveva insegnata Neve stessa, da bambini (vedi la sua scheda). Ottavio, invece, riconosce il <b>meccanismo</b>: l'ha costruito lui, venticinque anni fa. È l'oggetto più importante per il finale.</p></dd>
+</dl>
+<div class="nota"><b>Tesoro dell'Abbazia.</b> Nella tomba ci sono uno <b>Scudo +1</b> (lo scudo dell'Abate), una <b>Pergamena di Arma spirituale</b> e 80 mo in offerte votive. In più la Bacchetta dei dardi incantati (V6) e le pozioni del campanile (V8).</div>
+<p><b>Se affrontata prima</b> (al 2° livello): togli 2 scheletri dalla navata e dai all'Abate 30 punti ferita.</p>
+<p>✅ <b>Dopo il terzo luogo i personaggi salgono al 4° livello.</b></p>
+
+<!-- ===================================================================== -->
+<h2 id="atto3">7. Atto III · L'Isola del Fonditore</h2>
+<p><b>Livello:</b> 4 · <b>Mappa:</b> 07 · L'Isola del Fonditore · <b>Durata:</b> 2 sessioni</p>
+<div class="nota"><b>In breve.</b> È la notte della <b>Luna Vuota</b>, che arriva proprio quando il gruppo è pronto (non serve contare i giorni). Ilvane si prepara a fondere la Voce Madre nel crogiolo. Se ci riesce, il Pastore Grigio uscirà dal Pozzo della Bruma con il suo gregge per inghiottire Brumaria. I personaggi devono attraversare il lago, raggiungere la fonderia, fermare Ilvane (con le parole o con le armi) e affrontare il Pastore Grigio.</div>
+
+<h3>Preparativi a Brumaria</h3>
+<ul>
+<li><b>La barca:</b> quella di Beppe (se è stato salvato al Mulino) o una presa al Molo Lungo. Fosco, se è stato perdonato, si offre di remare: conosce la rotta.</li>
+<li><b>La confessione del Podestà:</b> se i giocatori glielo chiedono, Ermanno Valli scrive una lettera di scuse per Ilvane: <i>«Ho sbagliato. Avrei dovuto aspettare. Perdonami, se puoi.»</i> Con <b>Persuasione CD 12</b> decide addirittura di venire con loro. Sarà utilissima nel finale.</li>
+<li><b>Gli alleati:</b> il Capitano Brenna e Madre Orsola restano a difendere il borgo. Promettono che <b>a mezzanotte suoneranno tutte le campane recuperate</b>. Brenna dice: «Se vedete che serve aiuto, accendete il vecchio faro sull'isola. Verremo con le barche.»</li>
+<li><b>Un riposo lungo:</b> i personaggi partono con tutti i punti ferita e gli incantesimi.</li>
+</ul>
+
+<h3>Scena 1 · La traversata</h3>
+<div class="leggi">Il lago è nero e immobile come uno specchio. Non c'è luna, è la notte della Luna Vuota. I remi affondano senza rumore. Dopo pochi minuti la Bruma vi avvolge: non vedete più la riva, non vedete più niente. Solo nebbia grigia, fredda, che sa di ferro e di fiori appassiti. Poi, nella nebbia, qualcuno vi chiama per nome. È una voce che conoscete bene.</div>
+<p>Ogni personaggio sente la voce di una persona cara perduta che lo chiama dall'acqua. Chiedi a ogni giocatore <i>chi</i> sente: è un bel momento di gioco di ruolo. Chi vuole resistere fa un tiro salvezza su <b>Saggezza CD 11</b> (con vantaggio se il gruppo ha il dono di Vespro). Chi fallisce si sporge dalla barca e deve essere trattenuto da un compagno, oppure cade in acqua (Atletica CD 10 per tornare a bordo).</p>
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Mani dalla nebbia</span><br>
+<b>Nemici:</b> 4 Smarriti, che emergono dall'acqua aggrappandosi alla barca.<br>
+<b>Evitabile:</b> se il gruppo indossa la <b>maschera di cera</b> di Fosco (basta chi rema) o accende la <b>Lanterna di Tobia</b>, gli Smarriti girano intorno alla barca senza attaccare.</div>
+<div class="sei">aggiungi 1 Smarrito.</div>
+
+<h3>L'isola · chiave della mappa</h3>
+<dl class="chiave">
+<dt>I1 · Il pontile</dt>
+<dd>Due barche dei Senzavoce sono legate al pontile. Fanno la guardia <b>3 Senzavoce</b> con le lanterne. Ci sono tre modi per superarli:
+<ul>
+<li><b>Ingannarli:</b> con la maschera di cera e una prova di <b>Inganno CD 12</b>, li si convince di essere «nuovi fratelli».</li>
+<li><b>Convincerli:</b> con <b>Persuasione CD 12</b>, raccontando cosa sta per succedere davvero. Se Fosco è con il gruppo, la prova riesce automaticamente: i Senzavoce lo ascoltano, depongono le armi e tornano a Brumaria con le barche.</li>
+<li><b>Combattere</b>, vedi lo scontro qui sotto.</li>
+</ul>
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Le guardie del pontile</span><br>
+<b>Nemici:</b> 3 Senzavoce. Si arrendono quando uno di loro cade.</div></dd>
+
+<dt>I2 · Il sentiero delle maschere</dt>
+<dd>Il sentiero sale verso la fonderia ed è fiancheggiato da pali con maschere di cera. Su ogni maschera è scritto un nome: sono i nomi degli smarriti di Brumaria, raccolti da Ilvane. Se qualcuno legge i nomi ad alta voce, le maschere sussurrano «grazie» e il personaggio riceve <b>Ispirazione</b>. Tra i nomi ci sono <i>Lino</i>, il fratello di Fosco, e, sull'ultimo palo, <i>Neve</i>.</dd>
+
+<dt>I7 · Il faro spento</dt>
+<dd>Una torre bassa con una scala a chiocciola. In cima c'è un braciere con la legna già pronta. Accenderlo richiede solo un fuoco (Dardo di fuoco, una torcia, un acciarino). Se il faro viene acceso, <b>nel finale arrivano le barche di Brenna</b>, che si occupano di tutti gli Smarriti evocati dal Pastore (vedi il finale).</dd>
+
+<dt>I4 · Gli alloggi di Ilvane</dt>
+<dd>La porta è chiusa a chiave (<b>Destrezza CD 12</b> con gli attrezzi da scasso, o <b>Atletica CD 14</b>). Dentro ci sono un letto spartano, uno scrittoio pieno di disegni di Neve e il <b>diario di Ilvane</b> (Documento 4). Nel diario c'è la prova che Ilvane stessa ha dei dubbi: <i>«La voce di Neve nei sogni non conosce più la nostra ninna nanna.»</i> Nel forziere ci sono 150 mo, una <b>pozione di guarigione superiore</b> e un <b>Mantello di protezione</b>.</dd>
+
+<dt>I5 · Il deposito degli stampi</dt>
+<dd>File di stampi d'argilla per campane. Uno, più piccolo, ha inciso il nome «Neve» ed era pensato per una campanella. Nel deposito si sono formate <b>2 Scintille della forgia</b>, piccoli spiriti di fuoco nati dal calore della fonderia, che attaccano chi entra.
+<div class="scontro"><span class="diff">Facile</span><span class="tit">⚔ Scontro · Le scintille</span><br>
+<b>Nemici:</b> 2 Scintille della forgia. Quando muoiono esplodono: avvisa i giocatori di non restare attaccati a loro!</div></dd>
+
+<dt>I3 · La sala della fusione</dt>
+<dd>Il cuore dell'isola: un grande crogiolo pieno di bronzo fuso, quattro fornaci, la fossa di colata. La <b>Voce Madre</b> pende da una catena sopra il crogiolo, pronta a essere calata. Davanti al crogiolo c'è <b>Ilvane Corvo</b>.
+<div class="leggi">Il calore è soffocante. Il bronzo fuso nel crogiolo ribolle e getta una luce rossa sulle pareti. Una donna dai capelli grigi, con un grembiule di cuoio e le mani coperte di vecchie cicatrici, tiene la leva della catena. Sopra il fuoco oscilla un enorme batacchio di ferro scuro. Lei non si volta. «Sapevo che sareste venuti. Siete qui per fermarmi. Ma non capite. Lei mi chiama. Ogni notte. Da vent'anni.» Solo ora si gira, e i suoi occhi sono pieni di lacrime. «Voi cosa fareste, per riavere vostra figlia?»</div>
+
+<div class="nota"><b>Convincere Ilvane (la scena più importante).</b> Ilvane abbassa la leva tra <b>3 turni</b>, a meno che qualcuno non la fermi. Per convincerla servono <b>3 successi</b>. Ognuno di questi elementi vale <b>1 successo automatico</b>, senza tiri:
+<ul>
+<li>mostrarle il suo stesso diario e la frase sulla ninna nanna;</li>
+<li>farle ascoltare la <b>ninna nanna di Neve</b> (il carillon, oppure Leonida che la suona);</li>
+<li>darle il <b>ricordo in bottiglia</b> comprato da Gracida: Ilvane rivive un momento felice con Neve e capisce;</li>
+<li>la <b>lettera o la presenza del Podestà</b> che chiede perdono;</li>
+<li>la testimonianza di <b>Fosco</b>: «Maestra, Tobia è morto per questo. Non è ciò che Neve vorrebbe.»</li>
+</ul>
+Ogni altro buon argomento richiede una prova di <b>Persuasione o Intuizione CD 13</b> e vale 1 successo. I personaggi possono anche <b>afferrare la leva o la catena</b> (Atletica contro l'Atletica di Ilvane, +0) per guadagnare tempo.</div>
+<p><b>Se Ilvane viene convinta:</b> lascia la leva e crolla in ginocchio. Subito dopo, dal Pozzo della Bruma (I6) sale un ululato: il Pastore Grigio ha capito di aver perso la sua pedina, e viene a prendersi il borgo da solo. Ilvane si rialza e <b>combatte a fianco dei personaggi</b> nel finale (lancia Dardo di fuoco ogni turno; muovila tu o affidala a un giocatore).</p>
+<div class="scontro"><span class="diff">Media</span><span class="tit">⚔ Scontro · Ilvane Corvo (solo se non viene convinta)</span><br>
+<b>Nemici:</b> Ilvane Corvo e 2 Scintille della forgia, che escono dalle fornaci.<br>
+<b>Tattica:</b> Ilvane resta dietro il crogiolo e lancia incantesimi. Usa Ragnatela per bloccare chi si avvicina alla leva.<br>
+<b>Fine:</b> a <b>15 punti ferita</b> si arrende. Anche se viene sconfitta, i personaggi possono ancora parlarle e convincerla, che è il finale migliore. Non è necessario ucciderla.</div>
+<div class="sei">aggiungi 1 Scintilla della forgia.</div>
+<div class="consiglio">Se il gruppo arriva qui ferito, concedi un <b>riposo breve</b> di un'ora dopo la scena di Ilvane. Il Pastore Grigio non ha fretta: aspetta che il gruppo sia sul suo terreno, il Pozzo. Puoi dirlo così: «La nebbia si ritira per un'ora, come un respiro trattenuto… poi tornerà.»</div>
+<p>Se Ilvane riesce ad abbassare la leva, la Voce Madre cade nel crogiolo e comincia a fondersi. I personaggi hanno ancora <b>1 turno</b> per ripescarla con un'azione (<b>Atletica CD 12</b>; chi la prende subisce 2d6 danni da fuoco). Se non ci riescono, annerisci 2 caselle della Clessidra: il Pastore entra nel finale più forte.</p></dd>
+
+<dt>I6 · Il Pozzo della Bruma (il finale)</dt>
+<dd>Un cerchio di pietre antiche attorno a un pozzo da cui sale, lenta, la Bruma. Qui il Pastore Grigio entra nel nostro mondo.
+<div class="leggi">La nebbia sale dal pozzo come latte versato al contrario. Dentro la nebbia si alza una figura alta il doppio di un uomo, avvolta in un mantello grigio e logoro, con un lungo bastone ricurvo da pastore. Sotto il cappuccio non c'è un volto: solo nebbia che si muove. Accanto a lui, tenuta per mano, c'è una bambina scalza con la camicia da notte bianca. Ha i capelli pieni di brina. Guarda Ilvane e sussurra: «Mamma… ho tanto freddo.» Il Pastore parla, e la sua voce è quella di tutti i vostri cari perduti insieme: «Il gregge è affamato. Datemi il borgo… e lascerò andare la bambina.»</div>
+
+<div class="scontro"><span class="diff">Difficile · battaglia finale</span><span class="tit">⚔ Scontro finale · Il Pastore Grigio</span><br>
+<b>Nemici:</b> il Pastore Grigio e 2 Smarriti.<br>
+<b>Punti ferita del Pastore:</b> 90, <b>−10 per ogni voce recuperata</b>, <b>+10 per ogni casella annerita</b> della Clessidra. Esempio: 3 voci recuperate e 1 casella annerita danno 90 − 30 + 10 = <b>70 PF</b>.<br>
+<b>Neve, l'Agnella:</b> finché il Pastore tiene Neve per mano, all'inizio di ogni suo turno <b>recupera 5 punti ferita</b>. Neve è a 1,5 metri da lui, e non è una nemica.<br>
+<b>Come liberare Neve</b> (basta una di queste azioni):
+<ul>
+<li>suonare la <b>ninna nanna</b> (carillon o Leonida) entro 9 metri da Neve: è un'azione;</li>
+<li><b>Ilvane la chiama</b> per nome (se è alleata): è un'azione;</li>
+<li>un personaggio prende Neve per mano e la tira via: prova contrapposta di <b>Atletica</b> contro il Pastore (+4).</li>
+</ul>
+Quando Neve viene liberata, corre dalla madre (o dietro i personaggi), e il Pastore non recupera più punti ferita.<br>
+<b>Il nome:</b> se il gruppo conosce il nome «Ombrevallo» (dall'Abbazia), pronunciarlo con un'azione rende il Pastore <b>stordito</b> fino alla fine del suo prossimo turno (una sola volta).<br>
+<b>La Voce Madre:</b> se è stata salvata, un personaggio entro 1,5 metri può colpirla con un'azione: rintocca fortissimo. Il Pastore subisce <b>2d8 danni da tuono</b> e tutti gli Smarriti entro 9 metri si dissolvono. Si può fare una volta per round.<br>
+<b>Le barche di Brenna:</b> se il faro è stato acceso, dal 2° round arrivano le guardie, che tengono occupati tutti gli Smarriti evocati dal Pastore. Rimuovi dalla mappa gli Smarriti nuovi appena compaiono.<br>
+<b>A mezzanotte</b> (dal 3° round): le campane di Brumaria suonano in lontananza. Descrivilo in modo epico!</div>
+<div class="sei">il Pastore ha +15 punti ferita e inizia con 3 Smarriti.</div>
+<div class="consiglio">È il momento più importante della campagna: rendilo epico, ma non crudele. Se le cose vanno male, il Pastore preferisce <b>trascinare i personaggi verso il pozzo</b> piuttosto che finirli. Un personaggio a 0 punti ferita può essere «salvato» all'ultimo da Neve, che gli prende la mano e gli dice «Non andare anche tu». Se il gruppo ha giocato bene, fai finire lo scontro con un colpo spettacolare, e chiedi al giocatore: <b>«Come lo fai?»</b></div>
+</dd>
+</dl>
+
+<!-- ===================================================================== -->
+<h2 id="epilogo">8. Epilogo e finali possibili</h2>
+<div class="leggi">Il Pastore Grigio si piega su se stesso come un mantello vuoto. Non grida: sospira, come il vento che finalmente si calma. La nebbia ricade nel pozzo, poi nel lago, poi più giù, in un luogo dove non può più raggiungervi. Per la prima volta in vent'anni, sull'Isola del Fonditore si vede il cielo. Ci sono tutte le stelle. E da lontano, sull'acqua, arriva il suono di tutte le campane di Brumaria.</div>
+
+<h3>Il finale migliore · «Tutti a casa»</h3>
+<p><b>Neve è stata liberata e Ilvane è viva.</b> Neve ha ancora nove anni e non ricorda nulla della nebbia. Ilvane la stringe e non la lascia più. Nei giorni seguenti, a Brumaria, chi era stato smarriti negli ultimi anni ritrova la strada di casa: <b>Lino</b>, il fratello di Fosco, la madre di Marta, e altri. Arrivano confusi, infreddoliti, ma vivi (decidi tu quanti; magari solo quelli smarriti da poco). Il Podestà confessa pubblicamente la sua colpa e lascia la carica. La <b>Legge del Rintocco</b> viene cambiata: prima del suono di mezzanotte si chiamano ad alta voce i nomi di tutti, e nessuno viene più lasciato fuori.</p>
+<p>La <b>Festa della Bruma</b> viene ribattezzata <b>Festa dei Nomi</b>, e i personaggi sono gli ospiti d'onore. Ilvane fonde una nuova campanella, «<b>Neve</b>», e la regala al campanile. Se un personaggio aveva ceduto un ricordo a Gracida, in questo momento il ricordo gli torna: descrivetelo insieme.</p>
+
+<h3>Finale agrodolce · «Una voce nella nebbia»</h3>
+<p><b>Neve non è stata liberata</b> prima della sconfitta del Pastore. Quando il Pastore svanisce, Neve diventa luce. Sorride a sua madre e dice: «Non ho più freddo, mamma. Adesso posso dormire.» Poi scompare. Ilvane piange, ma è in pace. Resta a Brumaria per fondere di nuovo le voci perdute e insegnare il mestiere a Fosco.</p>
+
+<h3>Se Ilvane è morta</h3>
+<p>Neve, se è stata liberata, viene accolta da Madre Orsola al tempio. Il borgo si stringe intorno a lei. È un finale più triste, ed è giusto che i giocatori sentano il peso delle loro scelte, ma senza punirli: hanno comunque salvato Brumaria.</p>
+
+<h3>Se il gruppo viene sconfitto</h3>
+<p>Non è la fine! I personaggi si risvegliano sulla barca all'alba, trascinati a riva dalle guardie di Brenna. La Bruma ha preso l'isola, ma le campane recuperate hanno tenuto il borgo al sicuro. La notte successiva il Pastore tornerà. I personaggi hanno un'altra possibilità: rifate il finale, magari con l'aiuto di Brenna e delle guardie.</p>
+
+<h3>Ricompense finali</h3>
+<ul>
+<li>Il Consiglio paga quanto promesso (100 mo per voce) più 200 mo per la Voce Madre.</li>
+<li>Ilvane (se viva) forgia per ogni personaggio una <b>Campanella del Ricordo</b>: un oggetto magico personale (vedi Tesori).</li>
+<li>Il titolo di <b>Custodi del Rintocco</b> e una casa a Brumaria, se vogliono restare.</li>
+</ul>
+
+<h3>E dopo?</h3>
+<p>Se il gruppo vuole continuare, ecco qualche spunto per altre avventure:</p>
+<ul>
+<li>Il Pastore era solo uno dei <b>pastori dell'Oltrenebbia</b>. Ci sono altri villaggi con campane, e non tutti sono stati fortunati.</li>
+<li>La <b>Torre dei Venti</b> in rovina, a nord-est del lago, è il luogo dove fu forgiato il primo ferro di stella.</li>
+<li>Comare Gracida è ancora viva, e ha una collezione di ricordi rubati da restituire.</li>
+</ul>
+
+
+<!-- ===================================================================== -->
+<h2 id="bestiario">9. Bestiario</h2>
+<div class="consiglio">Come si legge una scheda: <b>CA</b> è il numero che il tiro d'attacco del giocatore deve raggiungere per colpire. <b>PF</b> sono i punti ferita (tienine il conto su un foglio). Nella riga «Attacchi», il <b>+3</b> va sommato al tuo d20 quando il mostro attacca: se il totale raggiunge la CA del personaggio, lo colpisce e tiri i danni. I mostri sono semplificati rispetto ai manuali ufficiali, così è più facile gestirli.</div>
+
+<div class="stat"><h4>Smarrito</h4><div class="tipo">Non morto Medio · anima perduta nella Bruma</div>
+<p><b>CA</b> 11 · <b>PF</b> 9 · <b>Velocità</b> 9 m</p>
+<div class="car"><div><b>FOR</b>10 (+0)</div><div><b>DES</b>12 (+1)</div><div><b>COS</b>10 (+0)</div><div><b>INT</b>3 (−4)</div><div><b>SAG</b>8 (−1)</div><div><b>CAR</b>5 (−3)</div></div>
+<p><b>Sensi:</b> vede al buio fino a 18 m. Non respira, non dorme, immune al veleno.</p>
+<p><b>Tocco gelido.</b> <i>Attacco in mischia:</i> +3 per colpire, 1d6+1 danni da freddo.</p>
+<p><b>Paura delle campane.</b> Quando qualcuno suona una campanella benedetta entro 9 m, lo Smarrito fa un TS Saggezza CD 10: se lo fallisce, nel suo turno fugge.</p>
+<p><b>Dissolversi.</b> A 0 PF diventa nebbia e lascia a terra un piccolo oggetto appartenuto a una persona smarrita (vedi tabelle).</p>
+<p><i>Grado di Sfida 1/8.</i> Descrizione: una sagoma grigia senza volto, con abiti sbiaditi di epoche diverse. Sussurra un nome che nessuno ricorda.</p></div>
+
+<div class="stat"><h4>Senzavoce</h4><div class="tipo">Umanoide Medio · cittadino disperato con maschera di cera grigia</div>
+<p><b>CA</b> 12 · <b>PF</b> 9 · <b>Velocità</b> 9 m</p>
+<div class="car"><div><b>FOR</b>11 (+0)</div><div><b>DES</b>12 (+1)</div><div><b>COS</b>10 (+0)</div><div><b>INT</b>10 (+0)</div><div><b>SAG</b>11 (+0)</div><div><b>CAR</b>10 (+0)</div></div>
+<p><b>Randello o pugnale.</b> <i>Attacco in mischia:</i> +3 per colpire, 1d4+1 danni.</p>
+<p><b>Maschera di cera.</b> Gli Smarriti lo ignorano.</p>
+<p><b>Non è un soldato.</b> A metà PF si arrende o fugge.</p>
+<p><i>Grado di Sfida 1/8.</i></p></div>
+
+<div class="stat"><h4>Uomo-rana</h4><div class="tipo">Umanoide Medio · abitante della palude, vanitoso e pavido</div>
+<p><b>CA</b> 13 · <b>PF</b> 11 · <b>Velocità</b> 6 m, nuoto 12 m</p>
+<div class="car"><div><b>FOR</b>12 (+1)</div><div><b>DES</b>12 (+1)</div><div><b>COS</b>13 (+1)</div><div><b>INT</b>7 (−2)</div><div><b>SAG</b>10 (+0)</div><div><b>CAR</b>7 (−2)</div></div>
+<p><b>Anfibio.</b> Respira sott'acqua. <b>Mimetismo:</b> vantaggio a nascondersi nella palude. <b>Salto:</b> salta fino a 6 m senza rincorsa.</p>
+<p><b>Lancia.</b> <i>Attacco in mischia o a distanza (6 m):</i> +3 per colpire, 1d6+1 danni perforanti.</p>
+<p><i>Grado di Sfida 1/4.</i></p></div>
+
+<div class="stat"><h4>Rana gigante</h4><div class="tipo">Bestia Media</div>
+<p><b>CA</b> 11 · <b>PF</b> 18 · <b>Velocità</b> 9 m, nuoto 9 m</p>
+<div class="car"><div><b>FOR</b>12 (+1)</div><div><b>DES</b>13 (+1)</div><div><b>COS</b>11 (+0)</div><div><b>INT</b>2 (−4)</div><div><b>SAG</b>10 (+0)</div><div><b>CAR</b>3 (−4)</div></div>
+<p><b>Lingua appiccicosa.</b> <i>Attacco in mischia (portata 3 m):</i> +3 per colpire, 1d6+1 danni e il bersaglio è <i>afferrato</i> (per liberarsi: Atletica o Acrobazia CD 11). Al turno successivo cerca di trascinarlo in acqua.</p>
+<p><i>Grado di Sfida 1/4.</i></p></div>
+
+<div class="stat"><h4>Comare Gracida</h4><div class="tipo">Folletto Medio (megera della palude) · avida, teatrale, collezionista di ricordi</div>
+<p><b>CA</b> 15 · <b>PF</b> 45 · <b>Velocità</b> 9 m, nuoto 12 m</p>
+<div class="car"><div><b>FOR</b>18 (+4)</div><div><b>DES</b>12 (+1)</div><div><b>COS</b>16 (+3)</div><div><b>INT</b>13 (+1)</div><div><b>SAG</b>14 (+2)</div><div><b>CAR</b>14 (+2)</div></div>
+<p><b>Anfibia.</b> <b>Imita le voci</b> di chiunque abbia sentito parlare.</p>
+<p><b>Artigli.</b> <i>Attacco in mischia:</i> +6 per colpire, 1d8+4 danni taglienti.</p>
+<p><b>Risata maligna</b> (al posto di un attacco). Un bersaglio entro 18 m fa un TS Saggezza CD 12: se lo fallisce subisce 1d6 danni psichici e ha svantaggio al prossimo tiro per colpire.</p>
+<p><b>Illusione.</b> Può apparire come una vecchina gentile. Chi la tocca o supera Indagare CD 14 capisce l'inganno.</p>
+<p><b>Codarda.</b> A 15 PF o meno si tuffa in acqua e fugge.</p>
+<p><i>Grado di Sfida 2.</i></p></div>
+
+<div class="stat"><h4>Goblin</h4><div class="tipo">Umanoide Piccolo · del clan Mordiferro</div>
+<p><b>CA</b> 15 · <b>PF</b> 7 · <b>Velocità</b> 9 m</p>
+<div class="car"><div><b>FOR</b>8 (−1)</div><div><b>DES</b>14 (+2)</div><div><b>COS</b>10 (+0)</div><div><b>INT</b>10 (+0)</div><div><b>SAG</b>8 (−1)</div><div><b>CAR</b>8 (−1)</div></div>
+<p><b>Sensi:</b> vede al buio fino a 18 m.</p>
+<p><b>Scimitarra.</b> <i>Attacco in mischia:</i> +4 per colpire, 1d6+2 danni taglienti.</p>
+<p><b>Arco corto.</b> <i>Attacco a distanza (24/96 m):</i> +4 per colpire, 1d6+2 danni perforanti.</p>
+<p><b>Fuga agile.</b> Può fare Disimpegno o Nascondersi come azione bonus.</p>
+<p><i>Grado di Sfida 1/4.</i></p></div>
+
+<div class="stat"><h4>Lupo</h4><div class="tipo">Bestia Media</div>
+<p><b>CA</b> 13 · <b>PF</b> 11 · <b>Velocità</b> 12 m</p>
+<div class="car"><div><b>FOR</b>12 (+1)</div><div><b>DES</b>15 (+2)</div><div><b>COS</b>12 (+1)</div><div><b>INT</b>3 (−4)</div><div><b>SAG</b>12 (+1)</div><div><b>CAR</b>6 (−2)</div></div>
+<p><b>Tattica del branco.</b> Ha vantaggio a colpire se un alleato è accanto al bersaglio.</p>
+<p><b>Morso.</b> <i>Attacco in mischia:</i> +4 per colpire, 2d4+2 danni perforanti. Il bersaglio fa un TS Forza CD 11: se lo fallisce cade <i>prono</i>.</p>
+<p><i>Grado di Sfida 1/4.</i></p></div>
+
+<div class="stat"><h4>Ugo il Grosso</h4><div class="tipo">Umanoide Medio (bugbear) · capo dei Mordiferro, avido e sportivo</div>
+<p><b>CA</b> 16 · <b>PF</b> 32 · <b>Velocità</b> 9 m</p>
+<div class="car"><div><b>FOR</b>15 (+2)</div><div><b>DES</b>14 (+2)</div><div><b>COS</b>13 (+1)</div><div><b>INT</b>8 (−1)</div><div><b>SAG</b>11 (+0)</div><div><b>CAR</b>9 (−1)</div></div>
+<p><b>Atletica</b> +4. Vede al buio fino a 18 m.</p>
+<p><b>Mazza ferrata.</b> <i>Attacco in mischia:</i> +4 per colpire, 2d8+2 danni perforanti.</p>
+<p><b>Attacco a sorpresa.</b> Se colpisce una creatura sorpresa, infligge 2d6 danni in più.</p>
+<p><b>D'onore (più o meno).</b> Sotto 10 PF si arrende.</p>
+<p><i>Grado di Sfida 1.</i></p></div>
+
+<div class="stat"><h4>Divoraferro</h4><div class="tipo">Mostruosità Media · insetto che mangia il metallo</div>
+<p><b>CA</b> 14 · <b>PF</b> 27 · <b>Velocità</b> 12 m</p>
+<div class="car"><div><b>FOR</b>13 (+1)</div><div><b>DES</b>12 (+1)</div><div><b>COS</b>13 (+1)</div><div><b>INT</b>2 (−4)</div><div><b>SAG</b>13 (+1)</div><div><b>CAR</b>6 (−2)</div></div>
+<p><b>Fiuto del ferro.</b> Sente l'odore del metallo fino a 9 m.</p>
+<p><b>Morso.</b> <i>Attacco in mischia:</i> +3 per colpire, 1d8+1 danni perforanti.</p>
+<p><b>Antenne.</b> Tocca un oggetto di metallo non magico indossato da una creatura entro 1,5 m: l'armatura perde 1 punto di CA, oppure l'arma fa −1 ai danni, fino alla riparazione.</p>
+<p><b>Corrosione.</b> Un'arma di metallo non magica che lo colpisce fa −1 ai danni fino alla riparazione.</p>
+<p><b>Goloso.</b> Se gli lanciano del ferro, lo insegue e lo mangia per 3 turni.</p>
+<p><i>Grado di Sfida 1/2.</i></p></div>
+
+<div class="stat"><h4>Scheletro</h4><div class="tipo">Non morto Medio · antico monaco</div>
+<p><b>CA</b> 13 · <b>PF</b> 13 · <b>Velocità</b> 9 m</p>
+<div class="car"><div><b>FOR</b>10 (+0)</div><div><b>DES</b>14 (+2)</div><div><b>COS</b>15 (+2)</div><div><b>INT</b>6 (−2)</div><div><b>SAG</b>8 (−1)</div><div><b>CAR</b>5 (−3)</div></div>
+<p><b>Vulnerabile ai danni contundenti</b> (subisce danni doppi). Immune al veleno.</p>
+<p><b>Spada corta.</b> <i>Attacco in mischia:</i> +4 per colpire, 1d6+2 danni perforanti.</p>
+<p><i>Grado di Sfida 1/4.</i></p></div>
+
+<div class="stat"><h4>Zombi</h4><div class="tipo">Non morto Medio · lento e testardo</div>
+<p><b>CA</b> 8 · <b>PF</b> 22 · <b>Velocità</b> 6 m</p>
+<div class="car"><div><b>FOR</b>13 (+1)</div><div><b>DES</b>6 (−2)</div><div><b>COS</b>16 (+3)</div><div><b>INT</b>3 (−4)</div><div><b>SAG</b>6 (−2)</div><div><b>CAR</b>5 (−3)</div></div>
+<p><b>Tempra da non morto.</b> Quando scende a 0 PF, tira un d20: con 11 o più resta in piedi con 1 PF (non funziona contro danni radiosi o colpi critici).</p>
+<p><b>Schianto.</b> <i>Attacco in mischia:</i> +3 per colpire, 1d6+1 danni contundenti.</p>
+<p><i>Grado di Sfida 1/4.</i></p></div>
+
+<div class="stat"><h4>Sciame di pipistrelli</h4><div class="tipo">Sciame di bestie Minuscole</div>
+<p><b>CA</b> 12 · <b>PF</b> 22 · <b>Velocità</b> volo 9 m</p>
+<p><b>Sciame.</b> Può occupare lo spazio di altre creature. Resiste ai danni da armi (subisce metà danni) ma i danni ad area lo colpiscono normalmente.</p>
+<p><b>Morsi.</b> <i>Attacco in mischia contro una creatura nel suo spazio:</i> +4 per colpire, 2d4 danni perforanti (1d4 se ha metà PF o meno).</p>
+<p><i>Grado di Sfida 1/4.</i></p></div>
+
+<div class="stat"><h4>Abate Ruggero</h4><div class="tipo">Non morto Medio · spirito tormentato dell'autore della Legge del Rintocco</div>
+<p><b>CA</b> 14 · <b>PF</b> 45 · <b>Velocità</b> 9 m</p>
+<div class="car"><div><b>FOR</b>15 (+2)</div><div><b>DES</b>14 (+2)</div><div><b>COS</b>16 (+3)</div><div><b>INT</b>10 (+0)</div><div><b>SAG</b>13 (+1)</div><div><b>CAR</b>15 (+2)</div></div>
+<p><b>Resistenze:</b> danni necrotici. Immune al veleno. Vede al buio fino a 18 m.</p>
+<p><b>Multiattacco.</b> Nel suo turno fa due attacchi: due con la mazza, oppure uno con la mazza e un Tocco della colpa.</p>
+<p><b>Mazza da guerra.</b> <i>Attacco in mischia:</i> +4 per colpire, 1d8+2 danni contundenti.</p>
+<p><b>Tocco della colpa.</b> <i>Attacco in mischia:</i> +4 per colpire, 2d6 danni necrotici.</p>
+<p><b>Voce della Legge (una volta per scontro).</b> «Senza indugio! Senza pietà!» Ogni nemico entro 9 m fa un TS Saggezza CD 12: se lo fallisce è <i>spaventato</i>. Ripete il TS alla fine di ogni suo turno e, se lo supera, si libera.</p>
+<p><b>L'inno.</b> Se l'enigma del Coro Muto è stato risolto, ha svantaggio a tutti i tiri per colpire.</p>
+<p><i>Grado di Sfida 3.</i></p></div>
+
+<div class="stat"><h4>Scintilla della forgia</h4><div class="tipo">Elementale Piccolo · spiritello di fuoco nato nella fonderia</div>
+<p><b>CA</b> 14 · <b>PF</b> 9 · <b>Velocità</b> 9 m</p>
+<div class="car"><div><b>FOR</b>7 (−2)</div><div><b>DES</b>15 (+2)</div><div><b>COS</b>12 (+1)</div><div><b>INT</b>8 (−1)</div><div><b>SAG</b>11 (+0)</div><div><b>CAR</b>10 (+0)</div></div>
+<p><b>Immune al fuoco.</b> Emana luce come una torcia.</p>
+<p><b>Tocco ardente.</b> <i>Attacco in mischia:</i> +4 per colpire, 2d6 danni da fuoco.</p>
+<p><b>Esplosione.</b> Quando muore esplode: chi è entro 3 m fa un TS Destrezza CD 11, e subisce 2d6 danni da fuoco se lo fallisce o la metà se lo supera.</p>
+<p><i>Grado di Sfida 1/2.</i></p></div>
+
+<div class="stat"><h4>Ilvane Corvo</h4><div class="tipo">Umanoide Medio (umana) · fonditrice e maga, madre disperata</div>
+<p><b>CA</b> 15 (Armatura magica) · <b>PF</b> 40 · <b>Velocità</b> 9 m</p>
+<div class="car"><div><b>FOR</b>9 (−1)</div><div><b>DES</b>14 (+2)</div><div><b>COS</b>12 (+1)</div><div><b>INT</b>17 (+3)</div><div><b>SAG</b>12 (+1)</div><div><b>CAR</b>11 (+0)</div></div>
+<p><b>Incantesimi</b> (TS CD 13, +5 per colpire):</p>
+<ul>
+<li><b>Dardo di fuoco</b> (a volontà): attacco a distanza (36 m), 2d10 danni da fuoco.</li>
+<li><b>Dardo incantato</b> (3 volte): tre dardi che colpiscono sempre, ognuno da 1d4+1 danni da forza. Si possono dividere tra più bersagli.</li>
+<li><b>Ragnatela</b> (2 volte): un cubo di 6 m di ragnatele. Chi è dentro fa un TS Destrezza CD 13 o resta <i>trattenuto</i>, e si libera con Atletica CD 13.</li>
+<li><b>Scudo</b> (2 volte, reazione): +5 alla CA contro un attacco.</li>
+</ul>
+<p><b>Martello da fonditore.</b> <i>Attacco in mischia:</i> +1 per colpire, 1d6−1 danni contundenti.</p>
+<p><b>Si arrende</b> a 15 PF.</p>
+<p><i>Grado di Sfida 3.</i> Da alleata nel finale: lancia Dardo di fuoco ogni turno contro il Pastore.</p></div>
+
+<div class="stat"><h4>Il Pastore Grigio (Ombrevallo)</h4><div class="tipo">Non morto Grande · signore dell'Oltrenebbia</div>
+<p><b>CA</b> 14 · <b>PF</b> 90 (vedi la formula nel finale) · <b>Velocità</b> 9 m, fluttua sopra l'acqua e la nebbia</p>
+<div class="car"><div><b>FOR</b>18 (+4)</div><div><b>DES</b>12 (+1)</div><div><b>COS</b>16 (+3)</div><div><b>INT</b>14 (+2)</div><div><b>SAG</b>16 (+3)</div><div><b>CAR</b>18 (+4)</div></div>
+<p><b>Resistenze:</b> freddo, necrotico. <b>Vulnerabile al tuono</b> (danni doppi). Immune a <i>spaventato</i> e <i>affascinato</i>.</p>
+<p><b>Multiattacco.</b> Due colpi di bastone.</p>
+<p><b>Bastone del pastore.</b> <i>Attacco in mischia (portata 3 m):</i> +6 per colpire, 1d10+4 danni contundenti. Il bersaglio fa un TS Forza CD 13: se lo fallisce viene trascinato di 3 m verso il Pastore (o verso il pozzo).</p>
+<p><b>Richiamo del gregge</b> (al posto del Multiattacco; tira 1d6 all'inizio del suo turno: con 5-6 può usarlo). Appaiono 2 Smarriti entro 9 m da lui.</p>
+<p><b>Voce dei perduti</b> (una volta per scontro, al posto del Multiattacco). Parla con le voci dei cari perduti. Ogni nemico entro 9 m fa un TS Saggezza CD 13: se lo fallisce è <i>spaventato</i> fino alla fine del suo prossimo turno.</p>
+<p><b>L'Agnella.</b> Finché tiene Neve, recupera 5 PF all'inizio di ogni suo turno.</p>
+<p><b>Il nome.</b> Chi pronuncia «Ombrevallo» con un'azione lo rende <i>stordito</i> fino alla fine del suo prossimo turno (una volta sola).</p>
+<p><i>Grado di Sfida 4.</i> <b>Come muoverlo:</b> nel 1° round usa Voce dei perduti. Poi attacca chi è più vicino a Neve. Se un personaggio è a terra, cerca di trascinarlo verso il pozzo invece di colpirlo ancora.</p></div>
+
+<!-- ===================================================================== -->
+<h2 id="tesori">10. Tesori e oggetti magici</h2>
+<table>
+<tr><th>Oggetto</th><th>Dove</th><th>Effetto</th></tr>
+<tr><td><b>Campanella benedetta</b> (una a testa)</td><td>Atto I, Madre Orsola</td><td>Azione: gli Smarriti entro 9 m fanno un TS Saggezza CD 10, e chi lo fallisce fugge nel suo prossimo turno.</td></tr>
+<tr><td><b>Lanterna di Tobia</b></td><td>Campanile, A5</td><td>Fa luce per 9 m. Gli Smarriti non entrano nella luce se non superano un TS Saggezza CD 10. Non si spegne con l'acqua o il vento.</td></tr>
+<tr><td><b>Maschera di cera grigia</b></td><td>Fosco (Atto I)</td><td>Chi la indossa è invisibile per gli Smarriti e per la Bruma, a meno che non li attacchi.</td></tr>
+<tr><td>Pozione di guarigione</td><td>vari</td><td>Bevendola si recuperano 2d4+2 PF. Bere è un'azione.</td></tr>
+<tr><td>Pozione di guarigione superiore</td><td>Isola, I4</td><td>Recupera 4d4+4 PF.</td></tr>
+<tr><td>Acqua santa (fiaschetta)</td><td>Madre Orsola</td><td>Si lancia (azione, 6 m): 2d6 danni radiosi a un non morto colpito.</td></tr>
+<tr><td><b>Mantello elfico</b></td><td>Mulino, M4</td><td>Vantaggio alle prove di Furtività. Chi cerca di vedere chi lo indossa ha svantaggio alle prove di Percezione.</td></tr>
+<tr><td><b>Amuleto della rana</b></td><td>Mulino, M4</td><td>Una volta al giorno chi lo indossa respira sott'acqua per 1 ora e ottiene velocità di nuoto 9 m.</td></tr>
+<tr><td><b>Ricordo in bottiglia</b></td><td>Mulino (comprato da Gracida)</td><td>Il ricordo felice di Ilvane con Neve. Nel finale vale 1 successo automatico per convincerla.</td></tr>
+<tr><td><b>Spada lunga +1 «Rintocco»</b></td><td>Miniera, F7</td><td>+1 per colpire e ai danni. Quando colpisce un non morto risuona come una campana.</td></tr>
+<tr><td><b>Bacchetta dei dardi incantati</b></td><td>Abbazia, V6</td><td>Per Ottavio o Leonida. Ha 7 cariche: con 1 carica lancia Dardo incantato. Recupera 1d6+1 cariche all'alba.</td></tr>
+<tr><td><b>Scudo +1</b></td><td>Abbazia, V12</td><td>+1 alla CA (in totale +3 rispetto a chi non ha lo scudo). Perfetto per Alba o Bruno.</td></tr>
+<tr><td>Pergamena di Arma spirituale</td><td>Abbazia, V12</td><td>Solo per Alba: lancia l'incantesimo una volta senza consumare slot.</td></tr>
+<tr><td><b>Carillon d'argento</b></td><td>Abbazia, V12</td><td>Suona la ninna nanna di Neve. È fondamentale nel finale.</td></tr>
+<tr><td><b>Mantello di protezione</b></td><td>Isola, I4</td><td>+1 alla CA e a tutti i tiri salvezza.</td></tr>
+<tr><td><b>Campanella del Ricordo</b></td><td>Epilogo, regalo di Ilvane</td><td>Oggetto personale. Una volta al giorno, chi la suona può ritirare un tiro di dado appena fatto.</td></tr>
+</table>
+<p><b>Denaro totale nella campagna:</b> circa 900 mo, tra ricompense e tesori, più di quanto serve. I giocatori principianti amano comprare pozioni e armature migliori a Brumaria: lasciali fare!</p>
+
+<!-- ===================================================================== -->
+<h2 id="tabelle">11. Tabelle di supporto</h2>
+<h3>Incontri durante i viaggi (tira 1d8)</h3>
+<table>
+<tr><th>d8</th><th>Incontro</th></tr>
+<tr><td>1</td><td><b>Un mercante ambulante</b>, Zio Baldo, con un mulo carico. Vende pozioni a 60 mo e racconta pettegolezzi.</td></tr>
+<tr><td>2</td><td><b>2 Lupi</b> affamati. Fuggono se viene lanciata loro della carne o se uno dei due viene ferito.</td></tr>
+<tr><td>3</td><td><b>Un banco di Bruma</b> attraversa la strada. Ognuno fa un TS Saggezza CD 10: chi lo fallisce sente il proprio nome sussurrato e perde 1d4 PF per il freddo.</td></tr>
+<tr><td>4</td><td><b>Un santuario abbandonato</b> della Dama del Rintocco. Chi prega recupera 1d6 PF (una volta).</td></tr>
+<tr><td>5</td><td><b>3 Senzavoce</b> in viaggio verso l'isola. Possono essere convinti a tornare a casa (Persuasione CD 10).</td></tr>
+<tr><td>6</td><td><b>Una famiglia di cinghiali</b> attraversa il sentiero. Innocua se lasciata in pace.</td></tr>
+<tr><td>7</td><td><b>Un bambino smarrito</b> (vero, non uno Smarrito!) di Canneto. Riportarlo a casa vale 10 mo e un pranzo.</td></tr>
+<tr><td>8</td><td><b>2 Smarriti</b> vagano in un campo nebbioso. Sussurrano il nome di una persona di Brumaria.</td></tr>
+</table>
+
+<h3>Cosa lascia uno Smarrito che si dissolve (tira 1d10)</h3>
+<table>
+<tr><th>d10</th><th>Oggetto</th><th>d10</th><th>Oggetto</th></tr>
+<tr><td>1</td><td>Un bottone di madreperla</td><td>6</td><td>Una chiave arrugginita</td></tr>
+<tr><td>2</td><td>Un fermaglio per capelli a forma di pesce</td><td>7</td><td>Un dado d'osso</td></tr>
+<tr><td>3</td><td>Un soldatino di legno</td><td>8</td><td>Un ditale d'argento</td></tr>
+<tr><td>4</td><td>Una lettera d'amore illeggibile</td><td>9</td><td>Un amo da pesca con un nastrino rosso</td></tr>
+<tr><td>5</td><td>Un anello di rame</td><td>10</td><td>Un fiore di ninfea secco (era di Neve!)</td></tr>
+</table>
+
+<h3>Voci di paese (tira 1d10, alla Lanterna Annegata)</h3>
+<table>
+<tr><th>d10</th><th>Voce</th><th>Vera?</th></tr>
+<tr><td>1</td><td>«Hanno visto la vecchia Corvo comprare carbone a Canneto, il mese scorso.»</td><td>Vero</td></tr>
+<tr><td>2</td><td>«Il Podestà non dorme più da quando le campane tacciono.»</td><td>Vero</td></tr>
+<tr><td>3</td><td>«Nella palude c'è una vecchietta che fa i biscotti più buoni del mondo.»</td><td>Falso (sono di fango!)</td></tr>
+<tr><td>4</td><td>«I goblin della miniera hanno più fame che coraggio.»</td><td>Vero</td></tr>
+<tr><td>5</td><td>«Nell'abbazia c'è un tesoro d'oro grande come una casa.»</td><td>Falso</td></tr>
+<tr><td>6</td><td>«Chi ricorda i nomi degli smarriti non ha paura della nebbia.»</td><td>Vero, in un certo senso</td></tr>
+<tr><td>7</td><td>«Fosco, l'apprendista, ha perso il fratello due anni fa.»</td><td>Vero</td></tr>
+<tr><td>8</td><td>«La Bruma la manda un drago che vive in fondo al lago.»</td><td>Falso</td></tr>
+<tr><td>9</td><td>«Beppe il pescatore è sparito vicino al vecchio mulino.»</td><td>Vero</td></tr>
+<tr><td>10</td><td>«La campana Ombra non si suona da vent'anni. Da quella notte.»</td><td>Vero</td></tr>
+</table>
+
+<h3>Nomi pronti per PNG improvvisati</h3>
+<p><b>Donne:</b> Agata, Bice, Clelia, Dora, Elsa, Fiamma, Gilda, Irma, Lucrezia, Mirta, Nives, Ottavia, Rosalba, Tecla, Viola.<br>
+<b>Uomini:</b> Arnaldo, Bertoldo, Cosimo, Duilio, Egidio, Ferruccio, Gaspare, Ivo, Lapo, Marcello, Nello, Oreste, Primo, Rocco, Teodoro.<br>
+<b>Goblin:</b> Sgnack, Mordino, Ruttapietra, Zinzi, Gnaff, Brucaferro.<br>
+<b>Uomini-rana:</b> Gluglù, Bloppo, Gracchiola, Ranuzzo.</p>
+
+<!-- ===================================================================== -->
+<h2 id="handout">12. Documenti da consegnare ai giocatori</h2>
+<p>Stampa o leggi questi testi quando i personaggi li trovano. È ancora più bello se li copi a mano su un foglio vecchio!</p>
+
+<h4>Documento 1 · Il diario di Tobia (Campanile, A5)</h4>
+<div class="handout">
+<p><b>12 ottobre.</b> La Bruma sale presto quest'anno. Le ossa mi fanno male come vent'anni fa.</p>
+<p><b>20 ottobre.</b> Ho rivisto una barca venire dall'isola. Una donna col cappuccio grigio. Mi è sembrata lei, la vecchia fonditrice. Ma Ilvane non mette piede a Brumaria da quella notte… Dama del Rintocco, perdonami. Ho solo obbedito.</p>
+<p><b>27 ottobre.</b> Fosco fa domande strane. Vuole sapere come si smontano le voci delle campane, e dove tengo le chiavi. Dice che è per imparare. Ha gli occhi di chi non dorme. Povero ragazzo: da quando Lino è sparito non è più lui.</p>
+<p><b>30 ottobre.</b> Domani è la Festa. Suonerò io, come ogni anno. Ma stanotte ho sognato una bambina scalza che bussava alla porta del campanile. Diceva: «Tobia, perché non hai aspettato?»</p>
+</div>
+
+<h4>Documento 2 · L'Inno dei Tre Santi (Abbazia, V7)</h4>
+<div class="handout" style="text-align:center">
+<p><i>Prima la luce, poi la sera, poi la quiete:<br>così canta il coro, così si apre la porta.</i></p>
+<p>Lucia apre gli occhi al giorno,<br>
+con la lanterna accesa sul mattino.<br>
+Vespro lo accompagna al riposo,<br>
+con la stella che si leva sul cammino.<br>
+Velio veglia sul sonno dei giusti,<br>
+col bastone del pastore buono,<br>
+e chi si perde nella notte<br>
+ritrova casa al suono del suo nome.</p>
+</div>
+
+<h4>Documento 3 · La ninna nanna di Neve (carillon, o canzone di Leonida)</h4>
+<div class="handout" style="text-align:center">
+<p>Dormi, piccola neve,<br>
+che la notte è lunga e lieve,<br>
+c'è una campana sul lago,<br>
+che ti chiama col tuo nome.<br><br>
+Se la nebbia ti fa paura,<br>
+stringi forte la mia mano,<br>
+ogni strada torna a casa,<br>
+anche quando è più lontano.<br><br>
+Dormi, piccola neve,<br>
+mamma veglia e non si muove,<br>
+quando suona la campana<br>
+torna a casa, amore mio.</p>
+</div>
+<p class="nota">Se al tavolo c'è chi se la sente, può cantarla su una melodia semplice (va bene anche «Fra' Martino» rallentata). È un momento che i giocatori ricorderanno a lungo.</p>
+
+<h4>Documento 4 · Il diario di Ilvane (Isola, I4)</h4>
+<div class="handout">
+<p><i>Quarto mese.</i> La voce è tornata stanotte. «Mamma, fai tacere le campane.» È lei. È la mia Neve.</p>
+<p><i>Ottavo mese.</i> Il Pastore mi ha mostrato la strada: quattro voci, quattro elementi, la notte della Luna Vuota. Ho trovato chi mi aiuterà. Gente che ha perso quanto me.</p>
+<p><i>Ieri.</i> Tobia è morto. Non doveva succedere. Fosco piange e non smette. Mi dico che è per Neve. Me lo ripeto.</p>
+<p><i>Stanotte.</i> Le ho chiesto di cantarmi la nostra ninna nanna, quella del carillon. Non la ricordava. Ha detto: «Quale ninna nanna, mamma?» E la sua voce, per un attimo, non era la sua.</p>
+<p><i>Non importa. Non importa. Non importa.</i></p>
+</div>
+
+<h4>Documento 5 · Lettera di Ilvane a Gracida (Mulino, M6)</h4>
+<div class="handout">
+<p>Comare,<br>come d'accordo, ti affido la voce dell'Aurora. Tienila sott'acqua, sotto la ruota che non si ferma, fino alla notte della Luna Vuota. In pagamento ti lascio ciò che hai chiesto: il mio ricordo più bello. Il giorno in cui Neve imparò a nuotare, e rideva, e rideva.<br>
+Non ne ho bisogno. Presto avrò lei.</p>
+<p style="text-align:right">— I. C.</p>
+</div>
+
+<!-- ===================================================================== -->
+<h2 id="mappe">13. Tutte le mappe</h2>
+<p>Le mappe con la griglia (dalla 03 alla 07) sono in scala: <b>1 quadretto = 1,5 metri</b>. I numeri si riferiscono alle chiavi nei capitoli dell'avventura. Prima di mostrarle ai giocatori puoi coprire le parti non ancora esplorate con dei foglietti, oppure ridisegnarle man mano su un foglio a quadretti.</p>
+<figure class="mappa"><img src="../../asset/mappe/brumaria/01_valle_di_brumaria.svg" alt="Mappa regionale della Valle di Brumaria"><figcaption>01 · La Valle di Brumaria: si può mostrare ai giocatori.</figcaption></figure>
+<figure class="mappa"><img src="../../asset/mappe/brumaria/02_brumaria.svg" alt="Pianta del borgo di Brumaria"><figcaption>02 · Il borgo di Brumaria: si può mostrare ai giocatori.</figcaption></figure>
+<figure class="mappa"><img src="../../asset/mappe/brumaria/03_campanile.svg" alt="Il campanile su tre livelli"><figcaption>03 · Il Campanile (Atto I)</figcaption></figure>
+<figure class="mappa"><img src="../../asset/mappe/brumaria/04_mulino.svg" alt="Il mulino della palude"><figcaption>04 · Il Mulino della Palude Lenta (Atto II)</figcaption></figure>
+<figure class="mappa"><img src="../../asset/mappe/brumaria/05_miniera.svg" alt="La miniera di Ferrocupo"><figcaption>05 · La Miniera di Ferrocupo (Atto II)</figcaption></figure>
+<figure class="mappa"><img src="../../asset/mappe/brumaria/06_abbazia.svg" alt="L'abbazia di San Velio e la cripta"><figcaption>06 · L'Abbazia di San Velio (Atto II)</figcaption></figure>
+<figure class="mappa"><img src="../../asset/mappe/brumaria/07_isola_del_fonditore.svg" alt="L'Isola del Fonditore"><figcaption>07 · L'Isola del Fonditore (Atto III)</figcaption></figure>
+
+<!-- ===================================================================== -->
+<h2 id="schermo">14. Schermo del Master</h2>
+<p>Stampa questa pagina e tienila davanti a te durante il gioco.</p>
+<div class="cols">
+<div>
+<h4>Classi Difficoltà</h4>
+<p>Facile <b>10</b> · Media <b>12</b> · Difficile <b>15</b></p>
+<h4>Vantaggio / Svantaggio</h4>
+<p>Si tirano 2d20: con il vantaggio si tiene il più alto, con lo svantaggio il più basso. Usa il vantaggio per premiare le buone idee.</p>
+<h4>Copertura</h4>
+<p>Mezza copertura: +2 alla CA. Copertura tre quarti: +5 alla CA.</p>
+<h4>A 0 punti ferita</h4>
+<p>Il personaggio cade privo di sensi. Nel suo turno tira 1d20: con 10 o più è un successo, sotto 10 un fallimento. Con 3 successi si stabilizza, con 3 fallimenti muore. Un 20 naturale lo fa tornare con 1 PF. Qualsiasi cura lo rimette in piedi.</p>
+<h4>Riposi</h4>
+<p><b>Breve</b> (1 ora): si spendono Dadi Vita per curarsi. <b>Lungo</b> (8 ore): si recupera tutto.</p>
+</div>
+<div>
+<h4>Condizioni più comuni</h4>
+<p><b>Prono:</b> chi attacca in mischia ha vantaggio, chi attacca a distanza svantaggio. Rialzarsi costa metà movimento.<br>
+<b>Spaventato:</b> svantaggio ai tiri, e non può avvicinarsi a ciò che lo spaventa.<br>
+<b>Afferrato:</b> velocità 0.<br>
+<b>Trattenuto:</b> velocità 0, svantaggio ai suoi attacchi, e chi lo attacca ha vantaggio.<br>
+<b>Stordito:</b> non può agire, e chi lo attacca ha vantaggio.</p>
+<h4>Clessidra della Bruma</h4>
+<div class="clessidra"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+<p>+1 per tempo perso o un fallimento importante, −1 per ogni voce suonata. Nel finale vale +10 PF al Pastore per ogni casella.</p>
+<h4>Il Pastore Grigio</h4>
+<p>CA 14 · PF 90 −10 per voce +10 per casella · 2 colpi di bastone +6 (1d10+4) · recupera 5 PF a turno finché tiene Neve · vulnerabile al tuono · il nome «Ombrevallo» lo stordisce.</p>
+</div>
+</div>
+<p style="text-align:center;margin-top:3em;color:var(--muted)"><i>«Ogni strada torna a casa, anche quando è più lontano.»</i><br>Buon divertimento, Master!</p>
+<p style="text-align:center;font-size:.8em;color:var(--muted)">Avventura originale per D&amp;D 5ª edizione. Regole basate sul System Reference Document 5.1 (CC-BY-4.0, Wizards of the Coast).</p>
+
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+{
+ "id": "vermiglia",
+ "titolo": "La Tana di Vermiglia",
+ "sottotitolo": "One-shot di draghi per principianti",
+ "descrizione": "Una giovane drago rossa rapisce Tilde e il suo uovo dorato: gli eroi salgono sul Monte Fumo per salvarli. Nel finale nasce un cucciolo di drago d'oro.",
+ "livello": "3",
+ "giocatori": "5",
+ "durata": "1 sessione, circa 4 ore",
+ "personaggi": "strumenti/dati/personaggi.json",
+ "mostri": "strumenti/dati/mostri.json",
+ "documenti": [
+  {
+   "file": "1_Manuale_del_Master.html",
+   "titolo": "Manuale del Master",
+   "solo_master": true
+  },
+  {
+   "file": "2_Guida_del_Giocatore.html",
+   "titolo": "Guida del Giocatore"
+  },
+  {
+   "file": "3_Schede_dei_Personaggi.html",
+   "titolo": "Schede stampabili"
+  }
+ ],
+ "mappe_cartella": "../../asset/mappe/vermiglia",
+ "mappe": {
+  "01_piazza_di_pietracalda": {
+   "titolo": "Piazza di Pietracalda",
+   "ordine": 1,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    2,
+    3
+   ],
+   "note_master": "Scena 1. I coboldi escono dalla grata P6. Graffio rapisce Tilde dopo 3 round."
+  },
+  "02_passo_del_vento": {
+   "titolo": "Il Passo del Vento",
+   "ordine": 2,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    2,
+    18
+   ],
+   "note_master": "Scena 2. Frana da Q2 (TS Des CD 12, 2d6). Mek in Q5: riposo breve."
+  },
+  "03_forgia_di_durnkar": {
+   "titolo": "La Forgia di Durnkar",
+   "ordine": 3,
+   "griglia": {
+    "cella": 32,
+    "ox": 40,
+    "oy": 92
+   },
+   "inizio": [
+    4,
+    26
+   ],
+   "note_master": "Rune: fuoco, ferro, pietra. Passaggio segreto L3→L7. Uovo si schiude al 3° round."
+  }
+ }
+}
