@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Test end-to-end del Tavolo Virtuale.
+#   ./run.sh                               contro il server Python (tavolo/server.py)
+#   ./run.sh ../target/release/tavolo      contro il server Rust
+#   ./run.sh <server> test_gioco           solo un modulo (o test_gioco.TestDadi, …)
+set -euo pipefail
+cd "$(dirname "$0")"
+SERVER="${1:-python}"
+if [ "$SERVER" != python ]; then SERVER="$(realpath "$SERVER")"; fi
+shift || true
+if [ $# -eq 0 ]; then set -- test_accesso test_gioco test_permessi test_dati; fi
+TAVOLO_SERVER="$SERVER" exec python3 -m unittest -v "$@" 2>&1

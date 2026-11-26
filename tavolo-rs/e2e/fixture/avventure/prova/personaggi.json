@@ -1,0 +1,3 @@
+[{"id": "rocco", "nome": "Rocco", "icona": "🛡️", "colore": "#b03a2e", "razza": "Umano", "classe": "Guerriero", "pf": 28, "ca": 19, "facoltativo": false},
+ {"id": "lia", "nome": "Lia", "icona": "🏹", "colore": "#2980b9", "razza": "Elfa", "classe": "Ranger", "pf": 22, "ca": 15},
+ {"id": "bruno", "nome": "Bruno", "icona": "🔥", "colore": "#8e44ad", "razza": "Gnomo", "classe": "Mago", "pf": 14, "ca": 12, "facoltativo": true}]

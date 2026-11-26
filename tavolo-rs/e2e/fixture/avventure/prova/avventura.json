@@ -1,0 +1,2 @@
+{"id": "prova", "titolo": "Avventura di prova", "sottotitolo": "Per i test", "descrizione": "Fixture dei test end-to-end", "livello": "1", "giocatori": "3", "durata": "1 ora", "formato": 1,
+ "documenti": [{"file": "manuale.html", "titolo": "Manuale del Master", "solo_master": true}, {"file": "guida.html", "titolo": "Guida del Giocatore"}, {"file": "mappa.pdf", "titolo": "PDF"}]}
