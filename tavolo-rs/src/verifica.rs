@@ -27,8 +27,15 @@ fn equivalenti(a: &Value, b: &Value) -> bool {
     }
 }
 
+/// Campi «vuoti»: un campo assente e uno vuoto (null, false, "", [], {}) sono la stessa cosa per il client.
 fn vuoto(v: &Value) -> bool {
-    matches!(v, Value::Null | Value::Bool(false))
+    match v {
+        Value::Null | Value::Bool(false) => true,
+        Value::String(s) => s.is_empty(),
+        Value::Array(a) => a.is_empty(),
+        Value::Object(o) => o.is_empty(),
+        _ => false,
+    }
 }
 
 /// Differenze (percorso) tra originale e riletto, al massimo `max`.
@@ -38,7 +45,8 @@ fn differenze(a: &Value, b: &Value, percorso: &str, out: &mut Vec<String>, max: 
     }
     match (a, b) {
         (Value::Object(x), Value::Object(y)) => {
-            for k in x.keys().chain(y.keys()) {
+            let chiavi: std::collections::BTreeSet<&String> = x.keys().chain(y.keys()).collect();
+            for k in chiavi {
                 let (va, vb) = (x.get(k).unwrap_or(&Value::Null), y.get(k).unwrap_or(&Value::Null));
                 if !(vuoto(va) && vuoto(vb)) {
                     differenze(va, vb, &format!("{percorso}.{k}"), out, max);

@@ -9,5 +9,5 @@ cd "$(dirname "$0")"
 SERVER="${1:-python}"
 if [ "$SERVER" != python ]; then SERVER="$(realpath "$SERVER")"; fi
 shift || true
-if [ $# -eq 0 ]; then set -- test_accesso test_gioco test_permessi test_dati; fi
+if [ $# -eq 0 ]; then set -- test_accesso test_gioco test_permessi test_dati test_migrazione; fi
 TAVOLO_SERVER="$SERVER" exec python3 -m unittest -v "$@" 2>&1
