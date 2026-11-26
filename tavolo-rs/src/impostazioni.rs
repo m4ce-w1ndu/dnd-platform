@@ -70,7 +70,7 @@ impl Tavolo {
                     .map(|(k, v)| {
                         json!({"id": k, "nome": v.name, "account": v.account.clone().unwrap_or_default(),
                                "provider": v.provider.clone().unwrap_or_else(|| "ospite".into()), "avatar": v.avatar.clone().unwrap_or_default(),
-                               "master": v.master_ok || v.admin, "admin": v.admin, "online": self.clienti.contains_key(k),
+                               "master": (v.master_ok || v.admin) && !v.sistema, "admin": v.admin, "sistema": v.sistema, "online": self.clienti.contains_key(k),
                                "visto": v.seen, "io": k == id})
                     })
                     .collect();
@@ -254,7 +254,7 @@ impl Tavolo {
                         )
                         .await;
                 } else {
-                    if let Some(m) = master {
+                    if let Some(m) = master.filter(|_| !self.utenti[&uid].sistema) {
                         let u = self.utenti.get_mut(&uid).expect("utente");
                         u.master_ok = m;
                         if !m && u.is_master() {
@@ -263,7 +263,8 @@ impl Tavolo {
                         }
                     }
                     if let Some(a) = admin {
-                        if uid != id {
+                        // l'account di sistema resta sempre amministratore (e non si toglie i permessi da solo)
+                        if uid != id && !self.utenti[&uid].sistema {
                             let u = self.utenti.get_mut(&uid).expect("utente");
                             u.admin = a;
                             if a {

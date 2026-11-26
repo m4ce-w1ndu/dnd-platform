@@ -80,6 +80,7 @@ pub struct Chi {
     pub nome: String,
     pub master: bool,
     pub admin: bool,
+    pub sistema: bool,
 }
 
 pub struct Connessione {
@@ -445,6 +446,20 @@ impl Tavolo {
         let (utenti, account, scartati) = self.db.utenti().await?;
         self.utenti = utenti;
         self.intoccabili = scartati;
+        // Prima ogni accesso con la password dell'admin creava un utente «Admin» (admin, senza account esterno):
+        // sono tutti l'account di sistema. Non giocano e non fanno il Master.
+        let nome_sistema = capitalizza(&self.config.admin.utente);
+        for (id, u) in self.utenti.iter_mut() {
+            if !u.sistema && u.admin && u.account.is_none() && u.provider.is_none() && u.name == nome_sistema {
+                tracing::info!(utente = %id, "vecchio utente «{}» riconosciuto come account di sistema", u.name);
+                u.sistema = true;
+            }
+            if u.sistema {
+                u.role = "giocatore".into();
+                u.master_ok = false;
+                u.char = None;
+            }
+        }
         self.account = account.into_iter().collect();
         let attiva = self.db.get("attiva").await?.and_then(|v| v.as_str().map(String::from));
         let attiva = attiva.filter(|a| self.catalogo.contains_key(a));
@@ -658,7 +673,8 @@ impl Tavolo {
             id: id.into(),
             nome: u.name.clone(),
             master: u.is_master(),
-            admin: u.admin,
+            admin: u.admin && !u.sistema,
+            sistema: u.sistema,
         }
     }
 
@@ -708,7 +724,7 @@ impl Tavolo {
 
     fn io(&self, id: &str) -> Value {
         let u = &self.utenti[id];
-        json!({"ok": true, "nome": u.name, "admin": u.admin, "master": u.master_ok || u.admin,
+        json!({"ok": true, "nome": u.name, "admin": u.admin, "sistema": u.sistema, "master": (u.master_ok || u.admin) && !u.sistema,
                "provider": u.provider.clone().unwrap_or_default(), "avatar": u.avatar.clone().unwrap_or_default(),
                "char": u.char, "colore": u.color, "ruolo": u.role})
     }
@@ -735,7 +751,7 @@ impl Tavolo {
         }
         s["online"] = self.online();
         s["io"] = json!({"id": id, "name": u.name, "color": u.color, "role": u.role, "char": u.char,
-                         "avatar": u.avatar, "provider": u.provider, "admin": u.admin});
+                         "avatar": u.avatar, "provider": u.provider, "admin": u.admin, "sistema": u.sistema});
         s["avv"] = self.avventura_per(master);
         s["sessione"] = json!(self.sessione);
         if master || u.admin {
@@ -771,15 +787,30 @@ impl Tavolo {
                         .audit(None, None, Some(ip), "password_admin_convertita_argon2", &json!({}))
                         .await;
                 }
-                let nuovo = !conosciuto;
-                if nuovo {
-                    id = id_casuale(12);
-                    let nome = capitalizza(&self.config.admin.utente);
-                    self.utenti.insert(id.clone(), Utente::nuovo(&nome, "#e0b04a", "master"));
-                }
+                // Un solo account di sistema, riusato da tutti i dispositivi (prima ne nasceva uno per browser).
+                let _ = conosciuto;
+                let esistente = self
+                    .utenti
+                    .iter()
+                    .filter(|(_, u)| u.sistema)
+                    .max_by(|a, b| a.1.seen.total_cmp(&b.1.seen))
+                    .map(|(k, _)| k.clone());
+                let nuovo = esistente.is_none();
+                id = match esistente {
+                    Some(k) => k,
+                    None => {
+                        let k = id_casuale(12);
+                        let nome = capitalizza(&self.config.admin.utente);
+                        self.utenti.insert(k.clone(), Utente::nuovo(&nome, "#e0b04a", "giocatore"));
+                        k
+                    }
+                };
                 let u = self.utenti.get_mut(&id).expect("utente");
                 u.admin = true;
-                u.master_ok = true;
+                u.sistema = true;
+                u.master_ok = false;
+                u.role = "giocatore".into();
+                u.char = None;
                 u.seen = adesso();
                 let nome = u.name.clone();
                 self.db
@@ -844,8 +875,9 @@ impl Tavolo {
             };
         };
         let u = &self.utenti[&id];
-        // Master: l'admin (se lo chiede) oppure chi è stato nominato Master dall'admin. Tutti gli altri sono giocatori.
-        let mut ruolo = if s("ruolo") == "master" && (u.master_ok || u.admin) {
+        // Master: un amministratore del tavolo (se lo chiede) oppure chi è stato nominato Master.
+        // L'account di sistema non gioca: entra solo per le impostazioni, come spettatore senza personaggio.
+        let mut ruolo = if s("ruolo") == "master" && (u.master_ok || u.admin) && !u.sistema {
             "master"
         } else {
             "giocatore"
@@ -855,10 +887,10 @@ impl Tavolo {
         }
         let avv = self.attiva.as_ref().and_then(|a| self.catalogo.get(a));
         let pg = Some(s("personaggio"))
-            .filter(|p| !p.is_empty())
+            .filter(|p| !p.is_empty() && !u.sistema)
             .filter(|p| avv.is_some_and(|a| a.ha_personaggio(p)));
         let nome = tronca(s("nome").trim(), 30);
-        if !nome.is_empty() && nome_riservato(&nome, &self.config.admin.utente) && !u.admin {
+        if !nome.is_empty() && nome_riservato(&nome, &self.config.admin.utente) && !u.sistema {
             return Risposta::errore(400, "Questo nome è riservato: scegline un altro");
         }
         if let Some(p) = &pg {

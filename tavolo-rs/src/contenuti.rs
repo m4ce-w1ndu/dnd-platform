@@ -175,7 +175,7 @@ impl Tavolo {
                 let _ = reply.send(r);
             }
             CmdContenuto::Backup { cred, ip, reply } => {
-                let Some(id) = self.autentica(&cred).filter(|id| self.utenti[id].admin) else {
+                let Some(id) = self.autentica(&cred).filter(|id| self.utenti[id].sistema) else {
                     let _ = reply.send(None);
                     return;
                 };
@@ -193,7 +193,7 @@ impl Tavolo {
                 let _ = reply.send(r);
             }
             CmdContenuto::Audit { cred, reply } => {
-                let ok = self.autentica(&cred).is_some_and(|id| self.utenti[&id].admin);
+                let ok = self.autentica(&cred).is_some_and(|id| self.utenti[&id].sistema);
                 let r = if ok {
                     self.db.leggi_audit(1000).await.ok().map(Value::from)
                 } else {

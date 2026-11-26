@@ -120,6 +120,13 @@ SQLite in `$DATI_DIR/tavolo.db` (tabelle `impostazioni`, `utenti`, `account`, `p
 Avventure in `$AVVENTURE_DIR/<id>/`. All'avvio la sessione è sempre `chiusa` e la partita dell'avventura ricordata viene ricaricata.
 Il server ricontrolla la cartella avventure ogni 4 s e manda `catalogo` se cambia.
 
+## Regole sugli amministratori (server Rust, dal 27/11/2026)
+
+`/api/login` con `tipo:"admin"` restituisce sempre lo stesso utente, l'**account di sistema** (`sistema:true` in
+`/api/io`, `io` dello stato e `imp_leggi`). Può solo `imp_*`, `/api/backup`, `/api/audit`; non gioca. `sessione_apri`
+e `nomina_master` sono degli **amministratori del tavolo** (`admin:true`, non di sistema), che possono anche fare il
+Master; `sessione_inizia`/`sessione_chiudi`: Master o amministratore del tavolo. Dettagli in REGOLE.md.
+
 ## Novità del server Rust (compatibili)
 
 - Cookie `tv_sess` HttpOnly/SameSite=Lax in aggiunta a `id`+`secret` (il client attuale continua a usare id+secret).

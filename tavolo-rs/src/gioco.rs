@@ -83,12 +83,13 @@ impl Tavolo {
     }
 
     pub async fn op(&mut self, id: &str, op: Op, ip: &str) -> Risposta {
-        let (nome_u, colore_u, master, admin) = {
+        let (nome_u, colore_u, ruolo) = {
             let u = &self.utenti[id];
-            (u.name.clone(), u.color.clone(), u.is_master(), u.admin)
+            (u.name.clone(), u.color.clone(), Ruolo::di(u))
         };
+        let master = ruolo.master;
         let (chi, msg) = richiesto(&op);
-        if !chi.ammette(Ruolo { master, admin }) {
+        if !chi.ammette(ruolo) {
             return Risposta::no(msg);
         }
         let master_o_no = |ok: bool, msg: &str| if ok { None } else { Some(Risposta::no(msg)) };
@@ -376,6 +377,9 @@ impl Tavolo {
             Op::NominaMaster { id: uid, master: diventa } => {
                 if !self.utenti.contains_key(&uid) {
                     return Risposta::no("utente inesistente");
+                }
+                if diventa && self.utenti[&uid].sistema {
+                    return Risposta::no("l'account di sistema non può fare il Master");
                 }
                 let mut toccati = vec![];
                 if diventa {

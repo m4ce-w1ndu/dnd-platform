@@ -6,7 +6,7 @@ import time
 import unittest
 import zipfile
 
-from harness import PW_ADMIN, Base, Client, Server
+from harness import PW_ADMIN, Base, Client, Server, apri_tavolo
 from test_permessi import PNG
 
 
@@ -172,7 +172,7 @@ class TestEsportaImporta(Base):
         self.assertEqual(st["note_master"], "note da esportare")
 
     def test_backup(self):
-        r = self.admin.get("/api/backup?" + self.admin.qs())
+        r = self.sistema.get("/api/backup?" + self.sistema.qs())
         self.assertEqual(r.status, 200)
         self.assertTrue(r.body.startswith(b"SQLite format 3\x00"))
         self.assertIn(".db", r.h("content-disposition"))
@@ -181,7 +181,7 @@ class TestEsportaImporta(Base):
 class TestImpostazioni(Base):
     def test_leggi_senza_segreti(self):
         g = self.giocatore()
-        r = self.admin.ok("imp_leggi")
+        r = self.sistema.ok("imp_leggi")
         self.assertNotIn(g.secret, json.dumps(r))
         self.assertNotIn("hash", json.dumps(r["config"]))
         utente = next(u for u in r["utenti"] if u["id"] == g.id)
@@ -192,47 +192,47 @@ class TestImpostazioni(Base):
         self.assertEqual(set(r["config"]["oauth"]), {"discord", "google", "github"})
 
     def test_salva_validazione(self):
-        r = self.admin.ok("imp_salva", config={"public_url": "Dnd.Esempio.it/percorso/", "nome_tavolo": "  Il Tavolo  "})
+        r = self.sistema.ok("imp_salva", config={"public_url": "Dnd.Esempio.it/percorso/", "nome_tavolo": "  Il Tavolo  "})
         self.assertEqual(r["config"]["public_url"], "https://dnd.esempio.it")
         self.assertEqual(r["config"]["nome_tavolo"], "Il Tavolo")
         self.assertEqual(self.nuovo().get("/api/info").json["nome_tavolo"], "Il Tavolo")
-        self.assertFalse(self.admin.op("imp_salva", config={"public_url": "https://senza punto"}).json["ok"])
-        self.assertFalse(self.admin.op("imp_salva", config={"public_url": "javascript:alert(1)"}).json["ok"])
-        r = self.admin.op("imp_salva", config={"oauth": {"discord": {"attivo": True, "id": "non-numerico", "secret": "s"}}})
+        self.assertFalse(self.sistema.op("imp_salva", config={"public_url": "https://senza punto"}).json["ok"])
+        self.assertFalse(self.sistema.op("imp_salva", config={"public_url": "javascript:alert(1)"}).json["ok"])
+        r = self.sistema.op("imp_salva", config={"oauth": {"discord": {"attivo": True, "id": "non-numerico", "secret": "s"}}})
         self.assertFalse(r.json["ok"])
         self.assertIn("Discord", r.json["errore"])
-        r = self.admin.ok("imp_salva", config={"oauth": {"google": {"attivo": False, "id": "strano"}}})
+        r = self.sistema.ok("imp_salva", config={"oauth": {"google": {"attivo": False, "id": "strano"}}})
         self.assertEqual(r["config"]["oauth"]["google"]["id"], "")          # spento con valore strano: invariato
-        self.admin.ok("imp_salva", config={"public_url": ""})
+        self.sistema.ok("imp_salva", config={"public_url": ""})
 
     def test_password_admin(self):
-        self.assertFalse(self.admin.op("imp_admin", attuale="sbagliata", nuova="nuovapassword").json["ok"])
-        self.assertFalse(self.admin.op("imp_admin", attuale=PW_ADMIN, nuova="corta").json["ok"])
-        self.admin.ok("imp_admin", attuale=PW_ADMIN, nuova="nuovapassword", utente="capo")
+        self.assertFalse(self.sistema.op("imp_admin", attuale="sbagliata", nuova="nuovapassword").json["ok"])
+        self.assertFalse(self.sistema.op("imp_admin", attuale=PW_ADMIN, nuova="corta").json["ok"])
+        self.sistema.ok("imp_admin", attuale=PW_ADMIN, nuova="nuovapassword", utente="boss")
         self.assertEqual(self.nuovo().login_admin(PW_ADMIN).status, 403)
         self.assertEqual(self.nuovo().login_admin("nuovapassword").status, 403)        # utente cambiato
-        self.assertTrue(self.nuovo().login_admin("nuovapassword", utente="Capo").json["ok"])
-        self.assertEqual(self.nuovo().login_ospite("capo").status, 400)                # nome riservato
-        self.admin.ok("imp_admin", attuale="nuovapassword", nuova=PW_ADMIN, utente="admin")
+        self.assertTrue(self.nuovo().login_admin("nuovapassword", utente="Boss").json["ok"])
+        self.assertEqual(self.nuovo().login_ospite("boss").status, 400)                # nome riservato
+        self.sistema.ok("imp_admin", attuale="nuovapassword", nuova=PW_ADMIN, utente="admin")
         self.assertTrue(self.nuovo().login_admin().json["ok"])
 
     def test_utenti(self):
         g, h = self.giocatore(), self.giocatore()
-        self.assertFalse(self.admin.op("imp_utente", id="non-esiste").json["ok"])
-        self.assertFalse(self.admin.op("imp_utente", id=self.admin.id, elimina=True).json["ok"])
-        self.admin.ok("imp_utente", id=self.admin.id, admin=False)                      # ignorato: niente auto-retrocessione
-        self.assertTrue(self.admin.get("/api/io?" + self.admin.qs()).json["admin"])
-        self.admin.ok("imp_utente", id=g.id, master=True)
+        self.assertFalse(self.sistema.op("imp_utente", id="non-esiste").json["ok"])
+        self.assertFalse(self.sistema.op("imp_utente", id=self.sistema.id, elimina=True).json["ok"])
+        self.sistema.ok("imp_utente", id=self.sistema.id, admin=False)                    # ignorato: niente auto-retrocessione
+        self.assertTrue(self.sistema.get("/api/io?" + self.sistema.qs()).json["admin"])
+        self.sistema.ok("imp_utente", id=g.id, master=True)
         g.entra("master")
         self.assertEqual(g.get("/api/io?" + g.qs()).json["ruolo"], "master")
-        self.admin.ok("imp_utente", id=g.id, master=False)
+        self.sistema.ok("imp_utente", id=g.id, master=False)
         self.assertTrue(g.aspetta(lambda e: e.get("t") == "ricarica"))
         self.assertEqual(g.get("/api/io?" + g.qs()).json["ruolo"], "giocatore")
-        self.admin.ok("imp_utente", id=g.id, admin=True)
-        self.assertTrue(g.op("imp_leggi").json["ok"])
-        self.admin.ok("imp_utente", id=g.id, admin=False)
-        self.assertFalse(g.op("imp_leggi").json["ok"])
-        self.admin.ok("imp_utente", id=h.id, elimina=True)
+        self.sistema.ok("imp_utente", id=g.id, admin=True)
+        self.assertTrue(g.op("sessione_apri", id="prova").json["ok"])     # un amministratore apre il tavolo
+        self.sistema.ok("imp_utente", id=g.id, admin=False)
+        self.assertFalse(g.op("sessione_apri", id="prova").json["ok"])
+        self.sistema.ok("imp_utente", id=h.id, elimina=True)
         self.assertTrue(h.aspetta(lambda e: e.get("t") == "esci"))
         self.assertEqual(h.get("/api/io?" + h.qs()).status, 401)
 
@@ -254,12 +254,12 @@ class TestImpostazioni(Base):
 
     def test_partite(self):
         self.admin.ok("chat", testo="salvami")
-        r = self.admin.ok("imp_partite")
+        r = self.sistema.ok("imp_partite")
         p = next(x for x in r["partite"] if x["id"] == "prova")
         self.assertTrue(p["in_gioco"])
         for k in ("titolo", "aggiornata", "pedine", "tiri", "round"):
             self.assertIn(k, p)
-        self.admin.ok("imp_partita_azzera", id="prova")
+        self.sistema.ok("imp_partita_azzera", id="prova")
         self.assertEqual(self.admin.stato()["log"], [])
 
 
@@ -267,10 +267,7 @@ class TestPersistenza(unittest.TestCase):
     def test_riavvio(self):
         srv = Server()
         try:
-            a = Client(srv)
-            a.login_admin()
-            a.entra("master")
-            a.ok("sessione_apri", id="prova")
+            _sistema, a = apri_tavolo(srv)
             a.ok("sessione_inizia")
             g = Client(srv)
             g.login_ospite("Legolas")

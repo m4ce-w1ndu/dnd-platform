@@ -36,6 +36,11 @@ def porta_libera():
     return p
 
 
+def rust():
+    """Server Rust sotto test? (Le regole sugli amministratori sono cambiate rispetto al Python.)"""
+    return os.environ.get("TAVOLO_SERVER", "python") != "python"
+
+
 def solo_rust(f):
     """Test di robustezza che il server Python non supera (bug noti, corretti nella riscrittura)."""
     return unittest.skipIf(os.environ.get("TAVOLO_SERVER", "python") == "python", "bug noto del server Python")(f)
@@ -254,18 +259,32 @@ class Client:
             self.eventi.clear()
 
 
+def apri_tavolo(srv, nome="Gestore"):
+    """Account di sistema + un amministratore del tavolo (ospite promosso) seduto come Master con «prova» aperta.
+
+    Regole nuove: l'account di sistema («Admin», utente e password) assegna i permessi e configura,
+    il tavolo lo apre un altro amministratore. Funziona anche col server Python (dove l'admin può tutto)."""
+    sistema = Client(srv)
+    assert sistema.login_admin().json["ok"]
+    capo = Client(srv)
+    assert capo.login_ospite(nome).json["ok"]
+    sistema.ok("imp_utente", id=capo.id, admin=True)
+    assert capo.entra("master").json["ok"]
+    capo.ok("sessione_apri", id="prova")
+    return sistema, capo
+
+
 class Base(unittest.TestCase):
-    """Un server per classe di test; self.admin è l'admin seduto come Master con «prova» aperta."""
+    """Un server per classe di test; self.admin è un amministratore del tavolo seduto come Master con «prova»
+    aperta; self.sistema è l'account di sistema (impostazioni e permessi)."""
     env = None
 
     @classmethod
     def setUpClass(cls):
         cls.srv = Server(cls.env)
         cls.clienti = []
-        cls.admin = cls.nuovo()
-        assert cls.admin.login_admin().json["ok"]
-        assert cls.admin.entra("master").json["ok"]
-        cls.admin.ok("sessione_apri", id="prova")
+        cls.sistema, cls.admin = apri_tavolo(cls.srv)
+        cls.clienti += [cls.sistema, cls.admin]
 
     @classmethod
     def tearDownClass(cls):

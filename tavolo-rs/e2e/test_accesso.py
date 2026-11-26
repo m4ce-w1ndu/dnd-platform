@@ -2,7 +2,7 @@
 import time
 import unittest
 
-from harness import PW_ADMIN, Base, Client, Server
+from harness import PW_ADMIN, Base, Client, Server, rust, solo_rust
 
 
 class TestLogin(Base):
@@ -36,7 +36,7 @@ class TestLogin(Base):
         self.assertTrue(r.json["ok"])
         io = c.get("/api/io?" + c.qs()).json
         self.assertTrue(io["admin"])
-        self.assertTrue(io["master"])
+        self.assertEqual(io["master"], not rust())          # l'account di sistema non fa il Master
 
     def test_tipo_non_valido_e_json_rotto(self):
         c = self.nuovo()
@@ -147,8 +147,11 @@ class TestSessione(unittest.TestCase):
             self.assertIn(k, info)
         self.assertTrue(info["versione"])
 
+        sistema = Client(self.srv)
+        sistema.login_admin()
         a = Client(self.srv)
-        a.login_admin()
+        a.login_ospite("Gestore")
+        sistema.ok("imp_utente", id=a.id, admin=True)
         a.entra("master")
         a.collega()
         self.assertFalse(a.op("sessione_apri", id="non-esiste").json["ok"])
@@ -176,6 +179,48 @@ class TestSessione(unittest.TestCase):
         self.assertEqual(g.get("/api/info").json["sessione"], "chiusa")
         a.scollega()
         g.scollega()
+
+
+class TestAccountDiSistema(Base):
+    """Regole nuove: «Admin» (utente e password) configura e assegna i permessi, non gioca e non apre il tavolo."""
+
+    @solo_rust
+    def test_un_solo_account_di_sistema(self):
+        a, b = self.nuovo(), self.nuovo()
+        a.login_admin()
+        b.login_admin()
+        self.assertEqual(a.id, b.id)                       # niente più un «Admin» nuovo per ogni browser
+        self.assertEqual(a.id, self.sistema.id)
+        io = a.get("/api/io?" + a.qs()).json
+        self.assertTrue(io["sistema"] and io["admin"])
+        self.assertFalse(io["master"])
+
+    @solo_rust
+    def test_sistema_non_gioca(self):
+        s = self.sistema
+        self.assertTrue(s.entra("master").json["ok"])
+        self.assertEqual(s.get("/api/io?" + s.qs()).json["ruolo"], "giocatore")
+        for op, dati in (("sessione_apri", {"id": "prova"}), ("nomina_master", {"id": s.id}), ("sessione_chiudi", {}),
+                         ("chat", {"testo": "ciao"}), ("tira", {"espr": "1d20"}), ("scegli_pg", {"pg": "rocco"})):
+            self.assertFalse(s.op(op, **dati).json["ok"], op)
+        self.assertTrue(s.op("imp_leggi").json["ok"])
+
+    @solo_rust
+    def test_admin_del_tavolo(self):
+        capo, g = self.giocatore(nome="Vice"), self.giocatore()
+        self.sistema.ok("imp_utente", id=capo.id, admin=True)
+        self.assertFalse(capo.op("imp_leggi").json["ok"])          # le impostazioni restano al sistema
+        self.assertFalse(capo.op("nomina_master", id=self.sistema.id).json["ok"])
+        try:
+            capo.ok("nomina_master", id=capo.id)                      # un admin può fare il Master
+            self.assertEqual(capo.get("/api/io?" + capo.qs()).json["ruolo"], "master")
+            capo.ok("nomina_master", id=g.id)
+            self.assertEqual(g.get("/api/io?" + g.qs()).json["ruolo"], "master")
+            self.assertTrue(capo.get("/api/io?" + capo.qs()).json["master"])      # resta abilitato
+        finally:
+            self.admin.ok("nomina_master", id=self.admin.id)
+        self.sistema.ok("imp_utente", id=self.sistema.id, admin=False)            # non si toglie i permessi
+        self.assertTrue(self.sistema.op("imp_leggi").json["ok"])
 
 
 class TestStatico(Base):
@@ -242,19 +287,19 @@ class TestFileAvventura(Base):
 
 class TestOspitiEOAuth(Base):
     def test_password_del_tavolo(self):
-        self.admin.ok("imp_salva", config={"password_giocatori": "segreta"})
+        self.sistema.ok("imp_salva", config={"password_giocatori": "segreta"})
         try:
             self.assertTrue(self.nuovo().get("/api/info").json["password_giocatori"])
             self.assertEqual(self.nuovo().login_ospite("Tizio").status, 403)
             self.assertEqual(self.nuovo().login_ospite("Tizio", password="no").status, 403)
             self.assertTrue(self.nuovo().login_ospite("Tizio", password="segreta").json["ok"])
         finally:
-            self.admin.ok("imp_salva", config={"password_giocatori": ""})
+            self.sistema.ok("imp_salva", config={"password_giocatori": ""})
 
     def test_ospiti_spenti_e_oauth(self):
         c = self.nuovo()
         self.assertEqual(c.get("/auth/discord/start").status, 404)       # provider non configurato
-        self.admin.ok("imp_salva", config={"ospiti": False, "oauth": {"discord": {"attivo": True, "id": "157050307642143970", "secret": "s3greto"}}})
+        self.sistema.ok("imp_salva", config={"ospiti": False, "oauth": {"discord": {"attivo": True, "id": "157050307642143970", "secret": "s3greto"}}})
         try:
             info = c.get("/api/info").json
             self.assertFalse(info["ospiti"])
@@ -274,11 +319,11 @@ class TestOspitiEOAuth(Base):
             self.assertNotIn(b"tv_cred", r.body)
             r = c.get("/auth/discord/callback?error=access_denied")
             self.assertIn("annullato".encode(), r.body)
-            leggi = self.admin.ok("imp_leggi")
+            leggi = self.sistema.ok("imp_leggi")
             self.assertTrue(leggi["config"]["oauth"]["discord"]["secret_impostato"])
             self.assertNotIn("s3greto", str(leggi))
         finally:
-            self.admin.ok("imp_salva", config={"ospiti": True, "oauth": {"discord": {"attivo": False}}})
+            self.sistema.ok("imp_salva", config={"ospiti": True, "oauth": {"discord": {"attivo": False}}})
         self.assertTrue(self.nuovo().login_ospite("Ospite").json["ok"])
 
 

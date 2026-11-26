@@ -30,6 +30,9 @@ class TestMigrazione(unittest.TestCase):
             a.ok("nebbia", azione="rivela", celle=["1,1", "2,3"])
             a.ok("iniziativa", azione="aggiungi", nome="Goblin", valore=14)
             a.ok("imp_salva", config={"nome_tavolo": "Tavolo di casa", "password_giocatori": ""})
+            capo = Client(srv)                                # un giocatore a cui l'admin dà i permessi di admin
+            capo.login_ospite("Gestore")
+            a.ok("imp_utente", id=capo.id, admin=True)
             srv.stop()                                  # SIGTERM: il Python salva
 
             r = subprocess.run([rust, "verifica-db", os.path.join(srv.dati, "tavolo.db")], capture_output=True, text=True, timeout=60)
@@ -43,8 +46,14 @@ class TestMigrazione(unittest.TestCase):
             a2 = Client(srv)
             self.assertTrue(a2.login_admin(PW_ADMIN).json["ok"])            # password PBKDF2 del Python → Argon2
             self.assertEqual(Client(srv).login_admin("sbagliata").status, 403)
-            a.ok("sessione_apri")
-            st = a.stato()
+            # il vecchio utente «Admin» del Python ora è l'account di sistema: configura ma non apre il tavolo
+            io_a = a.get("/api/io?" + a.qs()).json
+            self.assertTrue(io_a["sistema"])
+            self.assertFalse(a.op("sessione_apri").json["ok"])
+            self.assertEqual(a2.id, a.id)                    # e il nuovo accesso con password è lo stesso utente
+            capo.entra("master")
+            capo.ok("sessione_apri")
+            st = capo.stato()
             self.assertEqual(st["pedine"][pid]["ca"], "15 (scudo)")
             self.assertEqual(st["pedine"][pid]["x"], 9.5)
             self.assertEqual(st["schede"]["lia"]["note"], "àèìòù 🐉")
@@ -59,8 +68,8 @@ class TestMigrazione(unittest.TestCase):
             srv.start()
             self.assertTrue(Client(srv).login_admin(PW_ADMIN).json["ok"])
             self.assertEqual(g.get("/api/io?" + g.qs()).status, 200)
-            a.ok("sessione_apri")
-            self.assertIn(pid, a.stato()["pedine"])
+            capo.ok("sessione_apri")
+            self.assertIn(pid, capo.stato()["pedine"])
         finally:
             os.environ["TAVOLO_SERVER"] = rust
             srv.chiudi()

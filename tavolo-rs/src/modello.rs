@@ -206,6 +206,9 @@ pub struct Utente {
     pub admin: bool,
     #[serde(default, deserialize_with = "lenient::bool", skip_serializing_if = "falso")]
     pub master_ok: bool,
+    /// Account di sistema (utente e password dell'admin): solo impostazioni e permessi, non gioca.
+    #[serde(default, deserialize_with = "lenient::bool", skip_serializing_if = "falso")]
+    pub sistema: bool,
     #[serde(default, deserialize_with = "lenient::f64")]
     pub seen: f64,
     #[serde(default, deserialize_with = "lenient::opt_string", skip_serializing_if = "Option::is_none")]
@@ -235,6 +238,7 @@ impl Utente {
             char: None,
             admin: false,
             master_ok: false,
+            sistema: false,
             seen: crate::util::adesso(),
             account: None,
             avatar: None,

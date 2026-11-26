@@ -3,13 +3,14 @@
 Ruoli:
     G  giocatore seduto con il personaggio «rocco» (proprietario della sua pedina)
     P  altro giocatore senza personaggio (non proprietario di nulla)
-    A  amministratore seduto come giocatore (non è il Master di questa partita)
+    A  amministratore del tavolo seduto come giocatore (non è il Master di questa partita)
     M  Master nominato dall'amministratore (non è admin)
+    S  account di sistema «Admin» (utente e password): solo impostazioni e permessi (solo server Rust)
 Un comando permesso risponde ok:true; uno vietato risponde ok:false e NON cambia lo stato della partita.
 """
 import unittest
 
-from harness import PW_ADMIN, Base
+from harness import PW_ADMIN, Base, rust
 
 TUTTI = "GPAM"
 PNG = (b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x02\x00\x00\x00\x90\x91h6"
@@ -28,14 +29,15 @@ class TestMatricePermessi(Base):
         cls.G = cls.giocatore("rocco", nome="Proprietario")
         cls.P = cls.giocatore(nome="Estraneo")
         cls.A = cls.admin
-        cls.ruoli = {"G": cls.G, "P": cls.P, "A": cls.A, "M": cls.M}
+        cls.ruoli = {"G": cls.G, "P": cls.P, "A": cls.A, "M": cls.M, "S": cls.sistema}
 
     def fotografia(self):
         st = self.M.stato()
         return {k: st[k] for k in ("pedine", "iniziativa", "nebbia", "schede", "scena", "note_master", "sessione", "avv", "catalogo")}
 
     def prova(self, nome, payload, permessi, prima=None):
-        for ruolo in "GPAM":            # il Master per ultimo: le operazioni distruttive avvengono dopo i rifiuti
+        ordine = "GPSAM" if rust() else "GPAM"
+        for ruolo in ordine:            # il Master per ultimo: le operazioni distruttive avvengono dopo i rifiuti
             c = self.ruoli[ruolo]
             dati = payload(ruolo) if callable(payload) else payload
             if prima:
@@ -59,6 +61,7 @@ class TestMatricePermessi(Base):
             r = self.M.req("POST", "/api/carica_mappa?nome=tmp.png&" + self.M.qs(), raw=PNG)
             return {"id": r.json["id"]}
 
+        IMP = "S" if rust() else "A"           # regole nuove: impostazioni solo all'account di sistema
         casi = [
             ("tira", {"espr": "1d20"}, TUTTI),
             ("chat", {"testo": "ciao"}, TUTTI),
@@ -85,12 +88,12 @@ class TestMatricePermessi(Base):
             ("sessione_pausa", {}, "M"),
             ("sessione_chiudi", {}, "AM"),
             ("sessione_apri", {"id": "prova"}, "A"),
-            ("imp_leggi", {}, "A"),
-            ("imp_partite", {}, "A"),
-            ("imp_salva", {"config": {"nome_tavolo": "Tavolo di prova"}}, "A"),
-            ("imp_admin", {"attuale": PW_ADMIN}, "A"),
-            ("imp_utente", lambda _r: {"id": self.P.id, "master": False}, "A"),
-            ("imp_partita_azzera", {"id": "seconda"}, "A"),
+            ("imp_leggi", {}, IMP),
+            ("imp_partite", {}, IMP),
+            ("imp_salva", {"config": {"nome_tavolo": "Tavolo di prova"}}, IMP),
+            ("imp_admin", {"attuale": PW_ADMIN}, IMP),
+            ("imp_utente", lambda _r: {"id": self.P.id, "master": False}, IMP),
+            ("imp_partita_azzera", {"id": "seconda"}, IMP),
             ("scena", {"id": "02_grotta", "porta_gruppo": False}, "M"),
             ("griglia", {"id": "02_grotta", "griglia": {"cella": 30, "ox": 0, "oy": 0, "mostra": True}}, "M"),
             ("nebbia", {"azione": "rivela", "celle": ["1,1"]}, "M"),
@@ -114,14 +117,14 @@ class TestMatricePermessi(Base):
 
     def test_caricamenti_solo_master(self):
         for path in ("/api/carica_mappa?nome=x.png", "/api/carica_documento?nome=x.html", "/api/carica_avventura"):
-            for ruolo in "GPA":
+            for ruolo in ("GPAS" if rust() else "GPA"):
                 c = self.ruoli[ruolo]
                 r = c.req("POST", path + "&" + c.qs() if "?" in path else path + "?" + c.qs(), raw=PNG)
                 self.assertEqual(r.status, 403, (path, ruolo))
 
     def test_scaricamenti(self):
-        for path, chi in (("/api/scarica_avventura?id=prova", "M"), ("/api/esporta", "M"), ("/api/backup", "A")):
-            for ruolo in "GPAM":
+        for path, chi in (("/api/scarica_avventura?id=prova", "M"), ("/api/esporta", "M"), ("/api/backup", "S" if rust() else "A")):
+            for ruolo in ("GPSAM" if rust() else "GPAM"):
                 c = self.ruoli[ruolo]
                 r = c.get(path + ("&" if "?" in path else "?") + c.qs())
                 self.assertEqual(r.status, 200 if ruolo in chi else 403, (path, ruolo))
