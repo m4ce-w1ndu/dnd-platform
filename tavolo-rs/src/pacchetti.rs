@@ -41,11 +41,12 @@ pub fn estrai(dati: &[u8], avv_dir: &Path) -> Result<(String, PathBuf), String> 
     let mut totale: u64 = 0;
     for i in 0..z.len() {
         let f = z.by_index_raw(i).map_err(|_| "il file non è uno zip valido".to_string())?;
-        if f.is_dir() || f.name().ends_with('/') {
+        let nome = f.name().map_err(|_| "nome di file non valido nel pacchetto".to_string())?.to_string();
+        if f.is_dir() || nome.ends_with('/') {
             continue;
         }
         totale = totale.saturating_add(f.size());
-        nomi.push((i, f.name().to_string()));
+        nomi.push((i, nome));
     }
     if totale > MAX_ESTRATTO {
         return Err("pacchetto troppo grande una volta estratto".into());

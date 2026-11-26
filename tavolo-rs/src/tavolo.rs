@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use futures_util::FutureExt;
 use indexmap::IndexMap;
 use serde_json::{json, Map, Value};
 use tokio::sync::{mpsc, oneshot};
@@ -196,7 +197,14 @@ impl Tavolo {
                     let Some(cmd) = cmd else { break };
                     let inizio = Instant::now();
                     let fine = matches!(cmd, Cmd::Chiudi(_));
-                    self.gestisci(cmd).await;
+                    // Un bug in un comando non deve fermare il tavolo: si registra e si va avanti.
+                    // (Chi aspettava la risposta riceve un errore perché il canale oneshot viene chiuso.)
+                    let esito = std::panic::AssertUnwindSafe(self.gestisci(cmd)).catch_unwind().await;
+                    if let Err(p) = esito {
+                        let msg = p.downcast_ref::<&str>().map(|s| s.to_string()).or_else(|| p.downcast_ref::<String>().cloned()).unwrap_or_default();
+                        tracing::error!(errore = %msg, "comando andato in panico: il tavolo continua");
+                        self.metriche.panico();
+                    }
                     if self.online_da_mandare {
                         self.online_da_mandare = false;
                         let o = self.online();

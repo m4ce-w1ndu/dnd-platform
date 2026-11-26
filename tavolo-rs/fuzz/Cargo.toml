@@ -1,0 +1,39 @@
+# Fuzzing guidato dalla copertura (serve Rust nightly):
+#   cargo install cargo-fuzz
+#   cargo +nightly fuzz run comandi -- -max_total_time=60
+[package]
+name = "tavolo-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+serde_json = "1"
+tavolo = { path = ".." }
+
+[[bin]]
+name = "comandi"
+path = "fuzz_targets/comandi.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "dadi"
+path = "fuzz_targets/dadi.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "pacchetti"
+path = "fuzz_targets/pacchetti.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]

@@ -19,6 +19,7 @@ pub struct Metriche {
     salvataggi: AtomicU64,
     salvataggi_us: AtomicU64,
     errori_salvataggio: AtomicU64,
+    panici: AtomicU64,
 }
 
 impl Default for Metriche {
@@ -37,6 +38,7 @@ impl Default for Metriche {
             salvataggi: AtomicU64::new(0),
             salvataggi_us: AtomicU64::new(0),
             errori_salvataggio: AtomicU64::new(0),
+            panici: AtomicU64::new(0),
         }
     }
 }
@@ -74,6 +76,9 @@ impl Metriche {
         self.salvataggi.fetch_add(1, Relaxed);
         self.salvataggi_us.fetch_add(d.as_micros() as u64, Relaxed);
     }
+    pub fn panico(&self) {
+        self.panici.fetch_add(1, Relaxed);
+    }
     pub fn errore_salvataggio(&self) {
         self.errori_salvataggio.fetch_add(1, Relaxed);
     }
@@ -101,6 +106,7 @@ impl Metriche {
         riga("tavolo_accessi_falliti_totale", "counter", "Password sbagliate", vec![(String::new(), g(&self.accessi_falliti))]);
         riga("tavolo_salvataggi_totale", "counter", "Salvataggi nel database", vec![(String::new(), g(&self.salvataggi))]);
         riga("tavolo_salvataggi_secondi_totale", "counter", "Tempo speso a salvare", vec![(String::new(), g(&self.salvataggi_us) / 1e6)]);
+        riga("tavolo_comandi_in_panico_totale", "counter", "Comandi terminati per un bug (il tavolo è andato avanti)", vec![(String::new(), g(&self.panici))]);
         riga("tavolo_errori_salvataggio_totale", "counter", "Salvataggi non riusciti", vec![(String::new(), g(&self.errori_salvataggio))]);
         s
     }

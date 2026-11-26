@@ -123,15 +123,16 @@ impl Db {
             .execute(&mut *tx)
             .await?;
         // si cancellano tutti gli utenti tranne quelli che non si sono potuti leggere (li si lascia com'erano)
-        let mut q = String::from("DELETE FROM utenti");
+        let mut q = sqlx::QueryBuilder::<sqlx::Sqlite>::new("DELETE FROM utenti");
         if !intoccabili.is_empty() {
-            q += &format!(" WHERE id NOT IN ({})", vec!["?"; intoccabili.len()].join(","));
+            q.push(" WHERE id NOT IN (");
+            let mut sep = q.separated(",");
+            for id in intoccabili {
+                sep.push_bind(id);
+            }
+            q.push(")");
         }
-        let mut del = sqlx::query(&q);
-        for id in intoccabili {
-            del = del.bind(id);
-        }
-        del.execute(&mut *tx).await?;
+        q.build().execute(&mut *tx).await?;
         for (id, u) in utenti {
             sqlx::query("INSERT OR REPLACE INTO utenti(id,nome,account,admin,master,visto,dati) VALUES(?,?,?,?,?,?,?)")
                 .bind(id)
