@@ -5,9 +5,11 @@
 use serde::Deserialize;
 use serde_json::{Map, Value};
 
+use ts_rs::TS;
+
 use crate::util::{lenient, N};
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, serde::Serialize, TS)]
 pub struct Punto {
     #[serde(deserialize_with = "lenient::f64")]
     pub x: f64,
@@ -16,47 +18,65 @@ pub struct Punto {
 }
 
 /// Dati di una pedina mandati dal client: ogni campo può mancare (`None`) o essere presente (anche null).
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, TS)]
 pub struct PedinaIn {
     #[serde(default, deserialize_with = "lenient::opt_string")]
+    #[ts(optional = nullable)]
     pub id: Option<String>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "string | null")]
     pub scena: Option<Option<String>>,
     #[serde(default, deserialize_with = "lenient::presente_n")]
+    #[ts(optional, type = "number | null")]
     pub x: Option<Option<N>>,
     #[serde(default, deserialize_with = "lenient::presente_n")]
+    #[ts(optional, type = "number | null")]
     pub y: Option<Option<N>>,
     #[serde(default, deserialize_with = "lenient::opt_string")]
+    #[ts(optional = nullable)]
     pub nome: Option<String>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "string | null")]
     pub colore: Option<Option<String>>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "string | null")]
     pub icona: Option<Option<String>>,
     #[serde(default, deserialize_with = "lenient::presente_n")]
+    #[ts(optional, type = "number | null")]
     pub taglia: Option<Option<N>>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "unknown")]
     pub pf: Option<Option<Value>>,
     #[serde(default, deserialize_with = "lenient::presente_n")]
+    #[ts(optional, type = "number | null")]
     pub pfmax: Option<Option<N>>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "unknown")]
     pub ca: Option<Option<Value>>,
     #[serde(default, deserialize_with = "lenient::opt_bool")]
+    #[ts(optional = nullable)]
     pub nascosta: Option<bool>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "Array<string> | null")]
     pub condizioni: Option<Option<Vec<Value>>>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "string | null")]
     pub tipo: Option<Option<String>>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "string | null")]
     pub pg: Option<Option<String>>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "string | null")]
     pub mostro: Option<Option<String>>,
     #[serde(default, deserialize_with = "lenient::presente")]
+    #[ts(optional, type = "string | null")]
     pub proprietario: Option<Option<String>>,
     #[serde(default, deserialize_with = "lenient::presente_n")]
+    #[ts(optional, type = "number | null")]
     pub slot: Option<Option<N>>,
 }
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, TS)]
 pub struct GrigliaIn {
     #[serde(default, deserialize_with = "lenient::f64")]
     pub cella: f64,
@@ -64,33 +84,43 @@ pub struct GrigliaIn {
     pub ox: f64,
     #[serde(default, deserialize_with = "lenient::f64")]
     pub oy: f64,
+    #[ts(as = "Option<bool>", optional = nullable)]
     #[serde(default, deserialize_with = "lenient::bool")]
     pub mostra: bool,
 }
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, TS)]
 pub struct OAuthIn {
     #[serde(default, deserialize_with = "lenient::opt_bool")]
+    #[ts(optional = nullable)]
     pub attivo: Option<bool>,
     #[serde(default, deserialize_with = "lenient::opt_string")]
+    #[ts(optional = nullable)]
     pub id: Option<String>,
     #[serde(default, deserialize_with = "lenient::opt_string")]
+    #[ts(optional = nullable)]
     pub secret: Option<String>,
+    #[ts(as = "Option<bool>", optional = nullable)]
     #[serde(default, deserialize_with = "lenient::bool")]
     pub rimuovi_secret: bool,
 }
 
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, TS)]
 pub struct ConfigIn {
     #[serde(default, deserialize_with = "lenient::opt_string")]
+    #[ts(optional = nullable)]
     pub nome_tavolo: Option<String>,
     #[serde(default, deserialize_with = "lenient::opt_string")]
+    #[ts(optional = nullable)]
     pub password_giocatori: Option<String>,
     #[serde(default, deserialize_with = "lenient::opt_string")]
+    #[ts(optional = nullable)]
     pub public_url: Option<String>,
     #[serde(default, deserialize_with = "lenient::opt_bool")]
+    #[ts(optional = nullable)]
     pub ospiti: Option<bool>,
     #[serde(default)]
+    #[ts(optional = nullable)]
     pub oauth: Option<std::collections::BTreeMap<String, OAuthIn>>,
 }
 
@@ -100,24 +130,31 @@ fn sempre() -> bool {
 
 /// Un comando di gioco. Il nome JSON è il campo `op`. (Viaggia sempre in un `Box`.)
 #[allow(clippy::large_enum_variant)]
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, TS)]
 #[serde(tag = "op", rename_all = "snake_case")]
 pub enum Op {
     Tira {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         espr: String,
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         etichetta: String,
+        #[ts(as = "Option<bool>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::bool")]
         segreto: bool,
         #[serde(default)]
+        #[ts(optional = nullable)]
         modo: Option<Value>,
         #[serde(default, deserialize_with = "lenient::opt_nonempty")]
+        #[ts(optional = nullable)]
         danni: Option<String>,
     },
     Chat {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         testo: String,
+        #[ts(as = "Option<bool>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::bool")]
         segreto: bool,
     },
@@ -126,64 +163,83 @@ pub enum Op {
         x: f64,
         #[serde(deserialize_with = "lenient::f64")]
         y: f64,
+        #[ts(as = "Option<bool>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::bool")]
         centra: bool,
     },
     Righello {
         #[serde(default)]
+        #[ts(optional = nullable)]
         punti: Option<Vec<Punto>>,
     },
     ScegliPg {
         #[serde(default, deserialize_with = "lenient::opt_nonempty")]
+        #[ts(optional = nullable)]
         pg: Option<String>,
     },
     PedinaMuovi {
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         id: Option<String>,
         #[serde(deserialize_with = "lenient::f64")]
         x: f64,
         #[serde(deserialize_with = "lenient::f64")]
         y: f64,
+        #[ts(as = "Option<bool>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::bool")]
         finale: bool,
     },
     PedinaSalva {
+        #[ts(as = "Option<PedinaIn>", optional = nullable)]
         #[serde(default)]
         pedina: PedinaIn,
     },
     PedinaElimina {
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         id: Option<String>,
     },
     Scheda {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         id: String,
+        #[ts(as = "Option<Map<String, Value>>", optional = nullable)]
         #[serde(default)]
         scheda: Map<String, Value>,
     },
     Iniziativa {
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         azione: Option<String>,
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         nome: Option<String>,
         #[serde(default, deserialize_with = "lenient::opt_i64")]
+        #[ts(optional = nullable)]
         valore: Option<i64>,
         #[serde(default, deserialize_with = "lenient::opt_nonempty")]
+        #[ts(optional = nullable)]
         pedina: Option<String>,
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         colore: Option<String>,
+        #[ts(as = "Option<bool>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::bool")]
         nascosta: bool,
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         id: Option<String>,
     },
     SessioneApri {
         #[serde(default, deserialize_with = "lenient::opt_nonempty")]
+        #[ts(optional = nullable)]
         id: Option<String>,
     },
     NominaMaster {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         id: String,
+        #[ts(as = "Option<bool>", optional = nullable)]
         #[serde(default = "sempre", deserialize_with = "lenient::bool")]
         master: bool,
     },
@@ -192,35 +248,46 @@ pub enum Op {
     SessioneChiudi {},
     ImpLeggi {},
     ImpSalva {
+        #[ts(as = "Option<ConfigIn>", optional = nullable)]
         #[serde(default)]
         config: ConfigIn,
     },
     ImpAdmin {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         attuale: String,
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         utente: String,
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         nuova: String,
     },
     ImpPartite {},
     ImpPartitaAzzera {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         id: String,
     },
     ImpUtente {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         id: String,
+        #[ts(as = "Option<bool>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::bool")]
         elimina: bool,
         #[serde(default, deserialize_with = "lenient::opt_bool")]
+        #[ts(optional = nullable)]
         master: Option<bool>,
         #[serde(default, deserialize_with = "lenient::opt_bool")]
+        #[ts(optional = nullable)]
         admin: Option<bool>,
     },
     Scena {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         id: String,
+        #[ts(as = "Option<bool>", optional = nullable)]
         #[serde(default = "sempre", deserialize_with = "lenient::bool")]
         porta_gruppo: bool,
     },
@@ -228,61 +295,78 @@ pub enum Op {
         #[serde(deserialize_with = "lenient::string")]
         id: String,
         #[serde(default)]
+        #[ts(optional = nullable)]
         griglia: Option<GrigliaIn>,
     },
     Nebbia {
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         scena: Option<String>,
         #[serde(default, deserialize_with = "lenient::opt_bool")]
+        #[ts(optional = nullable)]
         attiva: Option<bool>,
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         azione: Option<String>,
+        #[ts(as = "Option<Vec<String>>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::strings")]
         celle: Vec<String>,
     },
     NoteMaster {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         testo: String,
     },
     SvuotaLog {},
     PulisciScena {
         #[serde(default, deserialize_with = "lenient::opt_string")]
+        #[ts(optional = nullable)]
         scena: Option<String>,
     },
     ResetPartita {},
     AvventuraAttiva {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         id: String,
     },
     AvventuraNuova {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         titolo: String,
     },
     AvventuraInfo {
         #[serde(flatten)]
+        #[ts(skip)]
         campi: Map<String, Value>,
     },
     MappaMeta {
         #[serde(deserialize_with = "lenient::string")]
         id: String,
         #[serde(default, deserialize_with = "lenient::presente")]
+        #[ts(optional, type = "unknown")]
         titolo: Option<Option<Value>>,
         #[serde(default, deserialize_with = "lenient::opt_i64")]
+        #[ts(optional = nullable)]
         ordine: Option<i64>,
         #[serde(default, deserialize_with = "lenient::presente")]
+        #[ts(optional, type = "unknown")]
         note_master: Option<Option<Value>>,
         #[serde(default, deserialize_with = "lenient::presente")]
+        #[ts(optional, type = "unknown")]
         gruppo: Option<Option<Value>>,
     },
     MappaElimina {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         id: String,
     },
     DocumentoElimina {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         file: String,
     },
     AvventuraElimina {
+        #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
         id: String,
     },

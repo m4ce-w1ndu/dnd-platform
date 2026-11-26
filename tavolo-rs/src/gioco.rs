@@ -1,5 +1,6 @@
 //! I comandi di gioco (`/api/op`). Ogni comando passa prima dalla tabella dei permessi.
 
+use crate::api::Evento;
 use serde_json::{json, Map, Value};
 
 use crate::comandi::{Op, PedinaIn};
@@ -36,8 +37,12 @@ impl Tavolo {
         if let Some(p) = self.stato.pedine.values_mut().find(|p| p.pg.as_deref() == Some(pg)) {
             p.proprietario = Some(id.into());
             p.colore = Some(colore.into());
-            let ev = json!({"t": "pedina", "pedina": p});
-            self.invia(&ev);
+            let ev = Evento::Pedina {
+                pedina: p.clone(),
+                da: None,
+                trascina: None,
+            };
+            self.invia(ev);
             return;
         }
         let pf_info = info.get("pf").and_then(numero).unwrap_or(10.0);
@@ -76,9 +81,13 @@ impl Tavolo {
             slot: Some(N(n as f64)),
             altro: Map::new(),
         };
-        let ev = json!({"t": "pedina", "pedina": p});
+        let ev = Evento::Pedina {
+            pedina: p.clone(),
+            da: None,
+            trascina: None,
+        };
         self.stato.pedine.insert(pid, p);
-        self.invia(&ev);
+        self.invia(ev);
         self.salva_presto();
     }
 
@@ -165,7 +174,13 @@ impl Tavolo {
             }
 
             Op::Ping { x, y, centra } => {
-                self.invia(&json!({"t": "ping", "x": x, "y": y, "colore": colore_u, "chi": nome_u, "centra": centra && master}));
+                self.invia(Evento::Ping {
+                    x,
+                    y,
+                    colore: colore_u,
+                    chi: nome_u,
+                    centra: centra && master,
+                });
                 Risposta::si()
             }
 
@@ -173,8 +188,11 @@ impl Tavolo {
                 if punti.as_ref().is_some_and(|p| p.len() > 32) {
                     return Risposta::errore(400, "troppi punti");
                 }
-                let punti = punti.map(|v| v.into_iter().map(|p| json!({"x": p.x, "y": p.y})).collect::<Vec<_>>());
-                self.invia(&json!({"t": "righello", "da": id, "colore": colore_u, "punti": punti}));
+                self.invia(Evento::Righello {
+                    da: id.into(),
+                    colore: colore_u,
+                    punti,
+                });
                 Risposta::si()
             }
 
@@ -193,7 +211,7 @@ impl Tavolo {
                     self.crea_pedina_pg(id, p, &colore_u);
                 }
                 let o = self.online();
-                self.invia(&json!({"t": "online", "online": o}));
+                self.invia(Evento::Online { online: o });
                 self.salva_presto();
                 Risposta::si()
             }
@@ -207,11 +225,15 @@ impl Tavolo {
                 let p = self.stato.pedine.get_mut(&pid).expect("pedina");
                 p.x = Some(N(x));
                 p.y = Some(N(y));
-                let ev = json!({"t": "pedina", "pedina": p, "da": id, "trascina": !finale});
+                let ev = Evento::Pedina {
+                    pedina: p.clone(),
+                    da: Some(id.into()),
+                    trascina: Some(!finale),
+                };
                 if finale {
                     self.salva_presto();
                 }
-                self.invia(&ev);
+                self.invia(ev);
                 Risposta::si()
             }
 
@@ -229,9 +251,10 @@ impl Tavolo {
                 }
                 self.stato.pedine.shift_remove(&pid);
                 self.stato.iniziativa.ordine.retain(|x| x.pedina.as_deref() != Some(&pid));
-                self.invia(&json!({"t": "pedina_via", "id": pid}));
-                let ini = json!({"t": "iniziativa", "iniziativa": self.stato.iniziativa});
-                self.invia(&ini);
+                self.invia(Evento::PedinaVia { id: pid });
+                self.invia(Evento::Iniziativa {
+                    iniziativa: self.stato.iniziativa.clone(),
+                });
                 self.salva_presto();
                 Risposta::si()
             }
@@ -256,20 +279,24 @@ impl Tavolo {
                     sch.insert("note".into(), json!(t));
                 }
                 let pf = sch.get("pf").cloned();
-                let sch = Value::Object(sch.clone());
+                let sch = sch.clone();
                 let mut cambiate = vec![];
                 if let Some(pf) = pf {
                     for p in self.stato.pedine.values_mut() {
                         if p.pg.as_deref() == Some(&pg) {
                             p.pf = n_valido(&pf);
-                            cambiate.push(json!({"t": "pedina", "pedina": p}));
+                            cambiate.push(Evento::Pedina {
+                                pedina: p.clone(),
+                                da: None,
+                                trascina: None,
+                            });
                         }
                     }
                 }
                 for ev in cambiate {
-                    self.invia(&ev);
+                    self.invia(ev);
                 }
-                self.invia(&json!({"t": "scheda", "id": pg, "scheda": sch}));
+                self.invia(Evento::Scheda { id: pg, scheda: sch });
                 self.salva_presto();
                 Risposta::si()
             }
@@ -345,7 +372,7 @@ impl Tavolo {
                     _ => {}
                 }
                 let ini = self.stato.iniziativa.clone();
-                self.invia(&json!({"t": "iniziativa", "iniziativa": ini}));
+                self.invia(Evento::Iniziativa { iniziativa: ini.clone() });
                 if azione == "prossimo" {
                     if let Some(cur) = ini.ordine.get(ini.turno.max(0) as usize) {
                         if !cur.nascosta {
@@ -367,7 +394,7 @@ impl Tavolo {
                     self.attiva_avventura(Some(aid.clone())).await;
                 }
                 self.imposta_sessione("lobby");
-                self.invia(&json!({"t": "ricarica"}));
+                self.invia(Evento::Ricarica);
                 self.db
                     .audit(Some(id), Some(&nome_u), Some(ip), "sessione_apri", &json!({"avventura": aid}))
                     .await;
@@ -406,10 +433,10 @@ impl Tavolo {
                 toccati.push(uid.clone());
                 for k in &toccati {
                     let r = self.utenti[k].role.clone();
-                    self.invia_a(&json!({"t": "ruolo", "ruolo": r}), Some(k));
+                    self.invia_a(Evento::Ruolo { ruolo: r }, Some(k));
                 }
                 let o = self.online();
-                self.invia(&json!({"t": "online", "online": o}));
+                self.invia(Evento::Online { online: o });
                 let nome = self.utenti[&uid].name.clone();
                 if diventa {
                     self.sistema(&format!("👑 {nome} sarà il Master."));
@@ -468,13 +495,17 @@ impl Tavolo {
                             p.scena = Some(sid.clone());
                             p.x = None;
                             p.y = None;
-                            mossi.push(json!({"t": "pedina", "pedina": p}));
+                            mossi.push(Evento::Pedina {
+                                pedina: p.clone(),
+                                da: None,
+                                trascina: None,
+                            });
                         }
                     }
                 }
-                self.invia(&json!({"t": "scena", "id": sid}));
+                self.invia(Evento::Scena { id: Some(sid.clone()) });
                 for ev in mossi {
-                    self.invia(&ev);
+                    self.invia(ev);
                 }
                 self.sistema("🗺️ Il Master ha cambiato mappa.");
                 self.salva_presto();
@@ -512,8 +543,11 @@ impl Tavolo {
                     return Risposta::errore(400, "troppe celle");
                 }
                 nb.celle = insieme.into_iter().collect();
-                let ev = json!({"t": "nebbia", "scena": sc, "nebbia": nb});
-                self.invia(&ev);
+                let ev = Evento::Nebbia {
+                    scena: sc,
+                    nebbia: nb.clone(),
+                };
+                self.invia(ev);
                 self.salva_presto();
                 Risposta::si()
             }
@@ -526,7 +560,7 @@ impl Tavolo {
 
             Op::SvuotaLog {} => {
                 self.stato.log.clear();
-                self.invia(&json!({"t": "ricarica"}));
+                self.invia(Evento::Ricarica);
                 self.salva_presto();
                 Risposta::si()
             }
@@ -544,7 +578,7 @@ impl Tavolo {
                     self.stato.pedine.shift_remove(k);
                 }
                 for k in via {
-                    self.invia(&json!({"t": "pedina_via", "id": k}));
+                    self.invia(Evento::PedinaVia { id: k });
                 }
                 self.salva_presto();
                 Risposta::si()
@@ -557,7 +591,7 @@ impl Tavolo {
                     .and_then(|a| self.catalogo.get(a))
                     .and_then(|a| a.prima_mappa());
                 self.stato = Stato::vuoto(self.attiva.as_deref(), prima);
-                self.invia(&json!({"t": "ricarica"}));
+                self.invia(Evento::Ricarica);
                 self.salva_presto();
                 self.db
                     .audit(
@@ -576,7 +610,7 @@ impl Tavolo {
                     return Risposta::no("avventura inesistente");
                 };
                 self.attiva_avventura(Some(aid)).await;
-                self.invia(&json!({"t": "ricarica"}));
+                self.invia(Evento::Ricarica);
                 self.sistema(&format!("📚 Si gioca: {titolo}"));
                 Risposta::si()
             }
@@ -664,12 +698,19 @@ impl Tavolo {
         }
         if let Some(pg) = &p.pg {
             if let Some(sch) = self.stato.schede.get(pg) {
-                eventi.push(json!({"t": "scheda", "id": pg, "scheda": sch}));
+                eventi.push(Evento::Scheda {
+                    id: pg.clone(),
+                    scheda: sch.clone(),
+                });
             }
         }
-        eventi.push(json!({"t": "pedina", "pedina": p}));
+        eventi.push(Evento::Pedina {
+            pedina: p.clone(),
+            da: None,
+            trascina: None,
+        });
         for ev in eventi {
-            self.invia(&ev);
+            self.invia(ev);
         }
         self.salva_presto();
         Risposta::ok(json!({"ok": true, "id": p.id}))

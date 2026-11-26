@@ -6,6 +6,7 @@
 // Le risposte HTTP di errore viaggiano per valore come in tutto l'ecosistema axum: non sono un collo di bottiglia.
 #![allow(clippy::result_large_err)]
 
+pub mod api;
 pub mod catalogo;
 pub mod comandi;
 pub mod contenuti;

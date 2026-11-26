@@ -3,6 +3,7 @@
 use std::path::PathBuf;
 use std::sync::LazyLock;
 
+use crate::api::Evento;
 use bytes::Bytes;
 use regex::Regex;
 use serde_json::{json, Map, Value};
@@ -130,10 +131,10 @@ impl Tavolo {
                 let r = match esito {
                     Ok(Ok(())) => {
                         self.riscansiona();
-                        self.invia(&json!({"t": "catalogo"}));
+                        self.invia(Evento::Catalogo);
                         if Some(&aid) == self.attiva.as_ref() {
                             self.attiva_avventura(Some(aid.clone())).await;
-                            self.invia(&json!({"t": "ricarica"}));
+                            self.invia(Evento::Ricarica);
                         }
                         let nome = self.utenti.get(&id).map(|u| u.name.clone());
                         self.db
@@ -222,7 +223,7 @@ impl Tavolo {
         match serde_json::from_value::<Stato>(base) {
             Ok(st) => {
                 self.stato = st;
-                self.invia(&json!({"t": "ricarica"}));
+                self.invia(Evento::Ricarica);
                 self.salva_presto();
                 let nome = self.utenti[id].name.clone();
                 self.db
@@ -273,7 +274,7 @@ impl Tavolo {
             return Risposta::errore(500, "scrittura non riuscita");
         }
         self.riscansiona();
-        self.invia(&json!({"t": "catalogo"}));
+        self.invia(Evento::Catalogo);
         Risposta::ok(json!({"ok": true, "id": stem}))
     }
 
@@ -315,7 +316,7 @@ impl Tavolo {
             return Risposta::errore(500, "scrittura non riuscita");
         }
         self.riscansiona();
-        self.invia(&json!({"t": "catalogo"}));
+        self.invia(Evento::Catalogo);
         Risposta::si()
     }
 
@@ -392,7 +393,7 @@ impl Tavolo {
                     return Risposta::errore(500, "impossibile creare l'avventura");
                 }
                 self.riscansiona();
-                self.invia(&json!({"t": "catalogo"}));
+                self.invia(Evento::Catalogo);
                 return Risposta::ok(json!({"ok": true, "id": aid}));
             }
             Op::AvventuraInfo { campi } => {
@@ -440,8 +441,9 @@ impl Tavolo {
                         .as_ref()
                         .and_then(|a| self.catalogo.get(a))
                         .and_then(|a| a.prima_mappa());
-                    let ev = json!({"t": "scena", "id": self.stato.scena});
-                    self.invia(&ev);
+                    self.invia(Evento::Scena {
+                        id: self.stato.scena.clone(),
+                    });
                 }
                 self.salva_presto();
                 self.db
@@ -494,7 +496,7 @@ impl Tavolo {
             _ => return Risposta::no("operazione sconosciuta"),
         }
         self.riscansiona();
-        self.invia(&json!({"t": "catalogo"}));
+        self.invia(Evento::Catalogo);
         Risposta::si()
     }
 }

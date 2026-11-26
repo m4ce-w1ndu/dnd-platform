@@ -10,6 +10,8 @@ use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
+use ts_rs::TS;
+
 use crate::util::{lenient, N};
 
 fn uno() -> N {
@@ -19,15 +21,17 @@ fn falso(b: &bool) -> bool {
     !*b
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, TS)]
 pub struct Pedina {
     #[serde(deserialize_with = "lenient::string")]
     pub id: String,
     #[serde(default, deserialize_with = "lenient::opt_string", skip_serializing_if = "Option::is_none")]
     pub scena: Option<String>,
     #[serde(default, deserialize_with = "lenient::opt_n")]
+    #[ts(type = "number | null")]
     pub x: Option<N>,
     #[serde(default, deserialize_with = "lenient::opt_n")]
+    #[ts(type = "number | null")]
     pub y: Option<N>,
     #[serde(default, deserialize_with = "lenient::string")]
     pub nome: String,
@@ -36,12 +40,16 @@ pub struct Pedina {
     #[serde(default, deserialize_with = "lenient::opt_string", skip_serializing_if = "Option::is_none")]
     pub icona: Option<String>,
     #[serde(default = "uno", deserialize_with = "lenient::n_or")]
+    #[ts(type = "number")]
     pub taglia: N,
     #[serde(default, deserialize_with = "lenient::opt_n", skip_serializing_if = "Option::is_none")]
+    #[ts(type = "number | null")]
     pub pf: Option<N>,
     #[serde(default, deserialize_with = "lenient::opt_n", skip_serializing_if = "Option::is_none")]
+    #[ts(type = "number | null")]
     pub pfmax: Option<N>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(type = "number | string | null")]
     pub ca: Option<Value>,
     #[serde(default, deserialize_with = "lenient::bool", skip_serializing_if = "falso")]
     pub nascosta: bool,
@@ -56,13 +64,15 @@ pub struct Pedina {
     #[serde(default, deserialize_with = "lenient::opt_string", skip_serializing_if = "Option::is_none")]
     pub proprietario: Option<String>,
     #[serde(default, deserialize_with = "lenient::opt_n", skip_serializing_if = "Option::is_none")]
+    #[ts(type = "number | null")]
     pub slot: Option<N>,
     #[serde(flatten)]
+    #[ts(skip)]
     pub altro: Map<String, Value>,
 }
 
 /// Una voce della cronologia (tiro, chat, messaggio di sistema). I campi specifici restano in `resto`.
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, TS)]
 pub struct Voce {
     #[serde(default, deserialize_with = "lenient::string")]
     pub id: String,
@@ -74,11 +84,13 @@ pub struct Voce {
     pub da: Option<String>,
     #[serde(default, deserialize_with = "lenient::bool", skip_serializing_if = "falso")]
     pub segreto: bool,
+    /// Campi specifici del tipo (tiro: espr, parti, totale…; chat: testo; …).
     #[serde(flatten)]
+    #[ts(skip)]
     pub resto: Map<String, Value>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, TS)]
 pub struct VoceIniziativa {
     #[serde(deserialize_with = "lenient::string")]
     pub id: String,
@@ -95,10 +107,11 @@ pub struct VoceIniziativa {
     #[serde(default, deserialize_with = "lenient::opt_string", skip_serializing_if = "Option::is_none")]
     pub da: Option<String>,
     #[serde(flatten)]
+    #[ts(skip)]
     pub altro: Map<String, Value>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, TS)]
 pub struct Iniziativa {
     #[serde(default)]
     pub ordine: Vec<VoceIniziativa>,
@@ -122,7 +135,7 @@ impl Default for Iniziativa {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, TS)]
 pub struct Nebbia {
     #[serde(default, deserialize_with = "lenient::bool")]
     pub attiva: bool,
@@ -131,9 +144,10 @@ pub struct Nebbia {
 }
 
 /// La partita di un'avventura (riga di `partite`).
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, TS)]
 pub struct Stato {
     #[serde(default = "due")]
+    #[ts(type = "number")]
     pub versione: Value,
     #[serde(default, deserialize_with = "lenient::opt_string")]
     pub avventura: Option<String>,
@@ -148,10 +162,12 @@ pub struct Stato {
     #[serde(default)]
     pub iniziativa: Iniziativa,
     #[serde(default)]
+    #[ts(type = "Record<string, Record<string, unknown>>")]
     pub schede: IndexMap<String, Map<String, Value>>,
     #[serde(default, deserialize_with = "lenient::string")]
     pub note_master: String,
     #[serde(flatten)]
+    #[ts(skip)]
     pub altro: Map<String, Value>,
 }
 

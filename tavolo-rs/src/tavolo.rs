@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use crate::api::{Evento, Info, InfoAvventura, Io, IoStato, Online, PersonaggioBreve, Provider, StatoPer};
 use futures_util::FutureExt;
 use indexmap::IndexMap;
 use serde_json::{json, Map, Value};
@@ -266,7 +267,7 @@ impl Tavolo {
                     if self.online_da_mandare {
                         self.online_da_mandare = false;
                         let o = self.online();
-                        self.invia(&json!({"t": "online", "online": o}));
+                        self.invia(Evento::Online { online: o });
                     }
                     self.metriche.comando(inizio.elapsed());
                     if fine { break; }
@@ -559,17 +560,19 @@ impl Tavolo {
             self.attiva_avventura(None).await;
             self.imposta_sessione("chiusa");
         }
-        self.invia(&json!({"t": "catalogo"}));
+        self.invia(Evento::Catalogo);
     }
 
     // ------------------------------------------------------------------ eventi
 
     /// Manda un evento a tutti i collegati, filtrato per ruolo.
-    pub fn invia(&mut self, ev: &Value) {
+    pub fn invia(&mut self, ev: Evento) {
         self.invia_a(ev, None);
     }
 
-    pub fn invia_a(&mut self, ev: &Value, solo: Option<&str>) {
+    pub fn invia_a(&mut self, ev: Evento, solo: Option<&str>) {
+        let ev = serde_json::to_value(&ev).unwrap_or(Value::Null);
+        let ev = &ev;
         let tutto: Arc<str> = Arc::from(ev.to_string());
         let mut lenti = Vec::new();
         for (id, c) in &self.clienti {
@@ -598,17 +601,21 @@ impl Tavolo {
         self.metriche.eventi(1);
     }
 
-    pub fn online(&self) -> Value {
-        Value::Array(
-            self.clienti
-                .keys()
-                .filter_map(|id| self.utenti.get(id).map(|u| (id, u)))
-                .map(|(id, u)| {
-                    json!({"id": id, "name": u.name, "color": u.color, "role": u.role, "char": u.char,
-                           "avatar": u.avatar.clone().unwrap_or_default(), "admin": u.admin})
-                })
-                .collect(),
-        )
+    pub fn online(&self) -> Vec<Online> {
+        self.clienti
+            .keys()
+            .filter_map(|id| self.utenti.get(id).map(|u| (id, u)))
+            .map(|(id, u)| Online {
+                id: id.clone(),
+                name: u.name.clone(),
+                color: u.color.clone(),
+                role: u.role.clone(),
+                char: u.char.clone(),
+                avatar: u.avatar.clone().unwrap_or_default(),
+                admin: u.admin,
+                sistema: u.sistema,
+            })
+            .collect()
     }
 
     pub fn aggiungi_log(&mut self, mut voce: Voce) -> Value {
@@ -619,12 +626,12 @@ impl Tavolo {
             voce.ora = adesso();
         }
         let v = serde_json::to_value(&voce).unwrap_or(Value::Null);
-        self.stato.log.push(voce);
+        self.stato.log.push(voce.clone());
         let n = self.stato.log.len();
         if n > MAX_LOG {
             self.stato.log.drain(..n - MAX_LOG);
         }
-        self.invia(&json!({"t": "log", "voce": v}));
+        self.invia(Evento::Log { voce });
         self.salva_presto();
         v
     }
@@ -648,8 +655,11 @@ impl Tavolo {
 
     pub fn imposta_sessione(&mut self, s: &'static str) {
         self.sessione = s;
-        let ev = json!({"t": "sessione", "sessione": s, "attiva": self.attiva});
-        self.invia(&ev);
+        let ev = Evento::Sessione {
+            sessione: s.into(),
+            attiva: self.attiva.clone(),
+        };
+        self.invia(ev);
     }
 
     // ------------------------------------------------------------------ accesso
@@ -694,39 +704,70 @@ impl Tavolo {
         } else {
             None
         };
-        let presi: Vec<&String> = self
+        let presi: Vec<String> = self
             .clienti
             .keys()
-            .filter_map(|c| self.utenti.get(c).and_then(|u| u.char.as_ref()))
+            .filter_map(|c| self.utenti.get(c).and_then(|u| u.char.clone()))
             .collect();
-        let campo = |k: &str| a.and_then(|a| a.dati.get(k).cloned()).unwrap_or(json!(""));
-        let personaggi: Vec<Value> = a
+        let campo = |k: &str| a.and_then(|a| a.dati.get(k)).and_then(crate::util::testo).unwrap_or_default();
+        let testo = |p: &Value, k: &str| p.get(k).and_then(crate::util::testo);
+        let personaggi = a
             .map(|a| {
                 a.personaggi()
                     .iter()
-                    .map(|p| {
-                        let mut o = Map::new();
-                        for k in ["id", "nome", "icona", "razza", "classe", "colore", "facoltativo"] {
-                            o.insert(k.into(), p.get(k).cloned().unwrap_or(Value::Null));
-                        }
-                        Value::Object(o)
+                    .map(|p| PersonaggioBreve {
+                        id: testo(p, "id").unwrap_or_default(),
+                        nome: testo(p, "nome").unwrap_or_default(),
+                        icona: testo(p, "icona"),
+                        razza: testo(p, "razza"),
+                        classe: testo(p, "classe"),
+                        colore: testo(p, "colore"),
+                        facoltativo: p.get("facoltativo").is_some_and(crate::util::vero),
                     })
                     .collect()
             })
             .unwrap_or_default();
-        json!({
-            "avventura": {"id": campo("id"), "titolo": campo("titolo"), "sottotitolo": campo("sottotitolo"), "descrizione": campo("descrizione")},
-            "personaggi": personaggi, "presi": presi, "password_giocatori": !self.config.password_giocatori.is_empty(),
-            "login": self.oauth_attivi().iter().map(|p| json!({"id": p.id, "nome": p.nome})).collect::<Vec<_>>(),
-            "ospiti": self.ospiti(), "versione": self.versione, "nome_tavolo": self.config.nome_tavolo, "sessione": self.sessione,
-        })
+        let info = Info {
+            avventura: InfoAvventura {
+                id: campo("id"),
+                titolo: campo("titolo"),
+                sottotitolo: campo("sottotitolo"),
+                descrizione: campo("descrizione"),
+            },
+            personaggi,
+            presi,
+            password_giocatori: !self.config.password_giocatori.is_empty(),
+            login: self
+                .oauth_attivi()
+                .iter()
+                .map(|p| Provider {
+                    id: p.id.into(),
+                    nome: p.nome.into(),
+                })
+                .collect(),
+            ospiti: self.ospiti(),
+            versione: self.versione.clone(),
+            nome_tavolo: self.config.nome_tavolo.clone(),
+            sessione: self.sessione.into(),
+        };
+        serde_json::to_value(info).unwrap_or(Value::Null)
     }
 
     fn io(&self, id: &str) -> Value {
         let u = &self.utenti[id];
-        json!({"ok": true, "nome": u.name, "admin": u.admin, "sistema": u.sistema, "master": (u.master_ok || u.admin) && !u.sistema,
-               "provider": u.provider.clone().unwrap_or_default(), "avatar": u.avatar.clone().unwrap_or_default(),
-               "char": u.char, "colore": u.color, "ruolo": u.role})
+        let io = Io {
+            ok: true,
+            nome: u.name.clone(),
+            admin: u.admin,
+            sistema: u.sistema,
+            master: (u.master_ok || u.admin) && !u.sistema,
+            provider: u.provider.clone().unwrap_or_default(),
+            avatar: u.avatar.clone().unwrap_or_default(),
+            char: u.char.clone(),
+            colore: u.color.clone(),
+            ruolo: u.role.clone(),
+        };
+        serde_json::to_value(io).unwrap_or(Value::Null)
     }
 
     pub fn avventura_per(&self, master: bool) -> Value {
@@ -739,26 +780,32 @@ impl Tavolo {
     fn stato_per(&self, id: &str) -> Value {
         let u = &self.utenti[id];
         let master = u.is_master();
-        let mut s = serde_json::to_value(&self.stato).unwrap_or(json!({}));
+        let mut stato = self.stato.clone();
         if !master {
-            if let Some(Value::Object(p)) = s.get_mut("pedine") {
-                p.retain(|_, v| v.get("nascosta") != Some(&Value::Bool(true)));
-            }
-            if let Some(Value::Array(l)) = s.get_mut("log") {
-                l.retain(|e| e.get("segreto") != Some(&Value::Bool(true)) || e.get("da").and_then(Value::as_str) == Some(id));
-            }
-            s["note_master"] = json!("");
+            stato.pedine.retain(|_, p| !p.nascosta);
+            stato.log.retain(|e| !e.segreto || e.da.as_deref() == Some(id));
+            stato.note_master.clear();
         }
-        s["online"] = self.online();
-        s["io"] = json!({"id": id, "name": u.name, "color": u.color, "role": u.role, "char": u.char,
-                         "avatar": u.avatar, "provider": u.provider, "admin": u.admin, "sistema": u.sistema});
-        s["avv"] = self.avventura_per(master);
-        s["sessione"] = json!(self.sessione);
-        if master || u.admin {
-            s["catalogo"] = Value::Array(self.catalogo.values().map(Avventura::breve).collect());
-            s["attiva"] = json!(self.attiva);
-        }
-        s
+        let s = StatoPer {
+            stato,
+            online: self.online(),
+            io: IoStato {
+                id: id.into(),
+                name: u.name.clone(),
+                color: u.color.clone(),
+                role: u.role.clone(),
+                char: u.char.clone(),
+                avatar: u.avatar.clone(),
+                provider: u.provider.clone(),
+                admin: u.admin,
+                sistema: u.sistema,
+            },
+            avv: self.avventura_per(master),
+            sessione: self.sessione.into(),
+            catalogo: (master || u.admin).then(|| self.catalogo.values().map(Avventura::breve).collect()),
+            attiva: (master || u.admin).then(|| self.attiva.clone()),
+        };
+        serde_json::to_value(s).unwrap_or(Value::Null)
     }
 
     /// Primo passo: chi sei? (ospite o amministratore). `admin_ok` è la verifica della password fatta fuori dal task.

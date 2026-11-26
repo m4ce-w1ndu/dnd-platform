@@ -2,6 +2,7 @@
 
 use std::sync::LazyLock;
 
+use crate::api::Evento;
 use regex::Regex;
 use serde_json::{json, Value};
 
@@ -138,7 +139,7 @@ impl Tavolo {
                 }
                 self.config = nuovo;
                 self.salva_config().await;
-                self.invia(&json!({"t": "info"}));
+                self.invia(Evento::Info);
                 self.db
                     .audit(Some(id), Some(nome_u), Some(ip), "imp_salva", &json!({"campi": cambiati}))
                     .await;
@@ -217,7 +218,7 @@ impl Tavolo {
                     tracing::error!(errore = %e, "eliminazione della partita");
                 }
                 if attiva {
-                    self.invia(&json!({"t": "ricarica"}));
+                    self.invia(Evento::Ricarica);
                     self.salva_presto();
                 }
                 self.db
@@ -242,7 +243,7 @@ impl Tavolo {
                     }
                     self.account.retain(|_, v| *v != uid);
                     self.utenti.shift_remove(&uid);
-                    self.invia_a(&json!({"t": "esci"}), Some(&uid));
+                    self.invia_a(Evento::Esci, Some(&uid));
                     self.clienti.remove(&uid); // il browser riceve «esci» e poi lo stream si chiude
                     self.db
                         .audit(
@@ -259,7 +260,7 @@ impl Tavolo {
                         u.master_ok = m;
                         if !m && u.is_master() {
                             u.role = "giocatore".into();
-                            self.invia_a(&json!({"t": "ricarica"}), Some(&uid));
+                            self.invia_a(Evento::Ricarica, Some(&uid));
                         }
                     }
                     if let Some(a) = admin {

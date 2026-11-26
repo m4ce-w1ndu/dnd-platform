@@ -44,6 +44,7 @@ tower = "0.5"
 tower-http = { version = "0.6", features = ["limit", "trace", "catch-panic", "timeout"] }
 tower_governor = "0.7"
 tracing = "0.1"
+ts-rs = { version = "12", features = ["serde-json-impl", "indexmap-impl", "no-serde-warnings"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 urlencoding = "2"
 uuid = { version = "1", features = ["v4"] }
