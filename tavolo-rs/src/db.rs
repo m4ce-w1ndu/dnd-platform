@@ -34,13 +34,20 @@ impl Db {
             .synchronous(SqliteSynchronous::Normal)
             .busy_timeout(std::time::Duration::from_secs(10))
             .foreign_keys(true);
-        let pool = SqlitePoolOptions::new().max_connections(4).connect_with(opz).await.context("apertura del database")?;
+        let pool = SqlitePoolOptions::new()
+            .max_connections(4)
+            .connect_with(opz)
+            .await
+            .context("apertura del database")?;
         sqlx::migrate!("./migrations").run(&pool).await.context("migrazioni del database")?;
         Ok(Db { pool })
     }
 
     pub async fn get(&self, chiave: &str) -> Result<Option<Value>> {
-        let r = sqlx::query("SELECT valore FROM impostazioni WHERE chiave=?").bind(chiave).fetch_optional(&self.pool).await?;
+        let r = sqlx::query("SELECT valore FROM impostazioni WHERE chiave=?")
+            .bind(chiave)
+            .fetch_optional(&self.pool)
+            .await?;
         Ok(match r {
             Some(r) => Some(serde_json::from_str(&r.get::<String, _>(0))?),
             None => None,
@@ -57,7 +64,10 @@ impl Db {
     }
 
     pub async fn partita(&self, aid: &str) -> Result<Option<Value>> {
-        let r = sqlx::query("SELECT stato FROM partite WHERE avventura=?").bind(aid).fetch_optional(&self.pool).await?;
+        let r = sqlx::query("SELECT stato FROM partite WHERE avventura=?")
+            .bind(aid)
+            .fetch_optional(&self.pool)
+            .await?;
         Ok(match r {
             Some(r) => serde_json::from_str(&r.get::<String, _>(0)).ok(),
             None => None,
@@ -65,7 +75,9 @@ impl Db {
     }
 
     pub async fn partite(&self) -> Result<Vec<Partita>> {
-        let righe = sqlx::query("SELECT avventura, stato, aggiornata FROM partite ORDER BY aggiornata DESC").fetch_all(&self.pool).await?;
+        let righe = sqlx::query("SELECT avventura, stato, aggiornata FROM partite ORDER BY aggiornata DESC")
+            .fetch_all(&self.pool)
+            .await?;
         Ok(righe
             .into_iter()
             .map(|r| Partita {
@@ -77,7 +89,10 @@ impl Db {
     }
 
     pub async fn elimina_partita(&self, aid: &str) -> Result<()> {
-        sqlx::query("DELETE FROM partite WHERE avventura=?").bind(aid).execute(&self.pool).await?;
+        sqlx::query("DELETE FROM partite WHERE avventura=?")
+            .bind(aid)
+            .execute(&self.pool)
+            .await?;
         Ok(())
     }
 
@@ -118,10 +133,12 @@ impl Db {
         intoccabili: &[String],
     ) -> Result<()> {
         let mut tx = self.pool.begin().await?;
-        sqlx::query("INSERT INTO impostazioni(chiave, valore) VALUES('attiva', ?) ON CONFLICT(chiave) DO UPDATE SET valore=excluded.valore")
-            .bind(serde_json::to_string(&attiva)?)
-            .execute(&mut *tx)
-            .await?;
+        sqlx::query(
+            "INSERT INTO impostazioni(chiave, valore) VALUES('attiva', ?) ON CONFLICT(chiave) DO UPDATE SET valore=excluded.valore",
+        )
+        .bind(serde_json::to_string(&attiva)?)
+        .execute(&mut *tx)
+        .await?;
         // si cancellano tutti gli utenti tranne quelli che non si sono potuti leggere (li si lascia com'erano)
         let mut q = sqlx::QueryBuilder::<sqlx::Sqlite>::new("DELETE FROM utenti");
         if !intoccabili.is_empty() {
@@ -147,7 +164,11 @@ impl Db {
         }
         sqlx::query("DELETE FROM account").execute(&mut *tx).await?;
         for (k, v) in account {
-            sqlx::query("INSERT INTO account VALUES(?,?)").bind(k).bind(v).execute(&mut *tx).await?;
+            sqlx::query("INSERT INTO account VALUES(?,?)")
+                .bind(k)
+                .bind(v)
+                .execute(&mut *tx)
+                .await?;
         }
         if let Some((aid, st)) = partita {
             sqlx::query("INSERT INTO partite VALUES(?,?,?) ON CONFLICT(avventura) DO UPDATE SET stato=excluded.stato, aggiornata=excluded.aggiornata")
@@ -195,7 +216,10 @@ impl Db {
     /// Copia coerente del database in un file (VACUUM INTO), per il backup.
     pub async fn copia_in(&self, dest: &Path) -> Result<()> {
         let _ = std::fs::remove_file(dest);
-        sqlx::query("VACUUM INTO ?").bind(dest.to_string_lossy().to_string()).execute(&self.pool).await?;
+        sqlx::query("VACUUM INTO ?")
+            .bind(dest.to_string_lossy().to_string())
+            .execute(&self.pool)
+            .await?;
         Ok(())
     }
 

@@ -41,7 +41,10 @@ pub fn estrai(dati: &[u8], avv_dir: &Path) -> Result<(String, PathBuf), String> 
     let mut totale: u64 = 0;
     for i in 0..z.len() {
         let f = z.by_index_raw(i).map_err(|_| "il file non è uno zip valido".to_string())?;
-        let nome = f.name().map_err(|_| "nome di file non valido nel pacchetto".to_string())?.to_string();
+        let nome = f
+            .name()
+            .map_err(|_| "nome di file non valido nel pacchetto".to_string())?
+            .to_string();
         if f.is_dir() || nome.ends_with('/') {
             continue;
         }
@@ -59,13 +62,23 @@ pub fn estrai(dati: &[u8], avv_dir: &Path) -> Result<(String, PathBuf), String> 
         .ok_or("manca avventura.json nel pacchetto")?;
     let radice = radice[..radice.len() - "avventura.json".len()].to_string();
     let manifest: Value = {
-        let mut f = z.by_name(&format!("{radice}avventura.json")).map_err(|_| "avventura.json illeggibile".to_string())?;
+        let mut f = z
+            .by_name(&format!("{radice}avventura.json"))
+            .map_err(|_| "avventura.json illeggibile".to_string())?;
         let mut buf = Vec::new();
-        f.by_ref().take(2 * 1024 * 1024).read_to_end(&mut buf).map_err(|_| "avventura.json illeggibile".to_string())?;
+        f.by_ref()
+            .take(2 * 1024 * 1024)
+            .read_to_end(&mut buf)
+            .map_err(|_| "avventura.json illeggibile".to_string())?;
         serde_json::from_slice(&buf).map_err(|_| "avventura.json non è un JSON valido".to_string())?
     };
     let dal_manifest = manifest.get("id").and_then(crate::util::testo).filter(|s| !s.is_empty());
-    let dalla_cartella = radice.trim_matches('/').rsplit('/').next().filter(|s| !s.is_empty()).map(String::from);
+    let dalla_cartella = radice
+        .trim_matches('/')
+        .rsplit('/')
+        .next()
+        .filter(|s| !s.is_empty())
+        .map(String::from);
     let aid = dal_manifest.or(dalla_cartella).unwrap_or_else(|| "avventura".into()).to_lowercase();
     let aid: String = NON_ID.replace_all(&aid, "-").chars().take(60).collect();
     let aid = aid.trim_matches('-').to_string();
@@ -136,7 +149,9 @@ pub fn zip_avventura(base: &Path, aid: &str) -> io::Result<Vec<u8>> {
     let mut buf = io::Cursor::new(Vec::new());
     {
         let mut z = zip::ZipWriter::new(&mut buf);
-        let opz = zip::write::SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated).large_file(true);
+        let opz = zip::write::SimpleFileOptions::default()
+            .compression_method(zip::CompressionMethod::Deflated)
+            .large_file(true);
         let mut pila = vec![base.to_path_buf()];
         let mut files = Vec::new();
         while let Some(d) = pila.pop() {
@@ -187,7 +202,13 @@ mod test {
         if let Ok((_, tmp)) = r {
             assert!(tmp.join("etc/passwd").starts_with(&tmp));
         }
-        assert_eq!(fs::read_dir(dir.path()).unwrap().filter(|e| e.as_ref().unwrap().file_name().to_string_lossy().contains("evil")).count(), 0);
+        assert_eq!(
+            fs::read_dir(dir.path())
+                .unwrap()
+                .filter(|e| e.as_ref().unwrap().file_name().to_string_lossy().contains("evil"))
+                .count(),
+            0
+        );
     }
 
     #[test]

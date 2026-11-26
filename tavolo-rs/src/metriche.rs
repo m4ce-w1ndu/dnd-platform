@@ -92,22 +92,92 @@ impl Metriche {
             }
         };
         let g = |a: &AtomicU64| a.load(Relaxed) as f64;
-        riga("tavolo_uptime_secondi", "gauge", "Secondi dall'avvio", vec![(String::new(), self.avvio.elapsed().as_secs_f64())]);
+        riga(
+            "tavolo_uptime_secondi",
+            "gauge",
+            "Secondi dall'avvio",
+            vec![(String::new(), self.avvio.elapsed().as_secs_f64())],
+        );
         let r = self.richieste.lock().map(|m| m.clone()).unwrap_or_default();
-        riga("tavolo_risposte_http_totale", "counter", "Risposte HTTP per codice", r.iter().map(|(k, v)| (format!("{{codice=\"{k}\"}}"), *v as f64)).collect());
+        riga(
+            "tavolo_risposte_http_totale",
+            "counter",
+            "Risposte HTTP per codice",
+            r.iter().map(|(k, v)| (format!("{{codice=\"{k}\"}}"), *v as f64)).collect(),
+        );
         let o = self.ops.lock().map(|m| m.clone()).unwrap_or_default();
-        riga("tavolo_comandi_op_totale", "counter", "Comandi /api/op eseguiti", o.iter().map(|(k, v)| (format!("{{op=\"{k}\"}}"), *v as f64)).collect());
-        riga("tavolo_comandi_tavolo_totale", "counter", "Comandi gestiti dal task del tavolo", vec![(String::new(), g(&self.comandi))]);
-        riga("tavolo_comandi_tavolo_secondi_totale", "counter", "Tempo speso nei comandi", vec![(String::new(), g(&self.comandi_us) / 1e6)]);
-        riga("tavolo_comando_piu_lento_secondi", "gauge", "Comando più lento dall'avvio", vec![(String::new(), g(&self.comando_max_us) / 1e6)]);
-        riga("tavolo_eventi_totale", "counter", "Eventi inviati ai browser", vec![(String::new(), g(&self.eventi))]);
-        riga("tavolo_clienti_collegati", "gauge", "Browser collegati allo stream", vec![(String::new(), g(&self.clienti))]);
-        riga("tavolo_limitati_totale", "counter", "Richieste rifiutate dai limiti di frequenza", vec![(String::new(), g(&self.limitati))]);
-        riga("tavolo_accessi_falliti_totale", "counter", "Password sbagliate", vec![(String::new(), g(&self.accessi_falliti))]);
-        riga("tavolo_salvataggi_totale", "counter", "Salvataggi nel database", vec![(String::new(), g(&self.salvataggi))]);
-        riga("tavolo_salvataggi_secondi_totale", "counter", "Tempo speso a salvare", vec![(String::new(), g(&self.salvataggi_us) / 1e6)]);
-        riga("tavolo_comandi_in_panico_totale", "counter", "Comandi terminati per un bug (il tavolo è andato avanti)", vec![(String::new(), g(&self.panici))]);
-        riga("tavolo_errori_salvataggio_totale", "counter", "Salvataggi non riusciti", vec![(String::new(), g(&self.errori_salvataggio))]);
+        riga(
+            "tavolo_comandi_op_totale",
+            "counter",
+            "Comandi /api/op eseguiti",
+            o.iter().map(|(k, v)| (format!("{{op=\"{k}\"}}"), *v as f64)).collect(),
+        );
+        riga(
+            "tavolo_comandi_tavolo_totale",
+            "counter",
+            "Comandi gestiti dal task del tavolo",
+            vec![(String::new(), g(&self.comandi))],
+        );
+        riga(
+            "tavolo_comandi_tavolo_secondi_totale",
+            "counter",
+            "Tempo speso nei comandi",
+            vec![(String::new(), g(&self.comandi_us) / 1e6)],
+        );
+        riga(
+            "tavolo_comando_piu_lento_secondi",
+            "gauge",
+            "Comando più lento dall'avvio",
+            vec![(String::new(), g(&self.comando_max_us) / 1e6)],
+        );
+        riga(
+            "tavolo_eventi_totale",
+            "counter",
+            "Eventi inviati ai browser",
+            vec![(String::new(), g(&self.eventi))],
+        );
+        riga(
+            "tavolo_clienti_collegati",
+            "gauge",
+            "Browser collegati allo stream",
+            vec![(String::new(), g(&self.clienti))],
+        );
+        riga(
+            "tavolo_limitati_totale",
+            "counter",
+            "Richieste rifiutate dai limiti di frequenza",
+            vec![(String::new(), g(&self.limitati))],
+        );
+        riga(
+            "tavolo_accessi_falliti_totale",
+            "counter",
+            "Password sbagliate",
+            vec![(String::new(), g(&self.accessi_falliti))],
+        );
+        riga(
+            "tavolo_salvataggi_totale",
+            "counter",
+            "Salvataggi nel database",
+            vec![(String::new(), g(&self.salvataggi))],
+        );
+        riga(
+            "tavolo_salvataggi_secondi_totale",
+            "counter",
+            "Tempo speso a salvare",
+            vec![(String::new(), g(&self.salvataggi_us) / 1e6)],
+        );
+        riga(
+            "tavolo_comandi_in_panico_totale",
+            "counter",
+            "Comandi terminati per un bug (il tavolo è andato avanti)",
+            vec![(String::new(), g(&self.panici))],
+        );
+        riga(
+            "tavolo_errori_salvataggio_totale",
+            "counter",
+            "Salvataggi non riusciti",
+            vec![(String::new(), g(&self.errori_salvataggio))],
+        );
         s
     }
 }

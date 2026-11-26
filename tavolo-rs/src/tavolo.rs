@@ -48,7 +48,11 @@ pub struct Risposta {
 
 impl Risposta {
     pub fn ok(corpo: Value) -> Risposta {
-        Risposta { status: 200, corpo, cookie: None }
+        Risposta {
+            status: 200,
+            corpo,
+            cookie: None,
+        }
     }
     pub fn si() -> Risposta {
         Risposta::ok(json!({"ok": true}))
@@ -61,7 +65,11 @@ impl Risposta {
         Risposta::ok(json!({"ok": false, "errore": errore}))
     }
     pub fn errore(status: u16, errore: &str) -> Risposta {
-        Risposta { status, corpo: json!({"ok": false, "errore": errore}), cookie: None }
+        Risposta {
+            status,
+            corpo: json!({"ok": false, "errore": errore}),
+            cookie: None,
+        }
     }
 }
 
@@ -82,20 +90,69 @@ pub struct Connessione {
 /// I comandi che il task del tavolo sa gestire.
 pub enum Cmd {
     Info(oneshot::Sender<Value>),
-    Login { corpo: Value, ip: String, admin_ok: Option<(bool, Option<String>)>, reply: oneshot::Sender<Risposta> },
+    Login {
+        corpo: Value,
+        ip: String,
+        admin_ok: Option<(bool, Option<String>)>,
+        reply: oneshot::Sender<Risposta>,
+    },
     DatiAdmin(oneshot::Sender<crate::modello::AdminConf>),
-    Entra { corpo: Value, ip: String, reply: oneshot::Sender<Risposta> },
-    Io { cred: Cred, reply: oneshot::Sender<Option<Value>> },
-    Stato { cred: Cred, reply: oneshot::Sender<Option<Value>> },
-    Chi { cred: Cred, reply: oneshot::Sender<Option<Chi>> },
-    Connetti { cred: Cred, reply: oneshot::Sender<Option<Connessione>> },
-    Disconnetti { id: String, conn: u64 },
-    Op { cred: Cred, op: Box<Op>, ip: String, reply: oneshot::Sender<Risposta> },
+    Entra {
+        corpo: Value,
+        ip: String,
+        reply: oneshot::Sender<Risposta>,
+    },
+    Io {
+        cred: Cred,
+        reply: oneshot::Sender<Option<Value>>,
+    },
+    Stato {
+        cred: Cred,
+        reply: oneshot::Sender<Option<Value>>,
+    },
+    Chi {
+        cred: Cred,
+        reply: oneshot::Sender<Option<Chi>>,
+    },
+    Connetti {
+        cred: Cred,
+        reply: oneshot::Sender<Option<Connessione>>,
+    },
+    Disconnetti {
+        id: String,
+        conn: u64,
+    },
+    Op {
+        cred: Cred,
+        op: Box<Op>,
+        ip: String,
+        reply: oneshot::Sender<Risposta>,
+    },
     Contenuto(crate::contenuti::CmdContenuto),
-    OAuthInizio { prov: String, base: String, reply: oneshot::Sender<Option<String>> },
-    OAuthStato { prov: String, state: String, annullato: bool, reply: oneshot::Sender<Result<crate::oauth::Scambio, String>> },
-    OAuthUtente { prov: String, uid: String, nome: String, avatar: String, ip: String, reply: oneshot::Sender<(String, String, String)> },
-    DocumentoRiservato { aid: String, file: String, reply: oneshot::Sender<bool> },
+    OAuthInizio {
+        prov: String,
+        base: String,
+        reply: oneshot::Sender<Option<String>>,
+    },
+    OAuthStato {
+        prov: String,
+        state: String,
+        annullato: bool,
+        reply: oneshot::Sender<Result<crate::oauth::Scambio, String>>,
+    },
+    OAuthUtente {
+        prov: String,
+        uid: String,
+        nome: String,
+        avatar: String,
+        ip: String,
+        reply: oneshot::Sender<(String, String, String)>,
+    },
+    DocumentoRiservato {
+        aid: String,
+        file: String,
+        reply: oneshot::Sender<bool>,
+    },
     Riscansiona,
     Salute(oneshot::Sender<bool>),
     Chiudi(oneshot::Sender<()>),
@@ -229,7 +286,12 @@ impl Tavolo {
             Cmd::DatiAdmin(r) => {
                 let _ = r.send(self.config.admin.clone());
             }
-            Cmd::Login { corpo, ip, admin_ok, reply } => {
+            Cmd::Login {
+                corpo,
+                ip,
+                admin_ok,
+                reply,
+            } => {
                 let r = self.login(corpo, &ip, admin_ok).await;
                 let _ = reply.send(r);
             }
@@ -279,10 +341,22 @@ impl Tavolo {
             Cmd::OAuthInizio { prov, base, reply } => {
                 let _ = reply.send(self.oauth_inizio(&prov, &base));
             }
-            Cmd::OAuthStato { prov, state, annullato, reply } => {
+            Cmd::OAuthStato {
+                prov,
+                state,
+                annullato,
+                reply,
+            } => {
                 let _ = reply.send(self.oauth_stato(&prov, &state, annullato));
             }
-            Cmd::OAuthUtente { prov, uid, nome, avatar, ip, reply } => {
+            Cmd::OAuthUtente {
+                prov,
+                uid,
+                nome,
+                avatar,
+                ip,
+                reply,
+            } => {
                 let r = self.oauth_utente(&prov, &uid, &nome, &avatar, &ip).await;
                 let _ = reply.send(r);
             }
@@ -350,7 +424,12 @@ impl Tavolo {
     pub fn oauth_attivi(&self) -> Vec<&'static crate::oauth::Provider> {
         PROVIDER
             .iter()
-            .filter(|p| self.config.oauth.get(p.id).is_some_and(|c| c.attivo && !c.id.is_empty() && !c.secret.is_empty()))
+            .filter(|p| {
+                self.config
+                    .oauth
+                    .get(p.id)
+                    .is_some_and(|c| c.attivo && !c.id.is_empty() && !c.secret.is_empty())
+            })
             .collect()
     }
 
@@ -393,7 +472,13 @@ impl Tavolo {
         let inizio = Instant::now();
         let r = self
             .db
-            .salva(self.attiva.as_deref(), &self.utenti, &self.account, partita.as_ref().map(|(a, v)| (a.as_str(), v)), &self.intoccabili)
+            .salva(
+                self.attiva.as_deref(),
+                &self.utenti,
+                &self.account,
+                partita.as_ref().map(|(a, v)| (a.as_str(), v)),
+                &self.intoccabili,
+            )
             .await;
         match r {
             Ok(()) => self.metriche.salvataggio(inizio.elapsed()),
@@ -532,7 +617,14 @@ impl Tavolo {
     pub fn sistema(&mut self, testo: &str) {
         let mut resto = Map::new();
         resto.insert("testo".into(), json!(testo));
-        self.aggiungi_log(Voce { id: String::new(), ora: 0.0, tipo: "sistema".into(), da: None, segreto: false, resto });
+        self.aggiungi_log(Voce {
+            id: String::new(),
+            ora: 0.0,
+            tipo: "sistema".into(),
+            da: None,
+            segreto: false,
+            resto,
+        });
     }
 
     pub fn online_dopo(&mut self) {
@@ -562,7 +654,12 @@ impl Tavolo {
 
     fn chi(&self, id: &str) -> Chi {
         let u = &self.utenti[id];
-        Chi { id: id.into(), nome: u.name.clone(), master: u.is_master(), admin: u.admin }
+        Chi {
+            id: id.into(),
+            nome: u.name.clone(),
+            master: u.is_master(),
+            admin: u.admin,
+        }
     }
 
     fn connetti(&mut self, id: &str) -> Connessione {
@@ -576,8 +673,16 @@ impl Tavolo {
     }
 
     fn info(&self) -> Value {
-        let a = if self.sessione != "chiusa" { self.attiva.as_ref().and_then(|a| self.catalogo.get(a)) } else { None };
-        let presi: Vec<&String> = self.clienti.keys().filter_map(|c| self.utenti.get(c).and_then(|u| u.char.as_ref())).collect();
+        let a = if self.sessione != "chiusa" {
+            self.attiva.as_ref().and_then(|a| self.catalogo.get(a))
+        } else {
+            None
+        };
+        let presi: Vec<&String> = self
+            .clienti
+            .keys()
+            .filter_map(|c| self.utenti.get(c).and_then(|u| u.char.as_ref()))
+            .collect();
         let campo = |k: &str| a.and_then(|a| a.dati.get(k).cloned()).unwrap_or(json!(""));
         let personaggi: Vec<Value> = a
             .map(|a| {
@@ -643,22 +748,28 @@ impl Tavolo {
     /// Primo passo: chi sei? (ospite o amministratore). `admin_ok` è la verifica della password fatta fuori dal task.
     async fn login(&mut self, corpo: Value, ip: &str, admin_ok: Option<(bool, Option<String>)>) -> Risposta {
         let s = |k: &str| corpo.get(k).and_then(crate::util::testo).unwrap_or_default();
-        let cred = Cred { id: s("id"), secret: s("secret") };
-        let conosciuto = !cred.id.is_empty()
-            && self.utenti.get(&cred.id).is_some_and(|u| uguali(&u.secret, &cred.secret));
+        let cred = Cred {
+            id: s("id"),
+            secret: s("secret"),
+        };
+        let conosciuto = !cred.id.is_empty() && self.utenti.get(&cred.id).is_some_and(|u| uguali(&u.secret, &cred.secret));
         let mut id = cred.id.clone();
         match corpo.get("tipo").and_then(Value::as_str) {
             Some("admin") => {
                 let (ok, aggiorna) = admin_ok.unwrap_or((false, None));
                 if !ok {
                     self.metriche.accesso_fallito();
-                    self.db.audit(None, Some(&s("utente")), Some(ip), "login_admin_fallito", &json!({})).await;
+                    self.db
+                        .audit(None, Some(&s("utente")), Some(ip), "login_admin_fallito", &json!({}))
+                        .await;
                     return Risposta::errore(403, "Utente o password dell'amministratore sbagliati");
                 }
                 if let Some(h) = aggiorna {
                     self.config.admin.argon2 = Some(h);
                     self.salva_config().await;
-                    self.db.audit(None, None, Some(ip), "password_admin_convertita_argon2", &json!({})).await;
+                    self.db
+                        .audit(None, None, Some(ip), "password_admin_convertita_argon2", &json!({}))
+                        .await;
                 }
                 let nuovo = !conosciuto;
                 if nuovo {
@@ -671,7 +782,9 @@ impl Tavolo {
                 u.master_ok = true;
                 u.seen = adesso();
                 let nome = u.name.clone();
-                self.db.audit(Some(&id), Some(&nome), Some(ip), "login_admin", &json!({"nuovo_utente": nuovo})).await;
+                self.db
+                    .audit(Some(&id), Some(&nome), Some(ip), "login_admin", &json!({"nuovo_utente": nuovo}))
+                    .await;
             }
             Some("ospite") => {
                 if !self.ospiti() {
@@ -702,30 +815,48 @@ impl Tavolo {
         self.salva_presto();
         let u = &self.utenti[&id];
         let mut r = Risposta::ok(json!({"ok": true, "id": id, "secret": u.secret, "nome": u.name}));
-        r.cookie = Some(Cred { id: id.clone(), secret: u.secret.clone() });
+        r.cookie = Some(Cred {
+            id: id.clone(),
+            secret: u.secret.clone(),
+        });
         r
     }
 
     /// Il personaggio è già in mano a un altro giocatore collegato?
     pub fn pg_occupato(&self, pg: &str, id: &str) -> bool {
-        self.clienti.keys().any(|k| k != id && self.utenti.get(k).is_some_and(|u| u.char.as_deref() == Some(pg)))
+        self.clienti
+            .keys()
+            .any(|k| k != id && self.utenti.get(k).is_some_and(|u| u.char.as_deref() == Some(pg)))
     }
 
     /// Secondo passo: ci si siede al tavolo con un ruolo (e magari un personaggio).
     fn entra(&mut self, corpo: Value, _ip: &str) -> Risposta {
         let s = |k: &str| corpo.get(k).and_then(crate::util::testo).unwrap_or_default();
-        let cred = Cred { id: s("id"), secret: s("secret") };
+        let cred = Cred {
+            id: s("id"),
+            secret: s("secret"),
+        };
         let Some(id) = self.autentica(&cred) else {
-            return Risposta { status: 401, corpo: json!({"ok": false, "errore": "Devi prima accedere", "login": true}), cookie: None };
+            return Risposta {
+                status: 401,
+                corpo: json!({"ok": false, "errore": "Devi prima accedere", "login": true}),
+                cookie: None,
+            };
         };
         let u = &self.utenti[&id];
         // Master: l'admin (se lo chiede) oppure chi è stato nominato Master dall'admin. Tutti gli altri sono giocatori.
-        let mut ruolo = if s("ruolo") == "master" && (u.master_ok || u.admin) { "master" } else { "giocatore" };
+        let mut ruolo = if s("ruolo") == "master" && (u.master_ok || u.admin) {
+            "master"
+        } else {
+            "giocatore"
+        };
         if u.is_master() && u.master_ok && !u.admin {
             ruolo = "master";
         }
         let avv = self.attiva.as_ref().and_then(|a| self.catalogo.get(a));
-        let pg = Some(s("personaggio")).filter(|p| !p.is_empty()).filter(|p| avv.is_some_and(|a| a.ha_personaggio(p)));
+        let pg = Some(s("personaggio"))
+            .filter(|p| !p.is_empty())
+            .filter(|p| avv.is_some_and(|a| a.ha_personaggio(p)));
         let nome = tronca(s("nome").trim(), 30);
         if !nome.is_empty() && nome_riservato(&nome, &self.config.admin.utente) && !u.admin {
             return Risposta::errore(400, "Questo nome è riservato: scegline un altro");
@@ -735,7 +866,10 @@ impl Tavolo {
                 return Risposta::errore(409, "Personaggio già scelto da un altro giocatore");
             }
         }
-        let colore = colore_valido(corpo.get("colore").and_then(Value::as_str), &colore_valido(Some(&u.color), "#c0392b"));
+        let colore = colore_valido(
+            corpo.get("colore").and_then(Value::as_str),
+            &colore_valido(Some(&u.color), "#c0392b"),
+        );
         let u = self.utenti.get_mut(&id).expect("utente");
         if !nome.is_empty() {
             u.name = nome;
@@ -771,10 +905,22 @@ impl Tavolo {
         }
         let state = crate::util::token(24);
         let verifier = crate::util::token(48);
-        let base = if self.config.public_url.is_empty() { base } else { self.config.public_url.as_str() };
+        let base = if self.config.public_url.is_empty() {
+            base
+        } else {
+            self.config.public_url.as_str()
+        };
         let redirect = format!("{}/auth/{}/callback", base.trim_end_matches('/'), prov);
         let url = crate::oauth::url_autorizzazione(p, &conf.id, &redirect, &state, &verifier);
-        self.stati_oauth.insert(state, StatoOAuth { prov: prov.into(), scade: ora + 600.0, verifier, redirect });
+        self.stati_oauth.insert(
+            state,
+            StatoOAuth {
+                prov: prov.into(),
+                scade: ora + 600.0,
+                verifier,
+                redirect,
+            },
+        );
         Some(url)
     }
 
@@ -792,7 +938,13 @@ impl Tavolo {
         };
         let p = PROVIDER.iter().find(|p| p.id == prov).ok_or("provider sconosciuto")?;
         let conf = self.config.oauth.get(prov).cloned().unwrap_or_default();
-        Ok(crate::oauth::Scambio { provider: p, client_id: conf.id, client_secret: conf.secret, verifier: st.verifier, redirect: st.redirect })
+        Ok(crate::oauth::Scambio {
+            provider: p,
+            client_id: conf.id,
+            client_secret: conf.secret,
+            verifier: st.verifier,
+            redirect: st.redirect,
+        })
     }
 
     async fn oauth_utente(&mut self, prov: &str, uid: &str, nome: &str, avatar: &str, ip: &str) -> (String, String, String) {
@@ -802,7 +954,11 @@ impl Tavolo {
             Some(c) => c.clone(),
             None => {
                 let id = id_casuale(12);
-                let n = if nome.is_empty() { "Avventuriero".to_string() } else { tronca(nome, 30) };
+                let n = if nome.is_empty() {
+                    "Avventuriero".to_string()
+                } else {
+                    tronca(nome, 30)
+                };
                 self.utenti.insert(id.clone(), Utente::nuovo(&n, "#c0392b", "giocatore"));
                 self.account.insert(chiave.clone(), id.clone());
                 nuovo = true;
@@ -819,7 +975,13 @@ impl Tavolo {
         let admin = u.admin;
         self.salva_presto();
         self.db
-            .audit(Some(&id), Some(&r.2), Some(ip), if admin { "login_admin_oauth" } else { "login_oauth" }, &json!({"account": chiave, "nuovo_utente": nuovo}))
+            .audit(
+                Some(&id),
+                Some(&r.2),
+                Some(ip),
+                if admin { "login_admin_oauth" } else { "login_oauth" },
+                &json!({"account": chiave, "nuovo_utente": nuovo}),
+            )
             .await;
         r
     }

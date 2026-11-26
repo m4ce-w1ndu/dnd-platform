@@ -29,10 +29,18 @@ impl Avventura {
         self.dati.get("mappe").and_then(Value::as_array).map(Vec::as_slice).unwrap_or(&[])
     }
     pub fn personaggi(&self) -> &[Value] {
-        self.dati.get("personaggi").and_then(Value::as_array).map(Vec::as_slice).unwrap_or(&[])
+        self.dati
+            .get("personaggi")
+            .and_then(Value::as_array)
+            .map(Vec::as_slice)
+            .unwrap_or(&[])
     }
     pub fn documenti(&self) -> &[Value] {
-        self.dati.get("documenti").and_then(Value::as_array).map(Vec::as_slice).unwrap_or(&[])
+        self.dati
+            .get("documenti")
+            .and_then(Value::as_array)
+            .map(Vec::as_slice)
+            .unwrap_or(&[])
     }
     pub fn ha_mappa(&self, id: &str) -> bool {
         self.mappe().iter().any(|m| m["id"] == id)
@@ -124,7 +132,9 @@ pub fn carica_avventura(base: &Path, aid: &str) -> Option<Avventura> {
             if !IMG_EXT.contains(&ext.to_lowercase().as_str()) || !cart.join(&nome).is_file() {
                 continue;
             }
-            let meta = leggi_json(&cart.join(format!("{stem}.json"))).and_then(|v| v.as_object().cloned()).unwrap_or_default();
+            let meta = leggi_json(&cart.join(format!("{stem}.json")))
+                .and_then(|v| v.as_object().cloned())
+                .unwrap_or_default();
             let (w, h) = dimensioni_immagine(&cart.join(&nome)).unwrap_or((1000, 1000));
             let titolo = match meta.get("titolo") {
                 Some(t) if crate::util::vero(t) => t.clone(),
@@ -152,12 +162,17 @@ pub fn carica_avventura(base: &Path, aid: &str) -> Option<Avventura> {
     }
     let ordine = |m: &Value| crate::util::numero(&m["ordine"]).unwrap_or(999.0);
     mappe.sort_by(|a, b| {
-        ordine(a).partial_cmp(&ordine(b)).unwrap_or(std::cmp::Ordering::Equal).then_with(|| a["id"].as_str().cmp(&b["id"].as_str()))
+        ordine(a)
+            .partial_cmp(&ordine(b))
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| a["id"].as_str().cmp(&b["id"].as_str()))
     });
     let mut documenti = Vec::new();
     if let Some(Value::Array(docs)) = man.get("documenti") {
         for d in docs {
-            let Some(file) = d.get("file").and_then(Value::as_str) else { continue };
+            let Some(file) = d.get("file").and_then(Value::as_str) else {
+                continue;
+            };
             if file.is_empty() || file.contains("..") || !base.join("documenti").join(file).is_file() {
                 continue;
             }
@@ -207,7 +222,12 @@ pub fn firma(dir: &Path) -> Vec<(PathBuf, u64, i128)> {
             if md.is_dir() {
                 pila.push(e.path());
             } else {
-                let t = md.modified().ok().and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok()).map(|d| d.as_nanos() as i128).unwrap_or(0);
+                let t = md
+                    .modified()
+                    .ok()
+                    .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                    .map(|d| d.as_nanos() as i128)
+                    .unwrap_or(0);
                 out.push((e.path(), md.len(), t));
             }
         }
@@ -236,8 +256,7 @@ fn capitalizza(s: &str) -> String {
 static SVG_TAG: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?s)<svg[^>]*>").unwrap());
 static SVG_W: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"\swidth="([\d.]+)"#).unwrap());
 static SVG_H: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"\sheight="([\d.]+)"#).unwrap());
-static SVG_VB: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r#"viewBox="[\d.\-]+[ ,]+[\d.\-]+[ ,]+([\d.]+)[ ,]+([\d.]+)""#).unwrap());
+static SVG_VB: LazyLock<Regex> = LazyLock::new(|| Regex::new(r#"viewBox="[\d.\-]+[ ,]+[\d.\-]+[ ,]+([\d.]+)[ ,]+([\d.]+)""#).unwrap());
 
 /// (larghezza, altezza) di SVG/PNG/JPEG/WEBP leggendo solo l'intestazione.
 pub fn dimensioni_immagine(path: &Path) -> Option<(u32, u32)> {
@@ -246,10 +265,18 @@ pub fn dimensioni_immagine(path: &Path) -> Option<(u32, u32)> {
     let n = f.read(&mut head).ok()?;
     head.truncate(n);
     let nome = path.to_string_lossy().to_lowercase();
-    let num = |s: &str| s.parse::<f64>().ok().filter(|v| v.is_finite() && *v >= 0.0 && *v < 1e7).map(|v| v as u32);
+    let num = |s: &str| {
+        s.parse::<f64>()
+            .ok()
+            .filter(|v| v.is_finite() && *v >= 0.0 && *v < 1e7)
+            .map(|v| v as u32)
+    };
     if nome.ends_with(".svg") {
         let txt = String::from_utf8_lossy(&head);
-        let tag = SVG_TAG.find(&txt).map(|m| m.as_str().to_string()).unwrap_or_else(|| txt.to_string());
+        let tag = SVG_TAG
+            .find(&txt)
+            .map(|m| m.as_str().to_string())
+            .unwrap_or_else(|| txt.to_string());
         if let (Some(w), Some(h)) = (SVG_W.captures(&tag), SVG_H.captures(&tag)) {
             if let (Some(w), Some(h)) = (num(&w[1]), num(&h[1])) {
                 return Some((w, h));

@@ -58,7 +58,11 @@ fn differenze(a: &Value, b: &Value, percorso: &str, out: &mut Vec<String>, max: 
                 differenze(va, vb, &format!("{percorso}[{i}]"), out, max);
             }
         }
-        _ => out.push(format!("{percorso}: {} → {}", crate::util::tronca(&a.to_string(), 80), crate::util::tronca(&b.to_string(), 80))),
+        _ => out.push(format!(
+            "{percorso}: {} → {}",
+            crate::util::tronca(&a.to_string(), 80),
+            crate::util::tronca(&b.to_string(), 80)
+        )),
     }
 }
 
@@ -82,11 +86,24 @@ pub async fn verifica_db(originale: &Path) -> Result<bool> {
             let riletta = serde_json::to_value(&c)?;
             let mut d = vec![];
             differenze(&grezza, &riletta, "config", &mut d, 20);
-            println!("✓ configurazione: utente admin «{}», hash {}, ospiti {}, provider attivi: {}",
+            println!(
+                "✓ configurazione: utente admin «{}», hash {}, ospiti {}, provider attivi: {}",
                 c.admin.utente,
-                if c.admin.argon2.is_some() { "Argon2" } else if c.admin.hash.is_some() { "PBKDF2 (verrà convertito al primo accesso)" } else { "ASSENTE" },
+                if c.admin.argon2.is_some() {
+                    "Argon2"
+                } else if c.admin.hash.is_some() {
+                    "PBKDF2 (verrà convertito al primo accesso)"
+                } else {
+                    "ASSENTE"
+                },
                 c.ospiti,
-                c.oauth.iter().filter(|(_, o)| o.attivo).map(|(k, _)| k.as_str()).collect::<Vec<_>>().join(", "));
+                c.oauth
+                    .iter()
+                    .filter(|(_, o)| o.attivo)
+                    .map(|(k, _)| k.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
             for x in &d {
                 println!("  ✗ differenza: {x}");
                 ok = false;
@@ -111,13 +128,26 @@ pub async fn verifica_db(originale: &Path) -> Result<bool> {
         }
         diff_utenti += d.len();
     }
-    println!("✓ utenti: {} letti, {} illeggibili, {} account collegati, {} differenze", utenti.len(), scartati.len(), account.len(), diff_utenti);
+    println!(
+        "✓ utenti: {} letti, {} illeggibili, {} account collegati, {} differenze",
+        utenti.len(),
+        scartati.len(),
+        account.len(),
+        diff_utenti
+    );
     ok &= scartati.is_empty() && diff_utenti == 0;
     let admin: Vec<_> = utenti.iter().filter(|(_, u)| u.admin).collect();
     println!("  amministratori ({}):", admin.len());
     for (id, u) in admin {
-        let visto = time::OffsetDateTime::from_unix_timestamp(u.seen as i64).map(|t| t.date().to_string()).unwrap_or_default();
-        println!("    - {id} «{}» account={} provider={} ultimo accesso={visto}", u.name, u.account.as_deref().unwrap_or("-"), u.provider.as_deref().unwrap_or("-"));
+        let visto = time::OffsetDateTime::from_unix_timestamp(u.seen as i64)
+            .map(|t| t.date().to_string())
+            .unwrap_or_default();
+        println!(
+            "    - {id} «{}» account={} provider={} ultimo accesso={visto}",
+            u.name,
+            u.account.as_deref().unwrap_or("-"),
+            u.provider.as_deref().unwrap_or("-")
+        );
     }
 
     let attiva = db.get("attiva").await?;
@@ -126,9 +156,21 @@ pub async fn verifica_db(originale: &Path) -> Result<bool> {
         match serde_json::from_value::<Stato>(p.stato.clone()) {
             Ok(s) => {
                 let mut d = vec![];
-                differenze(&p.stato, &serde_json::to_value(&s)?, &format!("partita {}", p.avventura), &mut d, 10);
-                println!("✓ partita «{}»: {} pedine, {} voci di cronologia, {} schede, {} differenze",
-                    p.avventura, s.pedine.len(), s.log.len(), s.schede.len(), d.len());
+                differenze(
+                    &p.stato,
+                    &serde_json::to_value(&s)?,
+                    &format!("partita {}", p.avventura),
+                    &mut d,
+                    10,
+                );
+                println!(
+                    "✓ partita «{}»: {} pedine, {} voci di cronologia, {} schede, {} differenze",
+                    p.avventura,
+                    s.pedine.len(),
+                    s.log.len(),
+                    s.schede.len(),
+                    d.len()
+                );
                 for x in &d {
                     println!("  ✗ differenza: {x}");
                 }
@@ -147,7 +189,14 @@ pub async fn verifica_db(originale: &Path) -> Result<bool> {
     ok &= riletti.len() == utenti.len();
     db.chiudi().await;
     let _ = std::fs::remove_dir_all(&tmp);
-    println!("{}", if ok { "RISULTATO: tutto leggibile, nessuna perdita." } else { "RISULTATO: ci sono problemi (vedi sopra)." });
+    println!(
+        "{}",
+        if ok {
+            "RISULTATO: tutto leggibile, nessuna perdita."
+        } else {
+            "RISULTATO: ci sono problemi (vedi sopra)."
+        }
+    );
     Ok(ok)
 }
 
@@ -155,4 +204,21 @@ fn tempfile_dir() -> Result<std::path::PathBuf> {
     let d = std::env::temp_dir().join(format!("tavolo-verifica-{}", crate::util::id_casuale(8)));
     std::fs::create_dir_all(&d)?;
     Ok(d)
+}
+
+/// Copia coerente di un database (anche mentre il server lo usa): VACUUM INTO, senza toccare l'originale.
+pub async fn copia_db(da: &Path, a: &Path) -> Result<()> {
+    use sqlx::sqlite::SqliteConnectOptions;
+    use sqlx::ConnectOptions;
+    use std::str::FromStr;
+    anyhow::ensure!(!a.exists(), "{} esiste già", a.display());
+    let mut c = SqliteConnectOptions::from_str(&format!("sqlite://{}", da.display()))?
+        .read_only(true)
+        .connect()
+        .await?;
+    sqlx::query("VACUUM INTO ?")
+        .bind(a.to_string_lossy().to_string())
+        .execute(&mut c)
+        .await?;
+    Ok(())
 }

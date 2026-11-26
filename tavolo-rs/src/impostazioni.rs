@@ -51,7 +51,10 @@ impl Tavolo {
             .iter()
             .map(|p| {
                 let o = c.oauth.get(p.id).cloned().unwrap_or_default();
-                (p.id.to_string(), json!({"attivo": o.attivo, "id": o.id, "secret_impostato": !o.secret.is_empty(), "nome": p.nome, "console": p.console}))
+                (
+                    p.id.to_string(),
+                    json!({"attivo": o.attivo, "id": o.id, "secret_impostato": !o.secret.is_empty(), "nome": p.nome, "console": p.console}),
+                )
             })
             .collect();
         json!({"nome_tavolo": c.nome_tavolo, "public_url": c.public_url, "ospiti": c.ospiti,
@@ -99,7 +102,9 @@ impl Tavolo {
                     cambiati.push("ospiti");
                 }
                 for (prov, conf) in c.oauth.unwrap_or_default() {
-                    let Some(p) = PROVIDER.iter().find(|p| p.id == prov) else { continue };
+                    let Some(p) = PROVIDER.iter().find(|p| p.id == prov) else {
+                        continue;
+                    };
                     let dest = nuovo.oauth.entry(prov.clone()).or_default();
                     if let Some(a) = conf.attivo {
                         dest.attivo = a;
@@ -134,7 +139,9 @@ impl Tavolo {
                 self.config = nuovo;
                 self.salva_config().await;
                 self.invia(&json!({"t": "info"}));
-                self.db.audit(Some(id), Some(nome_u), Some(ip), "imp_salva", &json!({"campi": cambiati})).await;
+                self.db
+                    .audit(Some(id), Some(nome_u), Some(ip), "imp_salva", &json!({"campi": cambiati}))
+                    .await;
                 Risposta::ok(json!({"ok": true, "config": self.config_pubblica()}))
             }
 
@@ -145,7 +152,9 @@ impl Tavolo {
                     .await
                     .unwrap_or(false);
                 if !ok {
-                    self.db.audit(Some(id), Some(nome_u), Some(ip), "imp_admin_password_errata", &json!({})).await;
+                    self.db
+                        .audit(Some(id), Some(nome_u), Some(ip), "imp_admin_password_errata", &json!({}))
+                        .await;
                     return Risposta::no("la password attuale non è corretta");
                 }
                 if !nuova.is_empty() && nuova.chars().count() < 8 {
@@ -169,7 +178,13 @@ impl Tavolo {
                 }
                 self.salva_config().await;
                 self.db
-                    .audit(Some(id), Some(nome_u), Some(ip), "imp_admin", &json!({"utente": self.config.admin.utente}))
+                    .audit(
+                        Some(id),
+                        Some(nome_u),
+                        Some(ip),
+                        "imp_admin",
+                        &json!({"utente": self.config.admin.utente}),
+                    )
                     .await;
                 Risposta::si()
             }
@@ -205,11 +220,18 @@ impl Tavolo {
                     self.invia(&json!({"t": "ricarica"}));
                     self.salva_presto();
                 }
-                self.db.audit(Some(id), Some(nome_u), Some(ip), "imp_partita_azzera", &json!({"avventura": aid})).await;
+                self.db
+                    .audit(Some(id), Some(nome_u), Some(ip), "imp_partita_azzera", &json!({"avventura": aid}))
+                    .await;
                 Risposta::si()
             }
 
-            Op::ImpUtente { id: uid, elimina, master, admin } => {
+            Op::ImpUtente {
+                id: uid,
+                elimina,
+                master,
+                admin,
+            } => {
                 if !self.utenti.contains_key(&uid) {
                     return Risposta::no("utente inesistente");
                 }
@@ -222,7 +244,15 @@ impl Tavolo {
                     self.utenti.shift_remove(&uid);
                     self.invia_a(&json!({"t": "esci"}), Some(&uid));
                     self.clienti.remove(&uid); // il browser riceve «esci» e poi lo stream si chiude
-                    self.db.audit(Some(id), Some(nome_u), Some(ip), "utente_eliminato", &json!({"utente": uid, "nome": nome})).await;
+                    self.db
+                        .audit(
+                            Some(id),
+                            Some(nome_u),
+                            Some(ip),
+                            "utente_eliminato",
+                            &json!({"utente": uid, "nome": nome}),
+                        )
+                        .await;
                 } else {
                     if let Some(m) = master {
                         let u = self.utenti.get_mut(&uid).expect("utente");
@@ -242,7 +272,13 @@ impl Tavolo {
                         }
                     }
                     self.db
-                        .audit(Some(id), Some(nome_u), Some(ip), "utente_permessi", &json!({"utente": uid, "nome": nome, "master": master, "admin": admin}))
+                        .audit(
+                            Some(id),
+                            Some(nome_u),
+                            Some(ip),
+                            "utente_permessi",
+                            &json!({"utente": uid, "nome": nome, "master": master, "admin": admin}),
+                        )
                         .await;
                 }
                 self.online_dopo();
@@ -265,7 +301,10 @@ mod test {
 
     #[test]
     fn url_pubblico() {
-        assert_eq!(normalizza_url("Dnd.Esempio.it/percorso/").as_deref(), Some("https://dnd.esempio.it"));
+        assert_eq!(
+            normalizza_url("Dnd.Esempio.it/percorso/").as_deref(),
+            Some("https://dnd.esempio.it")
+        );
         assert_eq!(normalizza_url("http://localhost:8000").as_deref(), Some("http://localhost:8000"));
         assert_eq!(normalizza_url("").as_deref(), Some(""));
         assert_eq!(normalizza_url("https://senza punto"), None);

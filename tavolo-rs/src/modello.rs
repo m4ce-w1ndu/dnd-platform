@@ -114,7 +114,11 @@ fn round1() -> i64 {
 
 impl Default for Iniziativa {
     fn default() -> Self {
-        Iniziativa { ordine: vec![], turno: 0, round: 1 }
+        Iniziativa {
+            ordine: vec![],
+            turno: 0,
+            round: 1,
+        }
     }
 }
 
@@ -156,8 +160,17 @@ fn due() -> Value {
 }
 
 /// Chiavi della partita che `/api/importa` può sostituire.
-pub const CHIAVI_STATO: &[&str] =
-    &["versione", "avventura", "scena", "nebbia", "pedine", "log", "iniziativa", "schede", "note_master"];
+pub const CHIAVI_STATO: &[&str] = &[
+    "versione",
+    "avventura",
+    "scena",
+    "nebbia",
+    "pedine",
+    "log",
+    "iniziativa",
+    "schede",
+    "note_master",
+];
 
 impl Stato {
     pub fn vuoto(aid: Option<&str>, prima_mappa: Option<String>) -> Stato {
@@ -264,7 +277,12 @@ fn admin() -> String {
 
 impl Default for AdminConf {
     fn default() -> Self {
-        AdminConf { utente: admin(), sale: None, hash: None, argon2: None }
+        AdminConf {
+            utente: admin(),
+            sale: None,
+            hash: None,
+            argon2: None,
+        }
     }
 }
 fn vero_() -> bool {
@@ -328,7 +346,8 @@ mod test {
     #[test]
     fn utente_python() {
         let u: Utente = serde_json::from_value(json!({"secret": "s", "name": "Admin", "color": "#e0b04a", "role": "master",
-            "char": null, "admin": true, "master_ok": true, "seen": 1.7e9, "account": "discord:1"})).unwrap();
+            "char": null, "admin": true, "master_ok": true, "seen": 1.7e9, "account": "discord:1"}))
+        .unwrap();
         assert!(u.admin && u.master_ok && u.is_master());
         let c: Config = serde_json::from_value(json!({"admin": {"utente": "admin", "sale": "ab", "hash": "cd"}})).unwrap();
         assert!(c.ospiti);

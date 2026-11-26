@@ -89,7 +89,10 @@ fn cred(h: &HeaderMap, q: &HashMap<String, String>) -> Cred {
         for parte in c.split(';') {
             if let Some(v) = parte.trim().strip_prefix(&format!("{COOKIE}=")) {
                 if let Some((id, secret)) = v.split_once('.') {
-                    return Cred { id: id.into(), secret: secret.into() };
+                    return Cred {
+                        id: id.into(),
+                        secret: secret.into(),
+                    };
                 }
             }
         }
@@ -98,7 +101,12 @@ fn cred(h: &HeaderMap, q: &HashMap<String, String>) -> Cred {
 }
 
 fn https(h: &HeaderMap) -> bool {
-    header(h, "x-forwarded-proto").split(',').next().unwrap_or("").trim().eq_ignore_ascii_case("https")
+    header(h, "x-forwarded-proto")
+        .split(',')
+        .next()
+        .unwrap_or("")
+        .trim()
+        .eq_ignore_ascii_case("https")
 }
 
 fn json_risposta(r: Risposta, h: &HeaderMap) -> Response {
@@ -108,7 +116,10 @@ fn json_risposta(r: Risposta, h: &HeaderMap) -> Response {
     hh.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
     if let Some(c) = r.cookie {
         let secure = if https(h) { "; Secure" } else { "" };
-        let v = format!("{COOKIE}={}.{}; Path=/; HttpOnly; SameSite=Strict; Max-Age=31536000{secure}", c.id, c.secret);
+        let v = format!(
+            "{COOKIE}={}.{}; Path=/; HttpOnly; SameSite=Strict; Max-Age=31536000{secure}",
+            c.id, c.secret
+        );
         if let Ok(v) = HeaderValue::from_str(&v) {
             hh.insert(header::SET_COOKIE, v);
         }
@@ -117,12 +128,20 @@ fn json_risposta(r: Risposta, h: &HeaderMap) -> Response {
 }
 
 fn json_stato(status: u16, v: Value) -> Response {
-    json_risposta(Risposta { status, corpo: v, cookie: None }, &HeaderMap::new())
+    json_risposta(
+        Risposta {
+            status,
+            corpo: v,
+            cookie: None,
+        },
+        &HeaderMap::new(),
+    )
 }
 
 fn non_trovato() -> Response {
     let mut r = (StatusCode::NOT_FOUND, "Non trovato").into_response();
-    r.headers_mut().insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain; charset=utf-8"));
+    r.headers_mut()
+        .insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain; charset=utf-8"));
     r
 }
 
@@ -132,7 +151,12 @@ fn occupato() -> Response {
 
 /// Legge il corpo con un limite; oltre → 413 come il server Python.
 async fn leggi_corpo(h: &HeaderMap, body: Body, max: usize) -> Result<Bytes, Response> {
-    let troppo = || json_stato(413, json!({"ok": false, "errore": format!("file troppo grande (max {} MB)", max / 1024 / 1024)}));
+    let troppo = || {
+        json_stato(
+            413,
+            json!({"ok": false, "errore": format!("file troppo grande (max {} MB)", max / 1024 / 1024)}),
+        )
+    };
     if header(h, "content-length").parse::<usize>().is_ok_and(|n| n > max) {
         return Err(troppo());
     }
@@ -181,7 +205,10 @@ fn tipo_file(p: &Path) -> String {
         "js" | "mjs" => "application/javascript".to_string(),
         "md" => "text/markdown".to_string(),
         "webp" => "image/webp".to_string(),
-        _ => mime_guess::from_ext(&ext).first().map(|m| m.essence_str().to_string()).unwrap_or_else(|| "application/octet-stream".into()),
+        _ => mime_guess::from_ext(&ext)
+            .first()
+            .map(|m| m.essence_str().to_string())
+            .unwrap_or_else(|| "application/octet-stream".into()),
     };
     if t.starts_with("text/") || t == "application/javascript" || t == "application/json" || t == "image/svg+xml" {
         format!("{t}; charset=utf-8")
@@ -192,12 +219,19 @@ fn tipo_file(p: &Path) -> String {
 
 /// Serve un file (in streaming) con ETag: i browser non riscaricano mappe che non sono cambiate.
 async fn servi_file(full: &Path, h: &HeaderMap, sandbox: bool) -> Response {
-    let Ok(f) = tokio::fs::File::open(full).await else { return non_trovato() };
+    let Ok(f) = tokio::fs::File::open(full).await else {
+        return non_trovato();
+    };
     let Ok(md) = f.metadata().await else { return non_trovato() };
     if !md.is_file() {
         return non_trovato();
     }
-    let mtime = md.modified().ok().and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok()).map(|d| d.as_nanos()).unwrap_or(0);
+    let mtime = md
+        .modified()
+        .ok()
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
     let etag = format!("\"{:x}-{:x}\"", md.len(), mtime);
     let mut r = if header(h, "if-none-match") == etag {
         StatusCode::NOT_MODIFIED.into_response()
@@ -282,7 +316,10 @@ async fn intestazioni(State(app): State<App>, req: Request, next: Next) -> Respo
     }
     h.insert(header::X_CONTENT_TYPE_OPTIONS, HeaderValue::from_static("nosniff"));
     h.insert(header::REFERRER_POLICY, HeaderValue::from_static("same-origin"));
-    h.insert(HeaderName::from_static("permissions-policy"), HeaderValue::from_static("camera=(), microphone=(), geolocation=()"));
+    h.insert(
+        HeaderName::from_static("permissions-policy"),
+        HeaderValue::from_static("camera=(), microphone=(), geolocation=()"),
+    );
     app.metriche.risposta(r.status().as_u16());
     r
 }
@@ -338,7 +375,11 @@ async fn eventi(State(app): State<App>, h: HeaderMap, Query(q): Query<HashMap<St
         Some(None) => return json_stato(401, json!({"ok": false})),
         None => return occupato(),
     };
-    let guardia = Guardia { tavolo: app.tavolo.clone(), id, conn: conn.conn };
+    let guardia = Guardia {
+        tavolo: app.tavolo.clone(),
+        id,
+        conn: conn.conn,
+    };
     let mut rx = conn.rx;
     let flusso = async_stream::stream! {
         let _g = guardia;
@@ -347,18 +388,16 @@ async fn eventi(State(app): State<App>, h: HeaderMap, Query(q): Query<HashMap<St
             yield Ok(Event::default().data(&*msg));
         }
     };
-    let mut r = Sse::new(flusso).keep_alive(KeepAlive::new().interval(Duration::from_secs(15)).text("ping")).into_response();
-    r.headers_mut().insert(HeaderName::from_static("x-accel-buffering"), HeaderValue::from_static("no"));
+    let mut r = Sse::new(flusso)
+        .keep_alive(KeepAlive::new().interval(Duration::from_secs(15)).text("ping"))
+        .into_response();
+    r.headers_mut()
+        .insert(HeaderName::from_static("x-accel-buffering"), HeaderValue::from_static("no"));
     r.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
     r
 }
 
-async fn login(
-    State(app): State<App>,
-    ConnectInfo(peer): ConnectInfo<SocketAddr>,
-    h: HeaderMap,
-    body: Body,
-) -> Response {
+async fn login(State(app): State<App>, ConnectInfo(peer): ConnectInfo<SocketAddr>, h: HeaderMap, body: Body) -> Response {
     let ip = ip_da(&h, Some(peer));
     let raw = match leggi_corpo(&h, body, MAX_JSON).await {
         Ok(b) => b,
@@ -375,13 +414,24 @@ async fn login(
     // la password dell'admin si verifica fuori dal task del tavolo (Argon2/PBKDF2 sono lenti di proposito)
     let mut admin_ok = None;
     if corpo.get("tipo").and_then(Value::as_str) == Some("admin") {
-        let Some(conf) = app.tavolo.chiedi(Cmd::DatiAdmin).await else { return occupato() };
+        let Some(conf) = app.tavolo.chiedi(Cmd::DatiAdmin).await else {
+            return occupato();
+        };
         let utente = corpo.get("utente").and_then(crate::util::testo).unwrap_or_default();
         let pw = corpo.get("password").and_then(crate::util::testo).unwrap_or_default();
         let v = tokio::task::spawn_blocking(move || crate::password::verifica(&conf, &utente, &pw)).await;
         admin_ok = Some(v.map(|v| (v.ok, v.aggiorna)).unwrap_or((false, None)));
     }
-    match app.tavolo.chiedi(|reply| Cmd::Login { corpo, ip, admin_ok, reply }).await {
+    match app
+        .tavolo
+        .chiedi(|reply| Cmd::Login {
+            corpo,
+            ip,
+            admin_ok,
+            reply,
+        })
+        .await
+    {
         Some(r) => json_risposta(r, &h),
         None => occupato(),
     }
@@ -457,11 +507,17 @@ async fn importa(State(app): State<App>, ConnectInfo(peer): ConnectInfo<SocketAd
         Err(r) => return r,
     };
     let cred = cred(&h, &HashMap::new());
-    let Some(id_ok) = app.tavolo.chiedi(|reply| Cmd::Chi { cred: cred.clone(), reply }).await else { return occupato() };
+    let Some(id_ok) = app.tavolo.chiedi(|reply| Cmd::Chi { cred: cred.clone(), reply }).await else {
+        return occupato();
+    };
     if id_ok.is_none() {
         return json_stato(401, json!({"ok": false, "errore": "non autenticato"}));
     }
-    match app.tavolo.chiedi(|reply| Cmd::Contenuto(CmdContenuto::Importa { cred, corpo, ip, reply })).await {
+    match app
+        .tavolo
+        .chiedi(|reply| Cmd::Contenuto(CmdContenuto::Importa { cred, corpo, ip, reply }))
+        .await
+    {
         Some(r) if r.status == 404 => json_stato(404, json!({"ok": false})),
         Some(r) => json_risposta(r, &h),
         None => occupato(),
@@ -490,8 +546,25 @@ async fn carica_mappa(State(app): State<App>, h: HeaderMap, Query(q): Query<Hash
     };
     let nome = q.get("nome").cloned().unwrap_or_else(|| "mappa.png".into());
     let titolo = q.get("titolo").cloned().unwrap_or_default();
-    let cella = q.get("cella").and_then(|c| c.parse::<f64>().ok()).filter(|c| c.is_finite()).unwrap_or(0.0);
-    match app.tavolo.chiedi(|reply| Cmd::Contenuto(CmdContenuto::CaricaMappa { cred, nome, titolo, cella, dati, reply })).await {
+    let cella = q
+        .get("cella")
+        .and_then(|c| c.parse::<f64>().ok())
+        .filter(|c| c.is_finite())
+        .unwrap_or(0.0);
+    match app
+        .tavolo
+        .chiedi(|reply| {
+            Cmd::Contenuto(CmdContenuto::CaricaMappa {
+                cred,
+                nome,
+                titolo,
+                cella,
+                dati,
+                reply,
+            })
+        })
+        .await
+    {
         Some(r) => json_risposta(r, &h),
         None => occupato(),
     }
@@ -505,7 +578,20 @@ async fn carica_documento(State(app): State<App>, h: HeaderMap, Query(q): Query<
     let nome = q.get("nome").cloned().unwrap_or_else(|| "documento.html".into());
     let titolo = q.get("titolo").cloned().unwrap_or_default();
     let solo_master = q.get("solo_master").map(String::as_str) == Some("1");
-    match app.tavolo.chiedi(|reply| Cmd::Contenuto(CmdContenuto::CaricaDocumento { cred, nome, titolo, solo_master, dati, reply })).await {
+    match app
+        .tavolo
+        .chiedi(|reply| {
+            Cmd::Contenuto(CmdContenuto::CaricaDocumento {
+                cred,
+                nome,
+                titolo,
+                solo_master,
+                dati,
+                reply,
+            })
+        })
+        .await
+    {
         Some(r) => json_risposta(r, &h),
         None => occupato(),
     }
@@ -523,7 +609,11 @@ async fn carica_avventura(
         Ok(x) => x,
         Err(r) => return r,
     };
-    let Some(Some(avv)) = app.tavolo.chiedi(|reply| Cmd::Contenuto(CmdContenuto::PermessoCarica { cred: cred.clone(), reply })).await else {
+    let Some(Some(avv)) = app
+        .tavolo
+        .chiedi(|reply| Cmd::Contenuto(CmdContenuto::PermessoCarica { cred: cred.clone(), reply }))
+        .await
+    else {
         return json_stato(403, json!({"ok": false, "errore": "solo il Master può caricare"}));
     };
     let estratto = tokio::task::spawn_blocking(move || crate::pacchetti::estrai(&dati, &avv)).await;
@@ -532,7 +622,11 @@ async fn carica_avventura(
         Ok(Err(e)) => return json_stato(400, json!({"ok": false, "errore": e})),
         Err(_) => return json_stato(500, json!({"ok": false, "errore": "estrazione non riuscita"})),
     };
-    match app.tavolo.chiedi(|reply| Cmd::Contenuto(CmdContenuto::InstallaPacchetto { cred, tmp, aid, ip, reply })).await {
+    match app
+        .tavolo
+        .chiedi(|reply| Cmd::Contenuto(CmdContenuto::InstallaPacchetto { cred, tmp, aid, ip, reply }))
+        .await
+    {
         Some(r) => json_risposta(r, &h),
         None => occupato(),
     }
@@ -545,7 +639,11 @@ async fn scarica_avventura(State(app): State<App>, h: HeaderMap, Query(q): Query
         return json_stato(403, json!({"ok": false}));
     }
     let a2 = aid.clone();
-    let Some(Some(dir)) = app.tavolo.chiedi(|reply| Cmd::Contenuto(CmdContenuto::CartellaAvventura { cred, aid: a2, reply })).await else {
+    let Some(Some(dir)) = app
+        .tavolo
+        .chiedi(|reply| Cmd::Contenuto(CmdContenuto::CartellaAvventura { cred, aid: a2, reply }))
+        .await
+    else {
         return json_stato(403, json!({"ok": false}));
     };
     let a3 = aid.clone();
@@ -558,9 +656,17 @@ async fn scarica_avventura(State(app): State<App>, h: HeaderMap, Query(q): Query
 async fn esporta(State(app): State<App>, h: HeaderMap, Query(q): Query<HashMap<String, String>>) -> Response {
     let cred = cred(&h, &q);
     let aid = q.get("id").cloned().filter(|a| !a.is_empty());
-    match app.tavolo.chiedi(|reply| Cmd::Contenuto(CmdContenuto::Esporta { cred, aid, reply })).await {
+    match app
+        .tavolo
+        .chiedi(|reply| Cmd::Contenuto(CmdContenuto::Esporta { cred, aid, reply }))
+        .await
+    {
         Some(Some((aid, dati))) => {
-            let nome: String = aid.chars().filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_').take(60).collect();
+            let nome: String = aid
+                .chars()
+                .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
+                .take(60)
+                .collect();
             allegato(dati, "application/json; charset=utf-8", &format!("partita_{nome}.json"))
         }
         Some(None) => json_stato(403, json!({"ok": false})),
@@ -568,10 +674,19 @@ async fn esporta(State(app): State<App>, h: HeaderMap, Query(q): Query<HashMap<S
     }
 }
 
-async fn backup(State(app): State<App>, ConnectInfo(peer): ConnectInfo<SocketAddr>, h: HeaderMap, Query(q): Query<HashMap<String, String>>) -> Response {
+async fn backup(
+    State(app): State<App>,
+    ConnectInfo(peer): ConnectInfo<SocketAddr>,
+    h: HeaderMap,
+    Query(q): Query<HashMap<String, String>>,
+) -> Response {
     let ip = ip_da(&h, Some(peer));
     let cred = cred(&h, &q);
-    match app.tavolo.chiedi(|reply| Cmd::Contenuto(CmdContenuto::Backup { cred, ip, reply })).await {
+    match app
+        .tavolo
+        .chiedi(|reply| Cmd::Contenuto(CmdContenuto::Backup { cred, ip, reply }))
+        .await
+    {
         Some(Some(file)) => {
             let dati = tokio::fs::read(&file).await;
             let _ = tokio::fs::remove_file(&file).await;
@@ -601,8 +716,15 @@ async fn audit(State(app): State<App>, h: HeaderMap, Query(q): Query<HashMap<Str
 
 fn base_url(h: &HeaderMap) -> String {
     let proto = header(h, "x-forwarded-proto");
-    let proto = proto.split(',').next().map(str::trim).filter(|p| *p == "https" || *p == "http").unwrap_or("http");
-    let host = Some(header(h, "x-forwarded-host")).filter(|x| !x.is_empty()).unwrap_or_else(|| header(h, "host"));
+    let proto = proto
+        .split(',')
+        .next()
+        .map(str::trim)
+        .filter(|p| *p == "https" || *p == "http")
+        .unwrap_or("http");
+    let host = Some(header(h, "x-forwarded-host"))
+        .filter(|x| !x.is_empty())
+        .unwrap_or_else(|| header(h, "host"));
     let host = host.split(',').next().unwrap_or("").trim().to_string();
     let host_ok = !host.is_empty() && host.chars().all(|c| c.is_ascii_alphanumeric() || ".-:[]".contains(c));
     format!("{proto}://{}", if host_ok { host.as_str() } else { "localhost" })
@@ -635,7 +757,16 @@ async fn oauth(
             let annullato = q.contains_key("error");
             let state = q.get("state").cloned().unwrap_or_default();
             let p2 = prov.clone();
-            let esito = match app.tavolo.chiedi(|reply| Cmd::OAuthStato { prov: p2, state, annullato, reply }).await {
+            let esito = match app
+                .tavolo
+                .chiedi(|reply| Cmd::OAuthStato {
+                    prov: p2,
+                    state,
+                    annullato,
+                    reply,
+                })
+                .await
+            {
                 None => return occupato(),
                 Some(Err(e)) if e.is_empty() => return non_trovato(),
                 Some(e) => e,
@@ -652,7 +783,10 @@ async fn oauth(
                 }
                 if let Some(c) = r.cookie {
                     let secure = if https(&h) { "; Secure" } else { "" };
-                    if let Ok(v) = HeaderValue::from_str(&format!("{COOKIE}={}.{}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000{secure}", c.id, c.secret)) {
+                    if let Ok(v) = HeaderValue::from_str(&format!(
+                        "{COOKIE}={}.{}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000{secure}",
+                        c.id, c.secret
+                    )) {
                         hh.insert(header::SET_COOKIE, v);
                     }
                 }
@@ -668,8 +802,17 @@ async fn oauth(
                 Ok(x) => x,
                 Err(e) => return pagina(crate::oauth::pagina_errore(&e), None, None),
             };
-            let Some((id, secret, nome)) =
-                app.tavolo.chiedi(|reply| Cmd::OAuthUtente { prov: prov.clone(), uid, nome, avatar, ip, reply }).await
+            let Some((id, secret, nome)) = app
+                .tavolo
+                .chiedi(|reply| Cmd::OAuthUtente {
+                    prov: prov.clone(),
+                    uid,
+                    nome,
+                    avatar,
+                    ip,
+                    reply,
+                })
+                .await
             else {
                 return occupato();
             };
@@ -683,13 +826,19 @@ async fn oauth(
 }
 
 async fn file_avventura(State(app): State<App>, uri: Uri, h: HeaderMap, Query(q): Query<HashMap<String, String>>) -> Response {
-    let Ok(path) = urlencoding::decode(uri.path()) else { return non_trovato() };
+    let Ok(path) = urlencoding::decode(uri.path()) else {
+        return non_trovato();
+    };
     let parti: Vec<&str> = path.split('/').collect(); // ['', 'avventure', id, 'mappe'|'documenti'|'immagini', file...]
     if parti.len() < 5 || !["mappe", "documenti", "immagini"].contains(&parti[3]) || !id_valido(parti[2]) {
         return non_trovato();
     }
-    let Some(rel) = relativo(&parti[2..].join("/")) else { return non_trovato() };
-    let Some(full) = dentro(&app.avv_reale, &rel).await else { return non_trovato() };
+    let Some(rel) = relativo(&parti[2..].join("/")) else {
+        return non_trovato();
+    };
+    let Some(full) = dentro(&app.avv_reale, &rel).await else {
+        return non_trovato();
+    };
     let aid_dir = app.avv_reale.join(parti[2]);
     if !full.starts_with(&aid_dir) {
         return non_trovato();
@@ -698,13 +847,18 @@ async fn file_avventura(State(app): State<App>, uri: Uri, h: HeaderMap, Query(q)
     if parti[3] == "documenti" {
         let file = parti[4..].join("/");
         let aid = parti[2].to_string();
-        let riservato = app.tavolo.chiedi(|reply| Cmd::DocumentoRiservato { aid, file, reply }).await.unwrap_or(true);
+        let riservato = app
+            .tavolo
+            .chiedi(|reply| Cmd::DocumentoRiservato { aid, file, reply })
+            .await
+            .unwrap_or(true);
         if riservato {
             let cred = cred(&h, &q);
             let master = matches!(app.tavolo.chiedi(|reply| Cmd::Chi { cred, reply }).await, Some(Some(c)) if c.master);
             if !master {
                 let mut r = (StatusCode::FORBIDDEN, "Solo per il Master").into_response();
-                r.headers_mut().insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain; charset=utf-8"));
+                r.headers_mut()
+                    .insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain; charset=utf-8"));
                 return r;
             }
         }
@@ -726,16 +880,25 @@ async fn statico(State(app): State<App>, method: Method, uri: Uri, h: HeaderMap)
         return StatusCode::METHOD_NOT_ALLOWED.into_response();
     }
     let p = uri.path();
-    let p = if matches!(p, "" | "/" | "/admin" | "/admin/") { "/index.html" } else { p };
+    let p = if matches!(p, "" | "/" | "/admin" | "/admin/") {
+        "/index.html"
+    } else {
+        p
+    };
     let Some(rel) = relativo(p) else { return non_trovato() };
     if rel.as_os_str().is_empty() {
         return non_trovato();
     }
-    let Some(full) = dentro(&app.web_reale, &rel).await else { return non_trovato() };
+    let Some(full) = dentro(&app.web_reale, &rel).await else {
+        return non_trovato();
+    };
     if full.file_name().is_some_and(|n| n == "index.html") {
-        let Ok(testo) = tokio::fs::read_to_string(&full).await else { return non_trovato() };
+        let Ok(testo) = tokio::fs::read_to_string(&full).await else {
+            return non_trovato();
+        };
         let mut r = testo.replace("__VERSIONE__", &app.versione).into_response();
-        r.headers_mut().insert(header::CONTENT_TYPE, HeaderValue::from_static("text/html; charset=utf-8"));
+        r.headers_mut()
+            .insert(header::CONTENT_TYPE, HeaderValue::from_static("text/html; charset=utf-8"));
         r.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
         return r;
     }
@@ -752,12 +915,18 @@ async fn salute(State(app): State<App>) -> Response {
 
 async fn metriche(State(app): State<App>, ConnectInfo(peer): ConnectInfo<SocketAddr>, h: HeaderMap) -> Response {
     let locale = peer.ip().is_loopback() && h.get("x-forwarded-for").is_none();
-    let token_ok = app.token_metriche.as_ref().is_some_and(|t| crate::util::uguali(&header(&h, "authorization"), &format!("Bearer {t}")));
+    let token_ok = app
+        .token_metriche
+        .as_ref()
+        .is_some_and(|t| crate::util::uguali(&header(&h, "authorization"), &format!("Bearer {t}")));
     if !locale && !token_ok {
         return non_trovato();
     }
     let mut r = app.metriche.testo().into_response();
-    r.headers_mut().insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain; version=0.0.4; charset=utf-8"));
+    r.headers_mut().insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static("text/plain; version=0.0.4; charset=utf-8"),
+    );
     r
 }
 

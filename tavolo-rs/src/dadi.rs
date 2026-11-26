@@ -6,8 +6,7 @@ use rand::Rng;
 use regex::Regex;
 use serde_json::{json, Value};
 
-static DADI_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"(?i)([+-]?)\s*(?:(\d*)d(\d+|%)(?:(kh|kl)(\d+))?|(\d+))").unwrap());
+static DADI_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)([+-]?)\s*(?:(\d*)d(\d+|%)(?:(kh|kl)(\d+))?|(\d+))").unwrap());
 static DANNI_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(\d*)d(\d+)").unwrap());
 
 #[derive(Debug, PartialEq)]
@@ -89,7 +88,12 @@ pub fn tira_con(espr: &str, rng: &mut impl Rng) -> Result<Value, Errore> {
 pub fn raddoppia_dadi(espr: &str) -> String {
     DANNI_RE
         .replace_all(espr, |c: &regex::Captures| {
-            let n: u64 = c.get(1).map(|g| g.as_str()).filter(|g| !g.is_empty()).and_then(|g| g.parse().ok()).unwrap_or(1);
+            let n: u64 = c
+                .get(1)
+                .map(|g| g.as_str())
+                .filter(|g| !g.is_empty())
+                .and_then(|g| g.parse().ok())
+                .unwrap_or(1);
             format!("{}d{}", n.saturating_mul(2), &c[2])
         })
         .into_owned()
@@ -101,8 +105,16 @@ mod test {
 
     #[test]
     fn valide() {
-        for (e, lo, hi) in [("1d20", 1, 20), ("2d6+3", 5, 15), ("d%", 1, 100), ("2d20kh1+5", 6, 25), ("10", 10, 10),
-                            ("-1d4", -4, -1), ("1d8 + 3 + 1d6", 5, 17), ("3D6", 3, 18)] {
+        for (e, lo, hi) in [
+            ("1d20", 1, 20),
+            ("2d6+3", 5, 15),
+            ("d%", 1, 100),
+            ("2d20kh1+5", 6, 25),
+            ("10", 10, 10),
+            ("-1d4", -4, -1),
+            ("1d8 + 3 + 1d6", 5, 17),
+            ("3D6", 3, 18),
+        ] {
             for _ in 0..50 {
                 let t = tira(e).unwrap();
                 let v = t["totale"].as_i64().unwrap();
@@ -124,8 +136,20 @@ mod test {
 
     #[test]
     fn non_valide() {
-        for e in ["", "ciao", "1d1", "101d6", "1d1001", "1d20+", "d", "2d6 3d6x", &"x".repeat(121),
-                  "50d6+50d6+50d6+51d6", "99999999999999999999", "1d99999999999999999999"] {
+        for e in [
+            "",
+            "ciao",
+            "1d1",
+            "101d6",
+            "1d1001",
+            "1d20+",
+            "d",
+            "2d6 3d6x",
+            &"x".repeat(121),
+            "50d6+50d6+50d6+51d6",
+            "99999999999999999999",
+            "1d99999999999999999999",
+        ] {
             assert!(tira(e).is_err(), "{e}");
         }
     }

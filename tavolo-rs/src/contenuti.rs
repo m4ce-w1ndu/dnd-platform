@@ -18,16 +18,59 @@ static NON_STEM: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[^a-z0-9_\-]").
 static NON_DOC: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[^\w\-.]").unwrap());
 
 pub enum CmdContenuto {
-    CaricaMappa { cred: Cred, nome: String, titolo: String, cella: f64, dati: Bytes, reply: oneshot::Sender<Risposta> },
-    CaricaDocumento { cred: Cred, nome: String, titolo: String, solo_master: bool, dati: Bytes, reply: oneshot::Sender<Risposta> },
-    InstallaPacchetto { cred: Cred, tmp: PathBuf, aid: String, ip: String, reply: oneshot::Sender<Risposta> },
+    CaricaMappa {
+        cred: Cred,
+        nome: String,
+        titolo: String,
+        cella: f64,
+        dati: Bytes,
+        reply: oneshot::Sender<Risposta>,
+    },
+    CaricaDocumento {
+        cred: Cred,
+        nome: String,
+        titolo: String,
+        solo_master: bool,
+        dati: Bytes,
+        reply: oneshot::Sender<Risposta>,
+    },
+    InstallaPacchetto {
+        cred: Cred,
+        tmp: PathBuf,
+        aid: String,
+        ip: String,
+        reply: oneshot::Sender<Risposta>,
+    },
     /// Autorizzazione + cartella delle avventure, per estrarre un pacchetto fuori dal task.
-    PermessoCarica { cred: Cred, reply: oneshot::Sender<Option<PathBuf>> },
-    CartellaAvventura { cred: Cred, aid: String, reply: oneshot::Sender<Option<PathBuf>> },
-    Esporta { cred: Cred, aid: Option<String>, reply: oneshot::Sender<Option<(String, Vec<u8>)>> },
-    Importa { cred: Cred, corpo: Value, ip: String, reply: oneshot::Sender<Risposta> },
-    Backup { cred: Cred, ip: String, reply: oneshot::Sender<Option<PathBuf>> },
-    Audit { cred: Cred, reply: oneshot::Sender<Option<Value>> },
+    PermessoCarica {
+        cred: Cred,
+        reply: oneshot::Sender<Option<PathBuf>>,
+    },
+    CartellaAvventura {
+        cred: Cred,
+        aid: String,
+        reply: oneshot::Sender<Option<PathBuf>>,
+    },
+    Esporta {
+        cred: Cred,
+        aid: Option<String>,
+        reply: oneshot::Sender<Option<(String, Vec<u8>)>>,
+    },
+    Importa {
+        cred: Cred,
+        corpo: Value,
+        ip: String,
+        reply: oneshot::Sender<Risposta>,
+    },
+    Backup {
+        cred: Cred,
+        ip: String,
+        reply: oneshot::Sender<Option<PathBuf>>,
+    },
+    Audit {
+        cred: Cred,
+        reply: oneshot::Sender<Option<Value>>,
+    },
 }
 
 impl Tavolo {
@@ -43,14 +86,28 @@ impl Tavolo {
 
     pub async fn contenuto(&mut self, c: CmdContenuto) {
         match c {
-            CmdContenuto::CaricaMappa { cred, nome, titolo, cella, dati, reply } => {
+            CmdContenuto::CaricaMappa {
+                cred,
+                nome,
+                titolo,
+                cella,
+                dati,
+                reply,
+            } => {
                 let r = match self.master_da(&cred) {
                     None => Risposta::errore(403, "solo il Master può caricare"),
                     Some(_) => self.carica_mappa(&nome, &titolo, cella, &dati).await,
                 };
                 let _ = reply.send(r);
             }
-            CmdContenuto::CaricaDocumento { cred, nome, titolo, solo_master, dati, reply } => {
+            CmdContenuto::CaricaDocumento {
+                cred,
+                nome,
+                titolo,
+                solo_master,
+                dati,
+                reply,
+            } => {
                 let r = match self.master_da(&cred) {
                     None => Risposta::errore(403, "solo il Master può caricare"),
                     Some(_) => self.carica_documento(&nome, &titolo, solo_master, &dati).await,
@@ -79,7 +136,15 @@ impl Tavolo {
                             self.invia(&json!({"t": "ricarica"}));
                         }
                         let nome = self.utenti.get(&id).map(|u| u.name.clone());
-                        self.db.audit(Some(&id), nome.as_deref(), Some(&ip), "carica_avventura", &json!({"avventura": aid})).await;
+                        self.db
+                            .audit(
+                                Some(&id),
+                                nome.as_deref(),
+                                Some(&ip),
+                                "carica_avventura",
+                                &json!({"avventura": aid}),
+                            )
+                            .await;
                         let titolo = self.catalogo.get(&aid).map(|a| a.titolo()).unwrap_or(aid.clone());
                         Risposta::ok(json!({"ok": true, "id": aid, "titolo": titolo}))
                     }
@@ -129,15 +194,25 @@ impl Tavolo {
             }
             CmdContenuto::Audit { cred, reply } => {
                 let ok = self.autentica(&cred).is_some_and(|id| self.utenti[&id].admin);
-                let r = if ok { self.db.leggi_audit(1000).await.ok().map(Value::from) } else { None };
+                let r = if ok {
+                    self.db.leggi_audit(1000).await.ok().map(Value::from)
+                } else {
+                    None
+                };
                 let _ = reply.send(r);
             }
         }
     }
 
     async fn importa(&mut self, id: &str, corpo: Value, ip: &str) -> Risposta {
-        let Value::Object(corpo) = corpo else { return Risposta::errore(400, "salvataggio non valido") };
-        let prima = self.attiva.as_ref().and_then(|a| self.catalogo.get(a)).and_then(|a| a.prima_mappa());
+        let Value::Object(corpo) = corpo else {
+            return Risposta::errore(400, "salvataggio non valido");
+        };
+        let prima = self
+            .attiva
+            .as_ref()
+            .and_then(|a| self.catalogo.get(a))
+            .and_then(|a| a.prima_mappa());
         let mut base = serde_json::to_value(Stato::vuoto(self.attiva.as_deref(), prima)).unwrap_or(json!({}));
         for k in CHIAVI_STATO {
             if let Some(v) = corpo.get(*k) {
@@ -150,7 +225,15 @@ impl Tavolo {
                 self.invia(&json!({"t": "ricarica"}));
                 self.salva_presto();
                 let nome = self.utenti[id].name.clone();
-                self.db.audit(Some(id), Some(&nome), Some(ip), "importa_partita", &json!({"avventura": self.attiva})).await;
+                self.db
+                    .audit(
+                        Some(id),
+                        Some(&nome),
+                        Some(ip),
+                        "importa_partita",
+                        &json!({"avventura": self.attiva}),
+                    )
+                    .await;
                 Risposta::si()
             }
             Err(e) => Risposta::errore(400, &format!("salvataggio non valido ({e})")),
@@ -158,7 +241,9 @@ impl Tavolo {
     }
 
     async fn carica_mappa(&mut self, nome_file: &str, titolo: &str, cella: f64, dati: &[u8]) -> Risposta {
-        let Some(base) = self.cartella_attiva() else { return Risposta::errore(400, "nessuna avventura attiva") };
+        let Some(base) = self.cartella_attiva() else {
+            return Risposta::errore(400, "nessuna avventura attiva");
+        };
         let (stem, ext) = dividi_ext(nome_file).unwrap_or((nome_file, ""));
         let ext = ext.to_lowercase();
         if !IMG_EXT.contains(&ext.as_str()) {
@@ -179,7 +264,8 @@ impl Tavolo {
             tracing::error!(errore = %e, "scrittura della mappa");
             return Risposta::errore(500, "scrittura non riuscita");
         }
-        let mut meta = json!({"titolo": if titolo.is_empty() { stem.clone() } else { tronca(titolo, 200) }, "gruppo": "Caricate", "ordine": 500});
+        let mut meta =
+            json!({"titolo": if titolo.is_empty() { stem.clone() } else { tronca(titolo, 200) }, "gruppo": "Caricate", "ordine": 500});
         if cella > 0.0 && cella.is_finite() {
             meta["griglia"] = json!({"cella": cella, "ox": 0, "oy": 0, "mostra": true});
         }
@@ -192,7 +278,9 @@ impl Tavolo {
     }
 
     async fn carica_documento(&mut self, nome_file: &str, titolo: &str, solo_master: bool, dati: &[u8]) -> Risposta {
-        let Some(base) = self.cartella_attiva() else { return Risposta::errore(400, "nessuna avventura attiva") };
+        let Some(base) = self.cartella_attiva() else {
+            return Risposta::errore(400, "nessuna avventura attiva");
+        };
         let base_nome = nome_file.rsplit(['/', '\\']).next().unwrap_or("");
         let (stem, ext) = dividi_ext(base_nome).unwrap_or((base_nome, ""));
         let ext = ext.to_lowercase();
@@ -200,7 +288,11 @@ impl Tavolo {
             return Risposta::errore(400, "formato non supportato (html, pdf, md, txt o immagini)");
         }
         let stem: String = NON_DOC.replace_all(stem, "_").chars().take(60).collect();
-        let stem = if stem.is_empty() || stem.chars().all(|c| c == '.') { "documento".to_string() } else { stem };
+        let stem = if stem.is_empty() || stem.chars().all(|c| c == '.') {
+            "documento".to_string()
+        } else {
+            stem
+        };
         let nome = format!("{stem}.{ext}");
         let docs = base.join("documenti");
         if tokio::fs::create_dir_all(&docs).await.is_err() || tokio::fs::write(docs.join(&nome), dati).await.is_err() {
@@ -243,12 +335,21 @@ impl Tavolo {
             Op::Griglia { id: sid, griglia } => {
                 let g = griglia.unwrap_or_default();
                 let mut agg = Map::new();
-                agg.insert("griglia".into(), json!({"cella": g.cella, "ox": g.ox, "oy": g.oy, "mostra": g.mostra}));
+                agg.insert(
+                    "griglia".into(),
+                    json!({"cella": g.cella, "ox": g.ox, "oy": g.oy, "mostra": g.mostra}),
+                );
                 if let Err(r) = self.scrivi_meta_mappa(&sid, agg) {
                     return r;
                 }
             }
-            Op::MappaMeta { id: sid, titolo, ordine, note_master, gruppo } => {
+            Op::MappaMeta {
+                id: sid,
+                titolo,
+                ordine,
+                note_master,
+                gruppo,
+            } => {
                 let mut agg = Map::new();
                 for (k, v) in [("titolo", titolo), ("note_master", note_master), ("gruppo", gruppo)] {
                     if let Some(v) = v {
@@ -280,7 +381,11 @@ impl Tavolo {
                 let base = self.percorsi.avventure.join(&aid);
                 let ok = std::fs::create_dir_all(base.join("mappe")).is_ok()
                     && std::fs::create_dir_all(base.join("documenti")).is_ok()
-                    && scrivi_json(&base.join("avventura.json"), &json!({"id": aid, "titolo": tronca(&titolo, 80), "formato": 1, "documenti": []})).is_ok()
+                    && scrivi_json(
+                        &base.join("avventura.json"),
+                        &json!({"id": aid, "titolo": tronca(&titolo, 80), "formato": 1, "documenti": []}),
+                    )
+                    .is_ok()
                     && scrivi_json(&base.join("personaggi.json"), &json!([])).is_ok()
                     && scrivi_json(&base.join("mostri.json"), &json!([])).is_ok();
                 if !ok {
@@ -291,7 +396,9 @@ impl Tavolo {
                 return Risposta::ok(json!({"ok": true, "id": aid}));
             }
             Op::AvventuraInfo { campi } => {
-                let Some(base) = self.cartella_attiva() else { return Risposta::errore(400, "nessuna avventura attiva") };
+                let Some(base) = self.cartella_attiva() else {
+                    return Risposta::errore(400, "nessuna avventura attiva");
+                };
                 let man_p = base.join("avventura.json");
                 let mut man = leggi_json(&man_p).and_then(|v| v.as_object().cloned()).unwrap_or_default();
                 for k in ["titolo", "sottotitolo", "descrizione", "livello", "giocatori", "durata"] {
@@ -307,7 +414,9 @@ impl Tavolo {
                 }
             }
             Op::MappaElimina { id: mid } => {
-                let Some(a) = self.attiva.as_ref().and_then(|a| self.catalogo.get(a)) else { return Risposta::no("mappa inesistente") };
+                let Some(a) = self.attiva.as_ref().and_then(|a| self.catalogo.get(a)) else {
+                    return Risposta::no("mappa inesistente");
+                };
                 if !a.ha_mappa(&mid) {
                     return Risposta::no("mappa inesistente");
                 }
@@ -326,15 +435,29 @@ impl Tavolo {
                 }
                 self.riscansiona();
                 if self.stato.scena.as_deref() == Some(&mid) {
-                    self.stato.scena = self.attiva.as_ref().and_then(|a| self.catalogo.get(a)).and_then(|a| a.prima_mappa());
+                    self.stato.scena = self
+                        .attiva
+                        .as_ref()
+                        .and_then(|a| self.catalogo.get(a))
+                        .and_then(|a| a.prima_mappa());
                     let ev = json!({"t": "scena", "id": self.stato.scena});
                     self.invia(&ev);
                 }
                 self.salva_presto();
-                self.db.audit(Some(id), Some(nome_u), Some(ip), "mappa_elimina", &json!({"avventura": self.attiva, "mappa": mid})).await;
+                self.db
+                    .audit(
+                        Some(id),
+                        Some(nome_u),
+                        Some(ip),
+                        "mappa_elimina",
+                        &json!({"avventura": self.attiva, "mappa": mid}),
+                    )
+                    .await;
             }
             Op::DocumentoElimina { file } => {
-                let Some(base) = self.cartella_attiva() else { return Risposta::errore(400, "nessuna avventura attiva") };
+                let Some(base) = self.cartella_attiva() else {
+                    return Risposta::errore(400, "nessuna avventura attiva");
+                };
                 let nome = file.rsplit(['/', '\\']).next().unwrap_or("").to_string();
                 let man_p = base.join("avventura.json");
                 let mut man = leggi_json(&man_p).and_then(|v| v.as_object().cloned()).unwrap_or_default();
@@ -364,7 +487,9 @@ impl Tavolo {
                 let dir = self.percorsi.avventure.join(&aid);
                 let _ = tokio::task::spawn_blocking(move || std::fs::remove_dir_all(dir)).await;
                 let _ = self.db.elimina_partita(&aid).await;
-                self.db.audit(Some(id), Some(nome_u), Some(ip), "avventura_elimina", &json!({"avventura": aid})).await;
+                self.db
+                    .audit(Some(id), Some(nome_u), Some(ip), "avventura_elimina", &json!({"avventura": aid}))
+                    .await;
             }
             _ => return Risposta::no("operazione sconosciuta"),
         }

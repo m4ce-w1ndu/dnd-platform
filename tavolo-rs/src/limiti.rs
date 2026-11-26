@@ -22,7 +22,10 @@ pub struct Limiti {
 
 impl Limiti {
     pub fn nuovi() -> Limiti {
-        Limiti { normale: RateLimiter::keyed(quota(5, 15)), veloce: RateLimiter::keyed(quota(20, 30)) }
+        Limiti {
+            normale: RateLimiter::keyed(quota(5, 15)),
+            veloce: RateLimiter::keyed(quota(20, 30)),
+        }
     }
 
     /// `true` se il comando va rifiutato (troppo frequente).

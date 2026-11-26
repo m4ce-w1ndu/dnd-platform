@@ -23,7 +23,10 @@ fn cartella(var: &str, predefinita: &str) -> PathBuf {
             return PathBuf::from(v);
         }
     }
-    let base = std::env::current_exe().ok().and_then(|e| e.parent().map(Path::to_path_buf)).unwrap_or_else(|| PathBuf::from("."));
+    let base = std::env::current_exe()
+        .ok()
+        .and_then(|e| e.parent().map(Path::to_path_buf))
+        .unwrap_or_else(|| PathBuf::from("."));
     base.join(predefinita)
 }
 
@@ -44,7 +47,12 @@ fn calcola_versione(web: &Path) -> String {
     }
     files.sort();
     for f in files {
-        h.update(f.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default().as_bytes());
+        h.update(
+            f.file_name()
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_default()
+                .as_bytes(),
+        );
         h.update(std::fs::read(&f).unwrap_or_default());
     }
     hex::encode(h.finalize())[..12].to_string()
@@ -88,8 +96,17 @@ async fn main() -> Result<()> {
                 let ok = tavolo::verifica::verifica_db(Path::new(f)).await?;
                 std::process::exit(if ok { 0 } else { 2 });
             }
+            "copia-db" => {
+                let (da, a) = (
+                    args.get(i + 1).context("uso: tavolo copia-db <da.db> <a.db>")?,
+                    args.get(i + 2).context("uso: tavolo copia-db <da.db> <a.db>")?,
+                );
+                tavolo::verifica::copia_db(Path::new(da), Path::new(a)).await?;
+                println!("copia coerente scritta in {a}");
+                return Ok(());
+            }
             "-h" | "--help" => {
-                println!("uso: tavolo [--porta N] [--host IP] | verifica-db <file.db> | --healthcheck");
+                println!("uso: tavolo [--porta N] [--host IP] | verifica-db <file.db> | copia-db <da.db> <a.db> | --healthcheck");
                 return Ok(());
             }
             a => anyhow::bail!("opzione sconosciuta: {a}"),
@@ -107,7 +124,11 @@ async fn main() -> Result<()> {
         tracing_subscriber::fmt().with_env_filter(filtro).init();
     }
 
-    let percorsi = Percorsi { dati: cartella("DATI_DIR", "dati"), avventure: cartella("AVVENTURE_DIR", "avventure"), web: cartella("WEB_DIR", "web") };
+    let percorsi = Percorsi {
+        dati: cartella("DATI_DIR", "dati"),
+        avventure: cartella("AVVENTURE_DIR", "avventure"),
+        web: cartella("WEB_DIR", "web"),
+    };
     std::fs::create_dir_all(&percorsi.dati).context("cartella dati")?;
     std::fs::create_dir_all(&percorsi.avventure).context("cartella avventure")?;
     let web_reale = std::fs::canonicalize(&percorsi.web).with_context(|| format!("cartella web {}", percorsi.web.display()))?;
@@ -127,11 +148,15 @@ async fn main() -> Result<()> {
         let (h, dir) = (handle.clone(), percorsi.avventure.clone());
         tokio::spawn(async move {
             let d2 = dir.clone();
-            let mut ultima = tokio::task::spawn_blocking(move || tavolo::catalogo::firma(&d2)).await.unwrap_or_default();
+            let mut ultima = tokio::task::spawn_blocking(move || tavolo::catalogo::firma(&d2))
+                .await
+                .unwrap_or_default();
             loop {
                 tokio::time::sleep(Duration::from_secs(4)).await;
                 let d2 = dir.clone();
-                let f = tokio::task::spawn_blocking(move || tavolo::catalogo::firma(&d2)).await.unwrap_or_default();
+                let f = tokio::task::spawn_blocking(move || tavolo::catalogo::firma(&d2))
+                    .await
+                    .unwrap_or_default();
                 if f != ultima {
                     ultima = f;
                     h.manda(Cmd::Riscansiona).await;
@@ -151,7 +176,9 @@ async fn main() -> Result<()> {
         token_metriche: std::env::var("METRICS_TOKEN").ok().filter(|t| t.len() >= 16).map(Arc::new),
     };
     let indirizzo: SocketAddr = format!("{host}:{porta}").parse().context("indirizzo di ascolto")?;
-    let listener = tokio::net::TcpListener::bind(indirizzo).await.with_context(|| format!("porta {porta} occupata?"))?;
+    let listener = tokio::net::TcpListener::bind(indirizzo)
+        .await
+        .with_context(|| format!("porta {porta} occupata?"))?;
 
     println!("{}", "=".repeat(60));
     println!("  🐉  TAVOLO VIRTUALE  ·  pronto!  (server Rust {})", env!("CARGO_PKG_VERSION"));
@@ -162,7 +189,14 @@ async fn main() -> Result<()> {
         Some(pw) => println!("  Account admin:         {utente_admin}  ·  password iniziale: {pw}"),
         None => println!("  Account admin:         {utente_admin}  (password cifrata nel database)"),
     }
-    println!("  Accesso con account:   {}", if provider.is_empty() { "(nessuno: si configura in ⚙️ Impostazioni)".into() } else { provider.join(", ") });
+    println!(
+        "  Accesso con account:   {}",
+        if provider.is_empty() {
+            "(nessuno: si configura in ⚙️ Impostazioni)".into()
+        } else {
+            provider.join(", ")
+        }
+    );
     println!("  Ospiti:                {}", if ospiti { "ammessi" } else { "non ammessi" });
     println!("  Avventure:             {n_avv}");
     println!("  In gioco:              {}", attiva.as_deref().unwrap_or("None"));

@@ -133,21 +133,35 @@ pub async fn completa(s: &Scambio, codice: &str) -> Result<(String, String, Stri
     let (uid, nome, avatar) = match p.id {
         "discord" => {
             let id = s("id").ok_or("Risposta di Discord senza id.")?;
-            let avatar = s("avatar").map(|a| format!("https://cdn.discordapp.com/avatars/{id}/{a}.png?size=64")).unwrap_or_default();
+            let avatar = s("avatar")
+                .map(|a| format!("https://cdn.discordapp.com/avatars/{id}/{a}.png?size=64"))
+                .unwrap_or_default();
             let nome = s("global_name").or_else(|| s("username")).unwrap_or_default();
             (id, nome, avatar)
         }
         "google" => {
             let id = s("email").or_else(|| s("sub")).ok_or("Risposta di Google senza id.")?;
-            (id, s("given_name").or_else(|| s("name")).unwrap_or_default(), s("picture").unwrap_or_default())
+            (
+                id,
+                s("given_name").or_else(|| s("name")).unwrap_or_default(),
+                s("picture").unwrap_or_default(),
+            )
         }
         _ => {
             let id = s("id").ok_or("Risposta di GitHub senza id.")?;
-            (id, s("name").or_else(|| s("login")).unwrap_or_default(), s("avatar_url").unwrap_or_default())
+            (
+                id,
+                s("name").or_else(|| s("login")).unwrap_or_default(),
+                s("avatar_url").unwrap_or_default(),
+            )
         }
     };
     // l'avatar finisce in un <img src>: solo https
-    let avatar = if avatar.starts_with("https://") && avatar.len() < 500 { avatar } else { String::new() };
+    let avatar = if avatar.starts_with("https://") && avatar.len() < 500 {
+        avatar
+    } else {
+        String::new()
+    };
     Ok((uid, nome, avatar))
 }
 
@@ -164,6 +178,10 @@ pub fn pagina_accesso(id: &str, secret: &str, nome: &str, account: &str, nonce: 
 }
 
 pub fn pagina_errore(msg: &str) -> String {
-    let m: String = crate::util::tronca(msg, 200).replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;").replace('"', "&quot;");
+    let m: String = crate::util::tronca(msg, 200)
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;");
     format!("<!doctype html><meta charset=\"utf-8\"><p style=\"font:16px sans-serif\">⚠️ {m}</p><p><a href=\"/\">Torna al tavolo</a></p>")
 }

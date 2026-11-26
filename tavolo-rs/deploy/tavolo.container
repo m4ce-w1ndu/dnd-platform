@@ -1,0 +1,29 @@
+# /etc/containers/systemd/tavolo-virtuale/tavolo.container  (versione Rust)
+# Stessa porta e stessi volumi del server Python: si passa dall'uno all'altro senza toccare i dati.
+# Aggiornamento: tavolo-rs/deploy/aggiorna.sh · Ritorno al Python: tavolo/deploy/aggiorna.sh
+[Unit]
+Description=Tavolo Virtuale D&D (server Rust)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+ContainerName=tavolo-virtuale
+Image=localhost/tavolo-virtuale-rs:latest
+StopTimeout=10
+PublishPort=8095:8000
+Volume=/var/lib/tavolo-virtuale/dati:/app/dati:Z
+Volume=/var/lib/tavolo-virtuale/avventure:/app/avventure:Z
+# il binario non scrive fuori dai volumi
+ReadOnly=true
+NoNewPrivileges=true
+DropCapability=ALL
+HealthCmd=/app/tavolo --healthcheck
+HealthInterval=60s
+HealthTimeout=5s
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=multi-user.target default.target

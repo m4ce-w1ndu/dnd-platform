@@ -59,6 +59,10 @@ nuovo mantiene identiche. Se una regola non ti va bene, dimmi quale e come la vu
 
 ## Da decidere (proposte, oggi NON attive)
 
-- Gli account «Admin» sconosciuti: l'admin li vede in ⚙️ → Utenti e può toglierli o eliminarli. Vuoi che li tolga io
-  dalla copia migrata, o preferisci farlo tu dal pannello?
+- **Gli account «Admin» che non riconosci quasi certamente sei tu.** Ogni volta che si entra con utente e password
+  dell'admin da un browser che non ha le credenziali salvate (altro PC, telefono, finestra anonima, la pagina
+  `/admin`), il server crea un nuovo utente chiamato «Admin» con i permessi di admin. Il server Rust fa lo stesso
+  (per compatibilità) ma ora scrive ogni accesso nel registro di audit con data e indirizzo IP.
+  Proposta: un solo utente «Admin» riusato da tutti i dispositivi. Lo attivo?
+  Quelli vecchi si possono eliminare da ⚙️ → Utenti.
 - Un admin dovrebbe poter fare le azioni del Master anche senza essere nominato Master? Oggi **no**.

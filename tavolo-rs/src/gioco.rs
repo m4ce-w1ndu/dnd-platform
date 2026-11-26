@@ -24,7 +24,13 @@ impl Tavolo {
     }
 
     pub fn crea_pedina_pg(&mut self, id: &str, pg: &str, colore: &str) {
-        let Some(info) = self.attiva.as_ref().and_then(|a| self.catalogo.get(a)).and_then(|a| a.personaggio(pg)).cloned() else {
+        let Some(info) = self
+            .attiva
+            .as_ref()
+            .and_then(|a| self.catalogo.get(a))
+            .and_then(|a| a.personaggio(pg))
+            .cloned()
+        else {
             return;
         };
         if let Some(p) = self.stato.pedine.values_mut().find(|p| p.pg.as_deref() == Some(pg)) {
@@ -43,7 +49,12 @@ impl Tavolo {
         let pf = sch.get("pf").and_then(numero).unwrap_or(pf_info);
         let n = self.stato.pedine.values().filter(|p| p.pg.is_some()).count();
         let pid = id_casuale(10);
-        let s = |k: &str, d: &str| info.get(k).and_then(crate::util::testo).filter(|t| !t.is_empty()).unwrap_or_else(|| d.into());
+        let s = |k: &str, d: &str| {
+            info.get(k)
+                .and_then(crate::util::testo)
+                .filter(|t| !t.is_empty())
+                .unwrap_or_else(|| d.into())
+        };
         let p = Pedina {
             id: pid.clone(),
             scena: self.stato.scena.clone(),
@@ -83,7 +94,13 @@ impl Tavolo {
         let master_o_no = |ok: bool, msg: &str| if ok { None } else { Some(Risposta::no(msg)) };
 
         match op {
-            Op::Tira { espr, etichetta, segreto, modo, danni } => {
+            Op::Tira {
+                espr,
+                etichetta,
+                segreto,
+                modo,
+                danni,
+            } => {
                 let r = match crate::dadi::tira(&espr) {
                     Ok(r) => r,
                     Err(e) => return Risposta::errore(400, e.0),
@@ -111,7 +128,14 @@ impl Tavolo {
                         Err(e) => return Risposta::errore(400, e.0),
                     }
                 }
-                let voce = Voce { id: String::new(), ora: 0.0, tipo: "tiro".into(), da: Some(id.into()), segreto, resto };
+                let voce = Voce {
+                    id: String::new(),
+                    ora: 0.0,
+                    tipo: "tiro".into(),
+                    da: Some(id.into()),
+                    segreto,
+                    resto,
+                };
                 let v = self.aggiungi_log(voce);
                 let mut out = v;
                 // come Python: il tiro restituito ha anche segreto:false esplicito
@@ -128,7 +152,14 @@ impl Tavolo {
                 resto.insert("chi".into(), json!(nome_u));
                 resto.insert("colore".into(), json!(colore_u));
                 resto.insert("testo".into(), json!(testo));
-                self.aggiungi_log(Voce { id: String::new(), ora: 0.0, tipo: "chat".into(), da: Some(id.into()), segreto, resto });
+                self.aggiungi_log(Voce {
+                    id: String::new(),
+                    ora: 0.0,
+                    tipo: "chat".into(),
+                    da: Some(id.into()),
+                    segreto,
+                    resto,
+                });
                 Risposta::si()
             }
 
@@ -187,7 +218,11 @@ impl Tavolo {
 
             Op::PedinaElimina { id: pid } => {
                 let pid = pid.unwrap_or_default();
-                let ok = self.stato.pedine.get(&pid).is_some_and(|p| master || p.proprietario.as_deref() == Some(id));
+                let ok = self
+                    .stato
+                    .pedine
+                    .get(&pid)
+                    .is_some_and(|p| master || p.proprietario.as_deref() == Some(id));
                 if !ok {
                     return Risposta::no("");
                 }
@@ -238,13 +273,23 @@ impl Tavolo {
                 Risposta::si()
             }
 
-            Op::Iniziativa { azione, nome, valore, pedina, colore, nascosta, id: vid } => {
+            Op::Iniziativa {
+                azione,
+                nome,
+                valore,
+                pedina,
+                colore,
+                nascosta,
+                id: vid,
+            } => {
                 let azione = azione.unwrap_or_default();
                 let ini = &mut self.stato.iniziativa;
                 match azione.as_str() {
                     "aggiungi" => {
                         if !master {
-                            let ok = pedina.as_ref().is_none_or(|pid| self.stato.pedine.get(pid).is_some_and(|p| self.puo_muovere(id, p)));
+                            let ok = pedina
+                                .as_ref()
+                                .is_none_or(|pid| self.stato.pedine.get(pid).is_some_and(|p| self.puo_muovere(id, p)));
                             if !ok {
                                 return Risposta::no("non è la tua pedina");
                             }
@@ -322,7 +367,9 @@ impl Tavolo {
                 }
                 self.imposta_sessione("lobby");
                 self.invia(&json!({"t": "ricarica"}));
-                self.db.audit(Some(id), Some(&nome_u), Some(ip), "sessione_apri", &json!({"avventura": aid})).await;
+                self.db
+                    .audit(Some(id), Some(&nome_u), Some(ip), "sessione_apri", &json!({"avventura": aid}))
+                    .await;
                 Risposta::si()
             }
 
@@ -365,7 +412,13 @@ impl Tavolo {
                 }
                 self.salva_presto();
                 self.db
-                    .audit(Some(id), Some(&nome_u), Some(ip), "nomina_master", &json!({"utente": uid, "nome": nome, "master": diventa}))
+                    .audit(
+                        Some(id),
+                        Some(&nome_u),
+                        Some(ip),
+                        "nomina_master",
+                        &json!({"utente": uid, "nome": nome, "master": diventa}),
+                    )
                     .await;
                 Risposta::si()
             }
@@ -395,7 +448,12 @@ impl Tavolo {
 
             // ------------------------------------------------------------ solo Master
             Op::Scena { id: sid, porta_gruppo } => {
-                if !self.attiva.as_ref().and_then(|a| self.catalogo.get(a)).is_some_and(|a| a.ha_mappa(&sid)) {
+                if !self
+                    .attiva
+                    .as_ref()
+                    .and_then(|a| self.catalogo.get(a))
+                    .is_some_and(|a| a.ha_mappa(&sid))
+                {
                     return Risposta::no("mappa inesistente");
                 }
                 self.stato.scena = Some(sid.clone());
@@ -419,8 +477,15 @@ impl Tavolo {
                 Risposta::si()
             }
 
-            Op::Nebbia { scena, attiva, azione, celle } => {
-                let Some(sc) = scena.or_else(|| self.stato.scena.clone()) else { return Risposta::no("nessuna mappa") };
+            Op::Nebbia {
+                scena,
+                attiva,
+                azione,
+                celle,
+            } => {
+                let Some(sc) = scena.or_else(|| self.stato.scena.clone()) else {
+                    return Risposta::no("nessuna mappa");
+                };
                 if celle.len() > MAX_CELLE_NEBBIA || celle.iter().any(|c| c.len() > 32) {
                     return Risposta::errore(400, "troppe celle");
                 }
@@ -464,8 +529,13 @@ impl Tavolo {
 
             Op::PulisciScena { scena } => {
                 let sc = scena.or_else(|| self.stato.scena.clone());
-                let via: Vec<String> =
-                    self.stato.pedine.iter().filter(|(_, p)| p.scena == sc && p.pg.is_none()).map(|(k, _)| k.clone()).collect();
+                let via: Vec<String> = self
+                    .stato
+                    .pedine
+                    .iter()
+                    .filter(|(_, p)| p.scena == sc && p.pg.is_none())
+                    .map(|(k, _)| k.clone())
+                    .collect();
                 for k in &via {
                     self.stato.pedine.shift_remove(k);
                 }
@@ -477,16 +547,30 @@ impl Tavolo {
             }
 
             Op::ResetPartita {} => {
-                let prima = self.attiva.as_ref().and_then(|a| self.catalogo.get(a)).and_then(|a| a.prima_mappa());
+                let prima = self
+                    .attiva
+                    .as_ref()
+                    .and_then(|a| self.catalogo.get(a))
+                    .and_then(|a| a.prima_mappa());
                 self.stato = Stato::vuoto(self.attiva.as_deref(), prima);
                 self.invia(&json!({"t": "ricarica"}));
                 self.salva_presto();
-                self.db.audit(Some(id), Some(&nome_u), Some(ip), "reset_partita", &json!({"avventura": self.attiva})).await;
+                self.db
+                    .audit(
+                        Some(id),
+                        Some(&nome_u),
+                        Some(ip),
+                        "reset_partita",
+                        &json!({"avventura": self.attiva}),
+                    )
+                    .await;
                 Risposta::si()
             }
 
             Op::AvventuraAttiva { id: aid } => {
-                let Some(titolo) = self.catalogo.get(&aid).map(|a| a.titolo()) else { return Risposta::no("avventura inesistente") };
+                let Some(titolo) = self.catalogo.get(&aid).map(|a| a.titolo()) else {
+                    return Risposta::no("avventura inesistente");
+                };
                 self.attiva_avventura(Some(aid)).await;
                 self.invia(&json!({"t": "ricarica"}));
                 self.sistema(&format!("📚 Si gioca: {titolo}"));
@@ -520,7 +604,12 @@ impl Tavolo {
             }
         }
         let condizioni = d.condizioni.clone().map(|c| {
-            c.unwrap_or_default().iter().filter_map(crate::util::testo).map(|s| tronca(&s, 20)).take(12).collect::<Vec<_>>()
+            c.unwrap_or_default()
+                .iter()
+                .filter_map(crate::util::testo)
+                .map(|s| tronca(&s, 20))
+                .take(12)
+                .collect::<Vec<_>>()
         });
         let p = if esiste {
             let p = self.stato.pedine.get_mut(&pid).expect("pedina");
@@ -617,7 +706,12 @@ fn applica_master(p: &mut Pedina, d: &PedinaIn) {
     if let Some(n) = d.nascosta {
         p.nascosta = n;
     }
-    for (campo, valore) in [(&mut p.tipo, &d.tipo), (&mut p.pg, &d.pg), (&mut p.mostro, &d.mostro), (&mut p.proprietario, &d.proprietario)] {
+    for (campo, valore) in [
+        (&mut p.tipo, &d.tipo),
+        (&mut p.pg, &d.pg),
+        (&mut p.mostro, &d.mostro),
+        (&mut p.proprietario, &d.proprietario),
+    ] {
         if let Some(v) = valore {
             *campo = v.as_ref().map(|s| tronca(s, 60));
         }

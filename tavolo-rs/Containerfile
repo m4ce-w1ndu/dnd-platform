@@ -1,0 +1,24 @@
+# Tavolo Virtuale · server Rust. Contesto di build: la radice del repository (servono tavolo-rs/ e tavolo/web/).
+#   podman build -f tavolo-rs/Containerfile -t tavolo-virtuale-rs .
+# Risultato: un binario statico (musl) e i file del client, in un'immagine FROM scratch (~15 MB).
+FROM docker.io/library/rust:1-alpine AS build
+RUN apk add --no-cache musl-dev
+WORKDIR /src
+COPY tavolo-rs/Cargo.toml tavolo-rs/Cargo.lock ./
+COPY tavolo-rs/migrations ./migrations
+COPY tavolo-rs/src ./src
+RUN cargo build --release --locked \
+ && mkdir -p /out/app/dati /out/app/avventure /out/tmp \
+ && cp target/release/tavolo /out/app/tavolo \
+ && chown -R 1000:1000 /out/app/dati /out/app/avventure \
+ && chmod 1777 /out/tmp
+COPY tavolo/web /out/app/web
+
+FROM scratch
+COPY --from=build /out/ /
+USER 1000:1000
+WORKDIR /app
+ENV PORT=8000 DATI_DIR=/app/dati AVVENTURE_DIR=/app/avventure WEB_DIR=/app/web RUST_LOG=info
+EXPOSE 8000
+HEALTHCHECK --interval=60s --timeout=5s CMD ["/app/tavolo", "--healthcheck"]
+ENTRYPOINT ["/app/tavolo"]

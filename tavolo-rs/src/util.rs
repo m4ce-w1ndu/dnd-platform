@@ -189,7 +189,9 @@ pub mod lenient {
         let v = Value::deserialize(d)?;
         match v {
             Value::Null => Ok(Some(None)),
-            v => numero(&v).map(|f| Some(Some(N(f)))).ok_or_else(|| de::Error::custom("numero non valido")),
+            v => numero(&v)
+                .map(|f| Some(Some(N(f))))
+                .ok_or_else(|| de::Error::custom("numero non valido")),
         }
     }
 }

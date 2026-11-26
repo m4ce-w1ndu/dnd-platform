@@ -290,11 +290,41 @@ pub enum Op {
 
 /// Tutti i nomi di comando conosciuti (stesso ordine della matrice dei permessi).
 pub const NOMI: &[&str] = &[
-    "tira", "chat", "ping", "righello", "scegli_pg", "pedina_muovi", "pedina_salva", "pedina_elimina", "scheda",
-    "iniziativa", "sessione_apri", "nomina_master", "sessione_inizia", "sessione_pausa", "sessione_chiudi",
-    "imp_leggi", "imp_salva", "imp_admin", "imp_partite", "imp_partita_azzera", "imp_utente", "scena", "griglia",
-    "nebbia", "note_master", "svuota_log", "pulisci_scena", "reset_partita", "avventura_attiva", "avventura_nuova",
-    "avventura_info", "mappa_meta", "mappa_elimina", "documento_elimina", "avventura_elimina",
+    "tira",
+    "chat",
+    "ping",
+    "righello",
+    "scegli_pg",
+    "pedina_muovi",
+    "pedina_salva",
+    "pedina_elimina",
+    "scheda",
+    "iniziativa",
+    "sessione_apri",
+    "nomina_master",
+    "sessione_inizia",
+    "sessione_pausa",
+    "sessione_chiudi",
+    "imp_leggi",
+    "imp_salva",
+    "imp_admin",
+    "imp_partite",
+    "imp_partita_azzera",
+    "imp_utente",
+    "scena",
+    "griglia",
+    "nebbia",
+    "note_master",
+    "svuota_log",
+    "pulisci_scena",
+    "reset_partita",
+    "avventura_attiva",
+    "avventura_nuova",
+    "avventura_info",
+    "mappa_meta",
+    "mappa_elimina",
+    "documento_elimina",
+    "avventura_elimina",
 ];
 
 /// Esito della lettura di un corpo `/api/op`.
@@ -307,7 +337,9 @@ pub enum Lettura {
 }
 
 pub fn leggi(corpo: Value) -> Lettura {
-    let Value::Object(m) = corpo else { return Lettura::NonValida("il comando deve essere un oggetto JSON".into()) };
+    let Value::Object(m) = corpo else {
+        return Lettura::NonValida("il comando deve essere un oggetto JSON".into());
+    };
     match m.get("op") {
         Some(Value::String(s)) if NOMI.contains(&s.as_str()) => {}
         Some(Value::String(_)) | Some(Value::Null) | None => return Lettura::Sconosciuta,
@@ -394,7 +426,10 @@ mod test {
         assert!(matches!(leggi(json!([1])), Lettura::NonValida(_)));
         assert!(matches!(leggi(json!({"op": "ping", "x": "abc", "y": 1})), Lettura::NonValida(_)));
         assert!(matches!(leggi(json!({"op": "chat", "testo": {"a": 1}})), Lettura::NonValida(_)));
-        assert!(matches!(leggi(json!({"op": "pedina_muovi", "id": [1], "x": 1, "y": 1})), Lettura::NonValida(_)));
+        assert!(matches!(
+            leggi(json!({"op": "pedina_muovi", "id": [1], "x": 1, "y": 1})),
+            Lettura::NonValida(_)
+        ));
         assert!(matches!(leggi(json!({"op": "ping", "x": 1e300, "y": 1})), Lettura::NonValida(_)));
     }
 }

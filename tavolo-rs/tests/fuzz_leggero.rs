@@ -14,9 +14,42 @@ use tavolo::modello::{Stato, Utente};
 use tavolo::tavolo::{Percorsi, Tavolo};
 
 const CAMPI: &[&str] = &[
-    "op", "id", "x", "y", "espr", "testo", "segreto", "danni", "pg", "pedina", "scheda", "azione", "valore", "nome",
-    "colore", "nascosta", "celle", "scena", "attiva", "griglia", "titolo", "ordine", "file", "punti", "finale",
-    "porta_gruppo", "master", "admin", "elimina", "config", "attuale", "nuova", "utente", "centra", "etichetta", "modo",
+    "op",
+    "id",
+    "x",
+    "y",
+    "espr",
+    "testo",
+    "segreto",
+    "danni",
+    "pg",
+    "pedina",
+    "scheda",
+    "azione",
+    "valore",
+    "nome",
+    "colore",
+    "nascosta",
+    "celle",
+    "scena",
+    "attiva",
+    "griglia",
+    "titolo",
+    "ordine",
+    "file",
+    "punti",
+    "finale",
+    "porta_gruppo",
+    "master",
+    "admin",
+    "elimina",
+    "config",
+    "attuale",
+    "nuova",
+    "utente",
+    "centra",
+    "etichetta",
+    "modo",
 ];
 
 fn valore(r: &mut StdRng, profondita: u32) -> Value {
@@ -25,10 +58,26 @@ fn valore(r: &mut StdRng, profondita: u32) -> Value {
         1 => json!(r.gen_bool(0.5)),
         2 => json!(r.gen_range(-1_000_000i64..1_000_000)),
         3 => json!(r.gen::<f64>() * 10f64.powi(r.gen_range(-5..300))),
-        4 => json!(["1d20", "2d6+3", "d%", "4d20kh1", "100d1000", "", "1d", "<script>", "#fff", "rocco", "01_piazza"][r.gen_range(0..11)]),
+        4 => json!(
+            [
+                "1d20",
+                "2d6+3",
+                "d%",
+                "4d20kh1",
+                "100d1000",
+                "",
+                "1d",
+                "<script>",
+                "#fff",
+                "rocco",
+                "01_piazza"
+            ][r.gen_range(0..11)]
+        ),
         5 => {
             let n = r.gen_range(0..40);
-            json!((0..n).map(|_| char::from_u32(r.gen_range(0..0x2FFFF)).unwrap_or('x')).collect::<String>())
+            json!((0..n)
+                .map(|_| char::from_u32(r.gen_range(0..0x2FFFF)).unwrap_or('x'))
+                .collect::<String>())
         }
         6 => Value::Array((0..r.gen_range(0..6)).map(|_| valore(r, profondita + 1)).collect()),
         _ => {
@@ -116,12 +165,19 @@ async fn logica_di_gioco() {
     let dir = tempfile::tempdir().unwrap();
     let avv = dir.path().join("avventure");
     copia(Path::new(env!("CARGO_MANIFEST_DIR")).join("e2e/fixture/avventure").as_path(), &avv);
-    let percorsi = Percorsi { dati: dir.path().join("dati"), avventure: avv, web: dir.path().into() };
+    let percorsi = Percorsi {
+        dati: dir.path().join("dati"),
+        avventure: avv,
+        web: dir.path().into(),
+    };
     std::env::set_var("MASTER_PASSWORD", "fuzz-password");
     let db = tavolo::db::Db::apri(&percorsi.dati.join("tavolo.db")).await.unwrap();
     let (mut t, _) = Tavolo::nuovo(percorsi, db, "v".into(), Arc::new(Default::default())).await.unwrap();
     let mut ruoli = vec![];
-    for (i, (master, admin)) in [(false, false), (false, false), (true, false), (false, true)].into_iter().enumerate() {
+    for (i, (master, admin)) in [(false, false), (false, false), (true, false), (false, true)]
+        .into_iter()
+        .enumerate()
+    {
         let mut u = Utente::nuovo(&format!("U{i}"), "#123456", if master { "master" } else { "giocatore" });
         u.admin = admin;
         u.master_ok = master || admin;
@@ -165,10 +221,16 @@ async fn logica_di_gioco() {
         if !master {
             // l'unica pedina che un giocatore può far nascere è quella del suo personaggio (scegli_pg)
             for (k, p) in t.stato.pedine.iter().filter(|(k, _)| !pedine_prima.contains(k)) {
-                assert!(op.nome() == "scegli_pg" && p.pg.is_some() && p.proprietario.as_deref() == Some(chi.as_str()),
-                        "un giocatore ha creato la pedina {k} con {}", op.nome());
+                assert!(
+                    op.nome() == "scegli_pg" && p.pg.is_some() && p.proprietario.as_deref() == Some(chi.as_str()),
+                    "un giocatore ha creato la pedina {k} con {}",
+                    op.nome()
+                );
             }
-            assert!(t.stato.pedine.values().filter(|p| p.nascosta).count() <= nascoste_prima, "un giocatore ha nascosto una pedina");
+            assert!(
+                t.stato.pedine.values().filter(|p| p.nascosta).count() <= nascoste_prima,
+                "un giocatore ha nascosto una pedina"
+            );
         }
         // i ruoli devono restare quelli del test (un admin può nominare altri Master: si rimette a posto)
         for (i, id) in ruoli.iter().enumerate() {

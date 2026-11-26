@@ -36,19 +36,28 @@ pub fn verifica(conf: &AdminConf, utente: &str, pw: &str) -> Verifica {
     if let Some(h) = &conf.argon2 {
         let Ok(parsed) = PasswordHash::new(h) else { return no };
         let ok_pw = Argon2::default().verify_password(pw.as_bytes(), &parsed).is_ok();
-        return Verifica { ok: ok_utente && ok_pw, aggiorna: None };
+        return Verifica {
+            ok: ok_utente && ok_pw,
+            aggiorna: None,
+        };
     }
     if let (Some(sale), Some(hash)) = (&conf.sale, &conf.hash) {
         let ok_pw = pbkdf2_hex(pw, sale).is_some_and(|h| uguali(&h, hash));
         let ok = ok_utente && ok_pw;
-        return Verifica { ok, aggiorna: ok.then(|| argon2(pw)) };
+        return Verifica {
+            ok,
+            aggiorna: ok.then(|| argon2(pw)),
+        };
     }
     no
 }
 
 pub fn argon2(pw: &str) -> String {
     let sale = SaltString::generate(&mut OsRng);
-    Argon2::default().hash_password(pw.as_bytes(), &sale).expect("hash argon2").to_string()
+    Argon2::default()
+        .hash_password(pw.as_bytes(), &sale)
+        .expect("hash argon2")
+        .to_string()
 }
 
 /// Imposta una nuova password: Argon2id + PBKDF2 compatibile con il server Python.
@@ -87,7 +96,10 @@ mod test {
 
     #[test]
     fn nuova_password() {
-        let mut c = AdminConf { utente: "capo".into(), ..Default::default() };
+        let mut c = AdminConf {
+            utente: "capo".into(),
+            ..Default::default()
+        };
         imposta(&mut c, "password-nuova");
         assert!(verifica(&c, "capo", "password-nuova").ok);
         // l'hash PBKDF2 è aggiornato anche lui (ritorno al server Python)

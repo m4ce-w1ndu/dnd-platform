@@ -95,9 +95,18 @@ mod test {
     use crate::comandi::{leggi, Lettura, NOMI};
     use serde_json::json;
 
-    const G: Ruolo = Ruolo { master: false, admin: false };
-    const M: Ruolo = Ruolo { master: true, admin: false };
-    const A: Ruolo = Ruolo { master: false, admin: true };
+    const G: Ruolo = Ruolo {
+        master: false,
+        admin: false,
+    };
+    const M: Ruolo = Ruolo {
+        master: true,
+        admin: false,
+    };
+    const A: Ruolo = Ruolo {
+        master: false,
+        admin: true,
+    };
     const MA: Ruolo = Ruolo { master: true, admin: true };
 
     fn op(nome: &str, extra: serde_json::Value) -> Op {
