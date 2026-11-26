@@ -650,7 +650,7 @@ function disegnaPannelloPedina() {
   box.hidden = false;
   box.innerHTML = `
     <div class="pp-testa"><span class="ic">${esc(p.icona || "●")}</span>
-      ${mia ? `<input class="nome" value="${esc(p.nome)}" id="pp-nome">` : `<b style="flex:1;font-size:15px">${esc(p.nome)}</b>`}
+      ${master ? `<input class="nome" value="${esc(p.nome)}" id="pp-nome">` : `<b style="flex:1;font-size:15px">${esc(p.nome)}</b>`}
       ${p.ca ? `<span class="chip" title="Classe Armatura">🛡️ CA ${p.ca}</span>` : ""}
       <button id="pp-chiudi" title="Chiudi">✕</button></div>
     ${p.pfmax ? (vedePf ? `<div class="pp-pf"><span class="num">${p.pf ?? p.pfmax}/${p.pfmax}</span>
@@ -812,7 +812,7 @@ function disegnaRighello(chi, punti, colore) {
   if (!g) { g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.id = id; $("#sovra").appendChild(g); }
   const [a, b] = punti;
   const z = 1 / S.view.z;
-  g.innerHTML = `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${colore}" stroke-width="${5 * z}" stroke-linecap="round" opacity=".9"/>
+  g.innerHTML = `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${esc(colore)}" stroke-width="${5 * z}" stroke-linecap="round" opacity=".9"/>
     <circle cx="${a.x}" cy="${a.y}" r="${6 * z}" fill="${colore}"/><circle cx="${b.x}" cy="${b.y}" r="${6 * z}" fill="${colore}"/>
     <g transform="translate(${b.x} ${b.y - 28 * z}) scale(${z})"><rect x="-60" y="-16" width="120" height="26" rx="13" fill="#1b130a" stroke="${colore}" stroke-width="2"/><text y="3" text-anchor="middle" fill="#fff" font-size="14" font-weight="800" font-family="system-ui">📏 ${fmtDist(distanzaQ(a, b))}</text></g>`;
 }
@@ -820,7 +820,7 @@ function mostraPing(x, y, colore, chi) {
   const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
   const z = 1 / S.view.z;
   g.setAttribute("class", "ping");
-  g.innerHTML = `<circle cx="${x}" cy="${y}" r="${10 * z}" fill="${colore}"><animate attributeName="r" from="${8 * z}" to="${60 * z}" dur="1.2s" repeatCount="2"/><animate attributeName="opacity" from="1" to="0" dur="1.2s" repeatCount="2"/></circle>
+  g.innerHTML = `<circle cx="${x}" cy="${y}" r="${10 * z}" fill="${esc(colore)}"><animate attributeName="r" from="${8 * z}" to="${60 * z}" dur="1.2s" repeatCount="2"/><animate attributeName="opacity" from="1" to="0" dur="1.2s" repeatCount="2"/></circle>
     <circle cx="${x}" cy="${y}" r="${7 * z}" fill="${colore}" stroke="#fff" stroke-width="${2 * z}"/>
     <text x="${x}" y="${y - 16 * z}" font-size="${13 * z}" text-anchor="middle" fill="#fff" stroke="#000" stroke-width="${3 * z}" paint-order="stroke" font-weight="800" font-family="system-ui">${esc(chi)}</text>`;
   $("#sovra").appendChild(g);
@@ -833,7 +833,7 @@ const FORME = {
   4: "50,6 95,88 5,88", 6: "12,12 88,12 88,88 12,88", 8: "50,3 94,50 50,97 6,50", 10: "50,4 92,40 50,96 8,40",
   12: "50,4 95,36 78,92 22,92 5,36", 20: "50,3 93,27 93,73 50,97 7,73 7,27", 100: "50,4 92,40 50,96 8,40",
 };
-const svgDado = (f, colore = "#7a2e1c", testo = "") => `<svg viewBox="0 0 100 100"><polygon points="${FORME[f] || FORME[6]}" fill="${colore}" stroke="#f6d27a" stroke-width="5" stroke-linejoin="round"/>${f === 20 ? '<polyline points="50,3 30,62 70,62 50,3" fill="none" stroke="#f6d27a55" stroke-width="3"/>' : ""}${testo ? `<text x="50" y="62" text-anchor="middle" font-size="30" font-weight="900" fill="#f6d27a">${testo}</text>` : ""}</svg>`;
+const svgDado = (f, colore = "#7a2e1c", testo = "") => `<svg viewBox="0 0 100 100"><polygon points="${FORME[f] || FORME[6]}" fill="${esc(colore)}" stroke="#f6d27a" stroke-width="5" stroke-linejoin="round"/>${f === 20 ? '<polyline points="50,3 30,62 70,62 50,3" fill="none" stroke="#f6d27a55" stroke-width="3"/>' : ""}${testo ? `<text x="50" y="62" text-anchor="middle" font-size="30" font-weight="900" fill="#f6d27a">${testo}</text>` : ""}</svg>`;
 
 function preparaDadi() {
   const box = $("#dadi-bottoni");

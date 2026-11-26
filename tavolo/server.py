@@ -641,6 +641,53 @@ def puo_muovere(cid, pedina):
     return pedina.get("proprietario") == cid or (pedina.get("pg") and pedina.get("pg") == USERS.get(cid, {}).get("char"))
 
 
+COLORE_RE = re.compile(r"^#[0-9a-fA-F]{3,8}$")
+NOMI_RISERVATI = {"admin", "amministratore", "master", "sistema"}
+
+
+def colore_valido(c, default="#c0392b"):
+    c = str(c or "").strip()
+    return c if COLORE_RE.match(c) else default
+
+
+def nome_riservato(nome):
+    n = re.sub(r"\s+", " ", str(nome or "")).strip().lower()
+    return n in NOMI_RISERVATI or n == CONFIG.get("admin", {}).get("utente", "admin").lower()
+
+
+LIMITI = {"veloce": (20.0, 30.0), "normale": (5.0, 15.0), "accesso": (2.0, 10.0)}   # richieste al secondo, raffica massima
+OP_VELOCI = {"pedina_muovi", "righello"}   # trascinamenti: il client ne manda ~12 al secondo
+_SECCHI = {}
+_SECCHI_LOCK = threading.Lock()
+
+
+def troppe_richieste(chi, tipo):
+    """Token bucket per giocatore (o IP): True se la richiesta va rifiutata."""
+    ritmo, raffica = LIMITI[tipo]
+    ora = time.monotonic()
+    with _SECCHI_LOCK:
+        if len(_SECCHI) > 5000:   # pulizia dei secchi vecchi
+            for k in [k for k, (_, t) in _SECCHI.items() if ora - t > 60]:
+                del _SECCHI[k]
+        gettoni, prima = _SECCHI.get((chi, tipo), (raffica, ora))
+        gettoni = min(raffica, gettoni + (ora - prima) * ritmo)
+        if gettoni < 1:
+            _SECCHI[(chi, tipo)] = (gettoni, ora)
+            return True
+        _SECCHI[(chi, tipo)] = (gettoni - 1, ora)
+        return False
+
+
+CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; "
+       "media-src 'self' data: blob:; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'; "
+       "form-action 'self'; frame-ancestors 'self'")
+
+
+def pg_occupato(pg, cid):
+    """Il personaggio è già in mano a un altro giocatore collegato?"""
+    return any(k != cid and k in USERS and USERS[k].get("char") == pg for k in CLIENTS)
+
+
 def pulisci_pedina(d):
     out = {}
     for k in ("id", "scena", "x", "y", "nome", "colore", "icona", "taglia", "pf", "pfmax", "ca", "nascosta", "condizioni",
@@ -727,9 +774,12 @@ def op(cid, d):
         validi = {p["id"] for p in CATALOGO.get(ATTIVA, {}).get("personaggi", [])}
         if pg and pg not in validi:
             return {"ok": False, "errore": "personaggio inesistente"}
-        u["char"] = pg
-        if pg and not master:
-            crea_pedina_pg(cid, pg, u["color"])
+        with LOCK:   # controllo e assegnazione insieme: due giocatori non possono prendere lo stesso PG nello stesso istante
+            if pg and not master and pg_occupato(pg, cid):
+                return {"ok": False, "errore": "personaggio già scelto da un altro giocatore"}
+            u["char"] = pg
+            if pg and not master:
+                crea_pedina_pg(cid, pg, u["color"])
         invia({"t": "online", "online": online()})
         salva_presto()
         return {"ok": True}
@@ -753,16 +803,19 @@ def op(cid, d):
                 if not puo_muovere(cid, vecchia):
                     return {"ok": False, "errore": "non è la tua pedina"}
                 if not master:
-                    for k in ("nascosta", "proprietario", "pg", "mostro"):
-                        nuova[k] = vecchia.get(k)
+                    # Il giocatore cambia solo posizione, PF e condizioni della sua pedina: nome, icona, scena… restano del Master.
+                    nuova = {k: nuova[k] for k in ("x", "y", "pf", "condizioni") if k in nuova}
+                    if "pf" in nuova:
+                        pfmax = vecchia.get("pfmax") or 0
+                        nuova["pf"] = max(0, min(int(nuova["pf"] or 0), pfmax)) if pfmax else vecchia.get("pf")
                 vecchia.update(nuova)
                 p = vecchia
             else:
+                # Solo il Master crea pedine nuove: quelle dei giocatori nascono da crea_pedina_pg (scegli_pg).
+                if not master:
+                    return {"ok": False, "errore": "solo il Master può aggiungere pedine"}
                 nuova["id"] = uuid.uuid4().hex[:10]
                 nuova.setdefault("scena", STATE["scena"])
-                if not master:
-                    nuova["proprietario"] = cid
-                    nuova["nascosta"] = False
                 STATE["pedine"][nuova["id"]] = nuova
                 p = nuova
             if p.get("pg") and "pf" in p:
@@ -813,9 +866,12 @@ def op(cid, d):
             ini = STATE["iniziativa"]
             if azione == "aggiungi":
                 voce = {"id": uuid.uuid4().hex[:8], "nome": str(d.get("nome", "?"))[:40], "valore": int(d.get("valore", 0)),
-                        "pedina": d.get("pedina"), "colore": d.get("colore", u["color"]), "nascosta": bool(d.get("nascosta")) and master}
+                        "pedina": d.get("pedina"), "colore": colore_valido(d.get("colore"), u["color"]), "nascosta": bool(d.get("nascosta")) and master}
                 if not master:
                     voce["da"] = cid
+                    ped = STATE["pedine"].get(voce["pedina"]) if voce["pedina"] else None
+                    if voce["pedina"] and not (ped and puo_muovere(cid, ped)):
+                        return {"ok": False, "errore": "non è la tua pedina"}
                 ini["ordine"] = [x for x in ini["ordine"] if not (voce["pedina"] and x.get("pedina") == voce["pedina"])]
                 ini["ordine"].append(voce)
                 ini["ordine"].sort(key=lambda x: -x["valore"])
@@ -1412,6 +1468,19 @@ class Gestore(BaseHTTPRequestHandler):
             return cid
         return None
 
+    def _ip(self):
+        # dietro il proxy HTTPS l'IP vero è l'ultimo aggiunto in X-Forwarded-For
+        xff = self.headers.get("X-Forwarded-For", "")
+        return xff.split(",")[-1].strip() or self.client_address[0]
+
+    def end_headers(self):
+        h = getattr(self, "_headers_buffer", [])
+        if not any(b.lower().startswith(b"content-security-policy:") for b in h):
+            self.send_header("Content-Security-Policy", getattr(self, "_csp", None) or CSP)
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self._csp = None
+        super().end_headers()
+
     def _file(self, full, attach=None):
         ctype = mimetypes.guess_type(full)[0] or "application/octet-stream"
         if ctype.startswith("text/") or ctype in ("application/javascript", "application/json", "image/svg+xml"):
@@ -1543,7 +1612,9 @@ class Gestore(BaseHTTPRequestHandler):
                 raise ValueError("Accesso annullato.")
             cid, sec, nome = oauth_fine(prov, qs.get("code", [""])[0], qs.get("state", [""])[0])
             dati = json.dumps({"id": cid, "secret": sec, "nome": nome, "account": PROVIDER[prov]["nome"]})
-            corpo = f"""<!doctype html><meta charset="utf-8"><title>Accesso</title><script>
+            nonce = secrets.token_urlsafe(16)
+            self._csp = f"default-src 'none'; script-src 'nonce-{nonce}'; base-uri 'none'; frame-ancestors 'none'"
+            corpo = f"""<!doctype html><meta charset="utf-8"><title>Accesso</title><script nonce="{nonce}">
 try{{const v=JSON.parse(localStorage.getItem("tv_cred")||"{{}}");localStorage.setItem("tv_cred",JSON.stringify(Object.assign(v,{dati},{{oauth:true}})))}}catch(e){{}}
 location.replace("/?accesso=1");</script>"""
         except Exception as e:  # errori di rete o del provider: si mostra un messaggio leggibile
@@ -1648,15 +1719,17 @@ location.replace("/?accesso=1");</script>"""
         except json.JSONDecodeError:
             return self._json({"ok": False, "errore": "JSON non valido"}, 400)
 
-        if url.path == "/api/login":
-            return self._login(body)
-        if url.path == "/api/entra":
-            return self._entra(body)
+        if url.path in ("/api/login", "/api/entra"):
+            if troppe_richieste(self._ip(), "accesso"):
+                return self._json({"ok": False, "errore": "Troppi tentativi: aspetta qualche secondo"}, 429)
+            return self._login(body) if url.path == "/api/login" else self._entra(body)
 
         cid = self._auth()
         if not cid:
             return self._json({"ok": False, "errore": "non autenticato"}, 401)
         if url.path == "/api/op":
+            if troppe_richieste(cid, "veloce" if body.get("op") in OP_VELOCI else "normale"):
+                return self._json({"ok": False, "errore": "Piano! Troppe azioni in poco tempo"}, 429)
             try:
                 return self._json(op(cid, body))
             except (ValueError, KeyError, TypeError) as e:
@@ -1692,6 +1765,8 @@ location.replace("/?accesso=1");</script>"""
             nome = str(body.get("nome", "")).strip()[:30]
             if not nome:
                 return self._json({"ok": False, "errore": "Scrivi il tuo nome"}, 400)
+            if nome_riservato(nome):
+                return self._json({"ok": False, "errore": "Questo nome è riservato: scegline un altro"}, 400)
             if not conosciuto:
                 cid = uuid.uuid4().hex[:12]
                 USERS[cid] = {"secret": secrets.token_urlsafe(18), "color": "#c0392b", "role": "giocatore", "char": None}
@@ -1714,11 +1789,17 @@ location.replace("/?accesso=1");</script>"""
         pg = body.get("personaggio") or None
         if pg and pg not in {p["id"] for p in CATALOGO.get(ATTIVA, {}).get("personaggi", [])}:
             pg = None
-        if body.get("nome"):
-            u["name"] = str(body["nome"]).strip()[:30] or u["name"]
-        u.update({"color": str(body.get("colore", u.get("color", "#c0392b")))[:9], "role": ruolo, "char": pg if ruolo == "giocatore" else None, "seen": time.time()})
-        if pg and ruolo == "giocatore":
-            crea_pedina_pg(cid, pg, u["color"])
+        nome = str(body.get("nome") or "").strip()[:30]
+        if nome and nome_riservato(nome) and not u.get("admin"):
+            return self._json({"ok": False, "errore": "Questo nome è riservato: scegline un altro"}, 400)
+        with LOCK:   # controllo del PG e assegnazione in un solo passo (niente doppioni con richieste simultanee)
+            if pg and ruolo == "giocatore" and pg_occupato(pg, cid):
+                return self._json({"ok": False, "errore": "Personaggio già scelto da un altro giocatore"}, 409)
+            if nome:
+                u["name"] = nome
+            u.update({"color": colore_valido(body.get("colore"), colore_valido(u.get("color"))), "role": ruolo, "char": pg if ruolo == "giocatore" else None, "seen": time.time()})
+            if pg and ruolo == "giocatore":
+                crea_pedina_pg(cid, pg, u["color"])
         salva_presto()
         if SESSIONE != "chiusa":
             sistema(f"👋 {u['name']} si è seduto al tavolo{' come Master' if ruolo == 'master' else ''}.")
