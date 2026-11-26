@@ -4,6 +4,7 @@
 #   ./run.sh ../target/release/tavolo      contro il server Rust
 #   ./run.sh <server> test_gioco           solo un modulo (o test_gioco.TestDadi, …)
 set -euo pipefail
+if [ "${1:-python}" != python ]; then set -- "$(realpath "$1")" "${@:2}"; fi
 cd "$(dirname "$0")"
 SERVER="${1:-python}"
 if [ "$SERVER" != python ]; then SERVER="$(realpath "$SERVER")"; fi

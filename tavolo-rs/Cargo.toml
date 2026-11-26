@@ -1,0 +1,60 @@
+[package]
+name = "tavolo"
+version = "3.0.0"
+edition = "2021"
+description = "Tavolo Virtuale per D&D: server di gioco"
+publish = false
+rust-version = "1.85"
+
+[[bin]]
+name = "tavolo"
+path = "src/main.rs"
+
+[lib]
+name = "tavolo"
+path = "src/lib.rs"
+
+[dependencies]
+anyhow = "1"
+argon2 = "0.5"
+async-stream = "0.3"
+axum = { version = "0.8", features = ["macros"] }
+base64 = "0.22"
+bytes = "1"
+futures-util = "0.3"
+governor = "0.8"
+hex = "0.4"
+indexmap = { version = "2", features = ["serde"] }
+hmac = "0.12"
+mime_guess = "2"
+pbkdf2 = { version = "0.12", default-features = false, features = ["hmac"] }
+rand = "0.8"
+regex = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.10"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "sqlite", "migrate", "macros"] }
+subtle = "2"
+time = { version = "0.3", features = ["formatting", "local-offset", "macros"] }
+tokio = { version = "1", features = ["full"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+tokio-util = { version = "0.7", features = ["io"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["limit", "trace", "catch-panic", "timeout"] }
+tower_governor = "0.7"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+urlencoding = "2"
+uuid = { version = "1", features = ["v4"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 4
+strip = true
+panic = "unwind"
