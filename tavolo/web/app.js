@@ -194,7 +194,9 @@ async function entra(dati, silenzioso) {
 /* ============================================================ connessione e stato */
 async function connetti() {
   const q = `c=${encodeURIComponent(S.cred.id)}&s=${encodeURIComponent(S.cred.secret)}`;
-  const st = await fetch("/api/stato?" + q).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const r = await fetch("/api/stato?" + q).catch(() => null);
+  if (!r || r.status >= 500) { riprova(); return; }          // server giù (riavvio, proxy 502…): si riprova più tardi
+  const st = r.ok ? await r.json().catch(() => null) : null;
   if (!st) { $("#ingresso").classList.add("aperta"); return; }
   $("#ingresso").classList.remove("aperta");
   $("#app").hidden = false;
@@ -210,8 +212,27 @@ async function connetti() {
     const st2 = await fetch("/api/stato?" + q).then((r) => (r.ok ? r.json() : null)).catch(() => null);
     if (st2) applicaStato(st2, true);
   };
-  es.onerror = () => { $("#stato-conn").className = "conn ko"; };
+  es.onerror = () => {
+    $("#stato-conn").className = "conn ko";
+    // Se il proxy risponde con un errore (es. 502 durante un riavvio) EventSource smette di riprovare da solo.
+    if (es.readyState === EventSource.CLOSED) riprova();
+  };
 }
+
+// Riconnessione dopo un riavvio del server: se nel frattempo il codice è cambiato, la pagina si ricarica.
+let riprovaTimer = null, riprovaAttesa = 2000;
+function riprova() {
+  if (riprovaTimer) return;
+  riprovaTimer = setTimeout(async () => {
+    riprovaTimer = null;
+    const i = await fetch("/api/info").then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    if (!i) { riprovaAttesa = Math.min(riprovaAttesa * 1.5, 15000); riprova(); return; }
+    riprovaAttesa = 2000;
+    if (S.versione && i.versione && i.versione !== S.versione) { location.reload(); return; }
+    connetti();
+  }, riprovaAttesa);
+}
+setInterval(() => { if (S.cred && document.visibilityState === "visible") controllaVersione(); }, 60000);
 
 async function controllaVersione() {
   const i = await fetch("/api/info").then((r) => r.json()).catch(() => null);
