@@ -17,7 +17,8 @@ Volume=/var/lib/tavolo-virtuale/avventure:/app/avventure:Z
 ReadOnly=true
 NoNewPrivileges=true
 DropCapability=ALL
-HealthCmd=/app/tavolo --healthcheck
+# forma «exec»: nell'immagine FROM scratch non c'è una shell per CMD-SHELL
+HealthCmd=["/app/tavolo", "--healthcheck"]
 HealthInterval=60s
 HealthTimeout=5s
 
