@@ -50,7 +50,9 @@ import { SistemaComponent } from './sistema.component';
             }
             🚪<span class="testo">Esci</span>
           </button>
-          <button class="solo-mobile" title="Mostra pannello" (click)="store.pannelloAperto.set(!store.pannelloAperto())">☰</button>
+          @if (!store.sistema()) {
+            <button class="solo-mobile" title="Mostra pannello" (click)="store.pannelloAperto.set(!store.pannelloAperto())">☰</button>
+          }
         </div>
       </header>
 

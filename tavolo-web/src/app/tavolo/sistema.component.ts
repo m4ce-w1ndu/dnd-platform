@@ -196,7 +196,9 @@ const GIORNO = 86400;
                         aria-label="giorni"
                       >
                         @for (g of [1, 7, 30, 90]; track g) {
-                          <option [value]="g">{{ g === 1 ? '1 giorno' : g + ' giorni' }}</option>
+                          <option [value]="g" [selected]="g === giorni()">
+                            {{ g === 1 ? '1 giorno' : g + ' giorni' }}
+                          </option>
                         }
                       </select>
                     </small>
@@ -217,7 +219,9 @@ const GIORNO = 86400;
                     aria-label="giorni"
                   >
                     @for (g of [1, 7, 30, 90]; track g) {
-                      <option [value]="g">{{ g === 1 ? '1 giorno' : g + ' giorni' }}</option>
+                      <option [value]="g" [selected]="g === giorni()">
+                        {{ g === 1 ? '1 giorno' : g + ' giorni' }}
+                      </option>
                     }
                   </select>
                 </div>
@@ -254,7 +258,8 @@ const GIORNO = 86400;
                       <span class="chip attivo">admin</span>
                     }
                     <small
-                      >{{ x.provider }}{{ x.account ? ' · ' + x.account : '' }} · visto
+                      >{{ x.sistema ? 'account di sistema' : x.provider
+                      }}{{ x.account ? ' · ' + x.account : '' }} · visto
                       {{ quando(x.visto) }}</small
                     >
                   </div>
@@ -658,7 +663,7 @@ export class SistemaComponent implements OnInit {
   private passa(x: UtenteImpostazioni, f: Filtro): boolean {
     switch (f) {
       case 'admin':
-        return x.admin;
+        return x.admin && !x.sistema;
       case 'account':
         return !!x.account && !x.sistema;
       case 'ospiti':
@@ -716,9 +721,15 @@ export class SistemaComponent implements OnInit {
         primo = false;
         return;
       }
-      untracked(() => void this.leggiUtenti());
+      // chi entra ed esce a raffica (o il proprio collegamento appena aperta la pagina) vale una lettura sola
+      clearTimeout(this.timerUtenti);
+      this.timerUtenti = setTimeout(() => untracked(() => void this.leggiUtenti()), 1000);
     });
+    inject(DestroyRef).onDestroy(() => clearTimeout(this.timerUtenti));
   }
+
+  private timerUtenti: ReturnType<typeof setTimeout> | undefined;
+  private lettoAlle = 0;
 
   ngOnInit(): void {
     void this.leggi();
@@ -726,6 +737,7 @@ export class SistemaComponent implements OnInit {
   }
 
   private async leggiUtenti(): Promise<void> {
+    if (Date.now() - this.lettoAlle < 1500) return; // appena letti da leggi()
     const r = await this.api.op({ op: 'imp_leggi' }, { silenzioso: true });
     if (r.ok) this.utenti.set(r.utenti ?? []);
   }
@@ -740,6 +752,7 @@ export class SistemaComponent implements OnInit {
   }
 
   private async leggi(): Promise<void> {
+    this.lettoAlle = Date.now();
     const r = await this.api.op({ op: 'imp_leggi' });
     if (!r.ok || !r.config) return;
     this.applica(r.config);
