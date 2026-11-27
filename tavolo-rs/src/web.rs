@@ -42,7 +42,7 @@ pub struct App {
     pub accessi: LimiteAccessi,
     pub percorsi: Arc<Percorsi>,
     pub web_reale: Arc<PathBuf>,
-    /// Client nuovo (Angular) servito sotto /beta/, se configurato (WEB_BETA_DIR).
+    /// Client nuovo (Angular), se configurato (WEB_BETA_DIR): è la pagina principale e il vecchio va su /vecchio/.
     pub web_beta: Option<Arc<PathBuf>>,
     pub avv_reale: Arc<PathBuf>,
     pub versione: Arc<String>,
@@ -300,9 +300,12 @@ pub fn router(app: App) -> Router {
         .route("/api/carica_documento", post(carica_documento))
         .route("/auth/{prov}/{fase}", get(oauth))
         .route("/avventure/{*resto}", get(file_avventura))
-        .route("/beta", get(|| async { axum::response::Redirect::permanent("/beta/") }))
+        .route("/beta", get(beta))
         .route("/beta/", get(beta))
         .route("/beta/{*resto}", get(beta))
+        .route("/vecchio", get(|| async { axum::response::Redirect::permanent("/vecchio/") }))
+        .route("/vecchio/", get(vecchio))
+        .route("/vecchio/{*resto}", get(vecchio))
         .route("/healthz", get(salute))
         .route("/metrics", get(metriche))
         .fallback(statico)
@@ -884,7 +887,15 @@ async fn statico(State(app): State<App>, method: Method, uri: Uri, h: HeaderMap)
     if method != Method::GET && method != Method::HEAD {
         return StatusCode::METHOD_NOT_ALLOWED.into_response();
     }
-    let p = uri.path();
+    match app.web_beta.clone() {
+        // con il client nuovo configurato, è lui la pagina principale (il vecchio resta su /vecchio/)
+        Some(base) => client_nuovo(&base, &uri, &h).await,
+        None => client_vecchio(&app, uri.path(), &h).await,
+    }
+}
+
+/// Il client vecchio (WEB_DIR): `p` è il percorso relativo alla sua radice.
+async fn client_vecchio(app: &App, p: &str, h: &HeaderMap) -> Response {
     let p = if matches!(p, "" | "/" | "/admin" | "/admin/") {
         "/index.html"
     } else {
@@ -907,22 +918,28 @@ async fn statico(State(app): State<App>, method: Method, uri: Uri, h: HeaderMap)
         r.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
         return r;
     }
-    servi_file(&full, &h, false).await
+    servi_file(&full, h, false).await
 }
 
-/// Il client nuovo sotto /beta/: i file se esistono, altrimenti index.html (applicazione a pagina singola).
-async fn beta(State(app): State<App>, uri: Uri, h: HeaderMap) -> Response {
-    let Some(base) = app.web_beta.clone() else { return non_trovato() };
-    let rel = uri.path().strip_prefix("/beta").unwrap_or("");
-    if let Some(full) = match relativo(rel) {
-        Some(r) if !r.as_os_str().is_empty() => dentro(&base, &r).await,
-        _ => None,
-    } {
-        if full.file_name().is_none_or(|n| n != "index.html") {
-            return servi_file(&full, &h, false).await;
+/// Il client nuovo (WEB_BETA_DIR): i file se esistono, altrimenti index.html (applicazione a pagina singola).
+/// Un percorso con estensione che non esiste è un 404 vero, non la pagina.
+async fn client_nuovo(base: &std::path::Path, uri: &Uri, h: &HeaderMap) -> Response {
+    let p = uri.path();
+    // /admin/ → /admin: i file della build sono relativi alla pagina e la CSP vieta <base>
+    if p.len() > 1 && p.ends_with('/') {
+        let q = uri.query().map(|q| format!("?{q}")).unwrap_or_default();
+        return axum::response::Redirect::permanent(&format!("{}{q}", p.trim_end_matches('/'))).into_response();
+    }
+    let rel = relativo(p);
+    if let Some(r) = rel.as_ref().filter(|r| !r.as_os_str().is_empty()) {
+        if let Some(full) = dentro(base, r).await {
+            if full.file_name().is_none_or(|n| n != "index.html") {
+                return servi_file(&full, h, false).await;
+            }
+        } else if r.extension().is_some() {
+            return non_trovato();
         }
     }
-    // a /beta/ i percorsi relativi di index.html (main-*.js, styles-*.css) si risolvono già sotto /beta/
     let Ok(testo) = tokio::fs::read_to_string(base.join("index.html")).await else {
         return non_trovato();
     };
@@ -931,6 +948,21 @@ async fn beta(State(app): State<App>, uri: Uri, h: HeaderMap) -> Response {
         .insert(header::CONTENT_TYPE, HeaderValue::from_static("text/html; charset=utf-8"));
     r.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
     r
+}
+
+/// Il client vecchio sotto /vecchio/ (quando il nuovo è la pagina principale), per chi preferisce ancora quello.
+async fn vecchio(State(app): State<App>, uri: Uri, h: HeaderMap) -> Response {
+    if app.web_beta.is_none() {
+        return axum::response::Redirect::permanent("/").into_response();
+    }
+    let p = uri.path().strip_prefix("/vecchio").unwrap_or("/");
+    client_vecchio(&app, p, &h).await
+}
+
+/// /beta/ era l'indirizzo provvisorio del client nuovo: ora è la pagina principale.
+async fn beta(uri: Uri) -> Response {
+    let q = uri.query().map(|q| format!("?{q}")).unwrap_or_default();
+    axum::response::Redirect::permanent(&format!("/{q}")).into_response()
 }
 
 async fn salute(State(app): State<App>) -> Response {

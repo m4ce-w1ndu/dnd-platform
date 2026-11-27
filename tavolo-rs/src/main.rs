@@ -134,7 +134,7 @@ async fn main() -> Result<()> {
     let web_reale = std::fs::canonicalize(&percorsi.web).with_context(|| format!("cartella web {}", percorsi.web.display()))?;
     let avv_reale = std::fs::canonicalize(&percorsi.avventure)?;
     let web_beta = match std::env::var("WEB_BETA_DIR").ok().filter(|d| !d.is_empty()) {
-        Some(d) => Some(std::fs::canonicalize(&d).with_context(|| format!("cartella del client beta {d}"))?),
+        Some(d) => Some(std::fs::canonicalize(&d).with_context(|| format!("cartella del client nuovo {d}"))?),
         None => None,
     };
     // la versione cambia se cambia uno dei due client: i browser aperti si ricaricano

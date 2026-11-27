@@ -1,7 +1,8 @@
 # Tavolo Virtuale · client nuovo (Angular + TypeScript)
 
 Riscrittura di `tavolo/web/app.js` con lo stesso aspetto (stesso foglio di stile) e la stessa API.
-In produzione è servito dal server Rust sotto **`/beta/`**; il client vecchio resta su `/` finché questo non lo sostituisce.
+In produzione è la pagina principale (`/`) del server Rust; il client vecchio resta su **`/vecchio/`** come ripiego
+(`/beta/`, l'indirizzo provvisorio, rimanda a `/`).
 
 - **Tipi generati dal server**: `src/app/api/generati/` viene scritto da `cargo test esporta_tipi_typescript`
   in `tavolo-rs/` (ts-rs). Se il server cambia un campo, il client non compila più. Non modificare a mano.

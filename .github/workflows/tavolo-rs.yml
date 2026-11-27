@@ -80,8 +80,9 @@ jobs:
             -v "$PWD/dati:/app/dati" -v "$PWD/avventure:/app/avventure" -e MASTER_PASSWORD=ci-password-123 tavolo-virtuale-rs
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8095/healthz && break; sleep 1; done
           curl -fsS http://127.0.0.1:8095/api/info
-          curl -fsS http://127.0.0.1:8095/ | grep -q "<html"
-          curl -fsS http://127.0.0.1:8095/beta/ | grep -q "<app-root>"
+          curl -fsS http://127.0.0.1:8095/ | grep -q "<app-root>"            # client nuovo
+          curl -fsS http://127.0.0.1:8095/vecchio/ | grep -q 'id="app"'      # client vecchio
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8095/beta/)" = 308
           docker exec tavolo /app/tavolo --healthcheck
           docker exec tavolo /app/tavolo verifica-db /app/dati/tavolo.db
           docker images tavolo-virtuale-rs

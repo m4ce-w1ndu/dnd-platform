@@ -1,4 +1,4 @@
-"""Test nel browser (Playwright + Chromium) del client nuovo in Angular, servito sotto /beta/.
+"""Test nel browser (Playwright + Chromium) del client nuovo in Angular (pagina principale; il vecchio è su /vecchio/).
 
 Percorrono a mano, come farebbe una persona, i flussi di tutti i ruoli: account di sistema, amministratore
 del tavolo, Master e giocatori, anche su telefono. Servono per decidere se il client vecchio si può togliere.
@@ -6,7 +6,7 @@ del tavolo, Master e giocatori, anche su telefono. Servono per decidere se il cl
 Requisiti (una volta sola):
     python3 -m venv e2e/.venv && e2e/.venv/bin/pip install playwright && e2e/.venv/bin/playwright install chromium
     (cd ../tavolo-web && npm ci && npx ng build)
-Uso:  ./run.sh ../target/release/tavolo test_gui      (solo server Rust: /beta/ non esiste nel Python)
+Uso:  ./run.sh ../target/release/tavolo test_gui      (solo server Rust: il Python serve solo il client vecchio)
 Screenshot dei fallimenti in $GUI_SCREENSHOT (predefinito: cartella temporanea, stampata).
 """
 import itertools
@@ -47,7 +47,7 @@ class GuiBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.srv = Server({"WEB_BETA_DIR": DIST})
-        cls.url = f"http://127.0.0.1:{cls.srv.porta}/beta/"
+        cls.url = f"http://127.0.0.1:{cls.srv.porta}/"
         cls.pw = sync_playwright().start()
         cls.browser = cls.pw.chromium.launch()
         cls.sistema = Client(cls.srv)
@@ -176,6 +176,7 @@ class TestSistema(GuiBase):
         expect(p.locator(".sis-pagina h2")).to_contain_text("Utenti")
         larga = p.evaluate("document.documentElement.scrollWidth > innerWidth")
         self.assertFalse(larga, "la pagina scorre di lato sul telefono")
+        self.assertLessEqual(p.evaluate("document.querySelector('.sis-pagina').getBoundingClientRect().right"), 390, "contenuto tagliato a destra")
 
 
 class TestPulizia(GuiBase):
@@ -200,7 +201,7 @@ class TestPulizia(GuiBase):
         db.commit()
         db.close()
         self.srv.start()
-        type(self).url = f"http://127.0.0.1:{self.srv.porta}/beta/"
+        type(self).url = f"http://127.0.0.1:{self.srv.porta}/"
         type(self).sistema = Client(self.srv)
         assert self.sistema.login_admin().json["ok"]
 
@@ -468,16 +469,94 @@ class TestStrumenti(PartitaBase):
         a.locator(".dialogo").get_by_role("button", name="Carica").click()
         expect(g.locator(".pedina")).to_have_count(pedine)                  # tornati com'era al salvataggio
 
+class TestSistemaVecchio(GuiBase):
+    """L'amministrazione del client vecchio (/vecchio/) ha le stesse sezioni di quella nuova."""
+
+    def entra_sistema_vecchio(self, telefono=False):
+        p = self.pagina(telefono)
+        p.goto(self.url + "vecchio/admin")
+        p.locator("#in-pw").fill(PW_ADMIN)
+        p.locator("#in-admin-btn").click()
+        expect(p.locator("#sis-nav")).to_be_visible()
+        return p
+
+    def test_sezioni_e_niente_sala(self):
+        p = self.entra_sistema_vecchio()
+        expect(p.locator("#sala")).to_be_hidden()
+        expect(p.locator("#nome-scena")).to_contain_text("Amministrazione")
+        for nome in ["Generale", "Accesso con account", "Utenti e permessi", "Partite e backup", "Registro", "Account di sistema"]:
+            p.locator("#sis-nav button", has_text=nome).click()
+            expect(p.locator(".sis-sez:not([hidden]) h2")).to_contain_text(nome.split()[0])
+        expect(p.locator("#i-audit .utente").first).to_contain_text("accesso di sistema")
+
+    def test_salva_e_utenti(self):
+        g = Client(self.srv)
+        g.login_ospite("DaPromuovere")
+        p = self.entra_sistema_vecchio()
+        p.locator("#sis-nav button", has_text="Generale").click()
+        salva = p.locator('.sis-sez[data-sez="generale"] [data-salva]')
+        expect(salva).to_be_disabled()
+        p.locator("#i-nome").fill("Tavolo vecchio")
+        expect(salva).to_be_enabled()
+        salva.click()
+        expect(salva).to_be_disabled()
+        self.assertEqual(Client(self.srv).get("/api/info").json["nome_tavolo"], "Tavolo vecchio")
+        p.locator("#sis-nav button", has_text="Utenti").click()
+        p.locator("#i-cerca").fill("promuo")
+        expect(p.locator("#i-utenti .utente")).to_have_count(1)
+        p.locator("#i-utenti .utente", has_text="DaPromuovere").get_by_label("Admin").check()
+        expect(p.locator("#i-utenti .utente .chip", has_text="admin")).to_be_visible()
+        p.locator("#i-cerca").fill("")
+        p.locator("#i-filtri button", has_text="Admin").click()
+        expect(p.locator("#i-utenti .utente")).to_have_count(1)
+        expect(p.locator("#i-pulizia")).to_have_class(re.compile("ok"))   # niente da pulire
+
+    def test_telefono(self):
+        p = self.entra_sistema_vecchio(telefono=True)
+        p.locator("#sis-nav button", has_text="Utenti").click()
+        expect(p.locator(".sis-sez:not([hidden]) h2")).to_contain_text("Utenti")
+        self.assertFalse(p.evaluate("document.documentElement.scrollWidth > innerWidth"), "la pagina scorre di lato")
+        self.assertLessEqual(p.evaluate("document.querySelector('.sis-pagina').getBoundingClientRect().right"), 390, "contenuto tagliato a destra")
+
+
 class TestCompatibilita(GuiBase):
     def test_chi_era_dentro_col_vecchio_client_resta_dentro(self):
         p = self.pagina()
-        p.goto(self.url.replace("/beta/", "/"))
+        p.goto(self.url + "vecchio/")
         p.locator("#in-nome").fill("Veterano")
         p.locator("#in-ospite-btn").click()
         expect(p.locator("#sala")).to_be_visible()          # dentro col client vecchio (credenziali salvate)
         p.goto(self.url)
         expect(p.locator("#sala")).to_be_visible()
         expect(p.locator("#sala")).to_contain_text("Veterano")
+
+    def test_indirizzi(self):
+        c = Client(self.srv)
+        r = c.get("/beta/?accesso=1")                                     # il vecchio indirizzo provvisorio
+        self.assertEqual((r.status, r.h("location")), (308, "/?accesso=1"))
+        self.assertEqual(c.get("/beta").h("location"), "/")
+        vecchio = c.get("/vecchio/")
+        self.assertEqual(vecchio.status, 200)
+        self.assertIn(b"app.js?v=", vecchio.body)
+        self.assertNotIn(b"__VERSIONE__", vecchio.body)
+        self.assertEqual(c.get("/vecchio/style.css").status, 200)
+        self.assertEqual(c.get("/vecchio").h("location"), "/vecchio/")
+        self.assertIn(b"<app-root>", c.get("/").body)
+        self.assertEqual(c.get("/admin/?x=1").h("location"), "/admin?x=1")
+        self.assertIn(b"<app-root>", c.get("/admin").body)                # percorso dell'app: stessa pagina
+        self.assertEqual(c.get("/non-esiste.js").status, 404)
+        self.assertNotIn(b"root:", c.get("/../../etc/passwd").body)
+        self.assertNotIn(b"root:", c.get("/vecchio/../../../etc/passwd").body)
+
+    def test_ingresso_admin_e_vecchio_client(self):
+        p = self.pagina()
+        p.goto(self.url + "admin/")                                       # ingresso di riserva dell'amministratore
+        expect(p.locator("details.admin-box")).to_have_attribute("open", "")
+        v = self.pagina()
+        v.goto(self.url + "vecchio/")                                     # il vecchio funziona ancora
+        v.locator("#in-nome").fill("Nostalgico")
+        v.locator("#in-ospite-btn").click()
+        expect(v.locator("#sala")).to_be_visible()
 
 
 if __name__ == "__main__":

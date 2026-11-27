@@ -1,7 +1,7 @@
 # Tavolo Virtuale · server Rust. Contesto di build: la radice del repository (servono tavolo-rs/ e tavolo/web/).
 #   podman build -f tavolo-rs/Containerfile -t tavolo-virtuale-rs .
 # Risultato: un binario statico (musl) e i due client, in un'immagine FROM scratch (~20 MB).
-# Il client nuovo (Angular), servito sotto /beta/ finché non sostituisce quello vecchio.
+# Il client nuovo (Angular) è la pagina principale; il vecchio resta su /vecchio/ come ripiego.
 FROM docker.io/library/node:24-alpine AS web
 WORKDIR /web
 COPY tavolo-web/package.json tavolo-web/package-lock.json ./

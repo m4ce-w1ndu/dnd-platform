@@ -258,8 +258,48 @@ body:not(.sistema) .solo-sistema{display:none!important}
 /* account di sistema: solo le impostazioni, a tutta pagina */
 body.sistema #strumenti,body.sistema #viewport,body.sistema #btn-pannello,body.sistema #sala,
 body.sistema #schede-nav button:not([data-tab="impostazioni"]){display:none!important}
-body.sistema #laterale{position:static;flex:1;width:auto;max-width:none;height:auto;transform:none;border:none;border-radius:0;box-shadow:none}
-body.sistema .tab{width:100%;max-width:760px;margin:0 auto}
+body.sistema #laterale{position:static;flex:1;min-width:0;width:auto;max-width:none;height:auto;transform:none;border:none;border-radius:0;box-shadow:none}
+body.sistema #barra .destra{margin-left:auto}
+body.sistema #schede-nav{display:none!important}
+body.sistema #tab-impostazioni{padding:0}
+/* amministrazione a sezioni (come nel client nuovo) */
+.sis{flex:1;display:flex;min-height:0;min-width:0;width:100%}
+.sis-nav,.sis-corpo{min-width:0}
+.sis-nav{width:210px;flex:none;display:flex;flex-direction:column;gap:2px;padding:12px 8px;background:var(--pan);border-right:1px solid var(--linea);overflow:auto}
+.sis-nav button{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid transparent;background:none;padding:9px 10px;color:var(--muto)}
+.sis-nav button:hover{background:var(--pan2);color:var(--testo)}
+.sis-nav button.attivo{background:#3a2f1e;border-color:var(--oro);color:var(--oro2)}
+.sis-nav .ic{font-size:17px;width:22px;text-align:center}
+.sis-nav .t{flex:1}
+.sis .bolla{background:var(--rosso);color:#fff;border-radius:10px;font-size:11px;padding:1px 7px;font-weight:700}
+.sis-corpo{flex:1;overflow:auto;padding:20px 16px 40px;min-width:0}
+.sis-pagina{max-width:760px;margin:0 auto}
+.sis-pagina h2{font-family:var(--serif);color:var(--oro2);margin:0 0 6px;font-size:22px}
+.sis-pagina .blocco{display:flex;flex-direction:column;gap:4px;background:var(--pan);border:1px solid var(--linea);border-radius:12px;padding:10px 14px;margin:10px 0}
+.salva-barra{position:sticky;bottom:-40px;margin-top:14px;display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 14px;border-radius:12px;background:var(--pan);border:1px solid var(--linea)}
+.salva-barra.sporco{border-color:var(--oro);box-shadow:0 -6px 20px rgba(0,0,0,.5)}
+.salva-barra button:disabled,.pulizia button:disabled{opacity:.45;cursor:default}
+.pulizia{display:flex;align-items:center;gap:12px;padding:10px 14px;margin:10px 0;border-radius:12px;border:1px solid var(--oro);background:#2a2216}
+.pulizia>div{flex:1;display:flex;flex-direction:column;gap:2px}
+.pulizia small{color:var(--muto)}
+.pulizia.ok{border-color:var(--linea);background:var(--pan)}
+.pulizia.ok .titolo,.pulizia.ok button{display:none}
+.pulizia select{padding:2px 6px;margin-left:4px}
+.filtri{margin:12px 0 4px}
+.filtri input{flex:1 1 200px}
+.filtri small{color:var(--muto);margin-left:2px}
+.utente.da-pulire{opacity:.55}
+.utente .chip{border:1px solid var(--linea);margin-left:4px;font-size:11px;padding:1px 7px}
+@media (max-width:760px){
+  .sis{flex-direction:column}
+  .sis-nav{width:auto;flex-direction:row;border-right:none;border-bottom:1px solid var(--linea);padding:6px;gap:4px;overflow-x:auto}
+  .sis-nav button{flex-direction:column;gap:2px;padding:6px 8px;font-size:11px;position:relative;flex:none}
+  .sis-nav .t{flex:none;white-space:nowrap}
+  .sis .bolla{position:absolute;top:0;right:0}
+  .sis-corpo{padding:14px 12px 40px}
+  .utente{flex-wrap:wrap}
+  .utente .n{flex-basis:calc(100% - 40px)}
+}
 
 /* ---------- mobile ---------- */
 @media (max-width:860px){

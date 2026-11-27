@@ -1,6 +1,8 @@
 # Tavolo Virtuale · server Rust
 
-Riscrittura di `tavolo/server.py`: stessa API, stesso database, stesso client (`tavolo/web/`).
+Riscrittura di `tavolo/server.py`: stessa API, stesso database.
+Client: quello nuovo in Angular (`tavolo-web/`, `WEB_BETA_DIR`) è la pagina principale; il vecchio (`tavolo/web/`,
+`WEB_DIR`) resta su `/vecchio/` come ripiego. Senza `WEB_BETA_DIR` il vecchio torna su `/`.
 Contratto: [CONTRATTO.md](CONTRATTO.md) · Regole (chi può fare cosa): [REGOLE.md](REGOLE.md)
 
 ## Provarlo sul PC

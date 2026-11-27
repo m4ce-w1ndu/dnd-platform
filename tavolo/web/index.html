@@ -246,38 +246,82 @@
           </div>
         </details>
       </div>
-      <!-- IMPOSTAZIONI (solo admin) -->
+      <!-- AMMINISTRAZIONE (solo account di sistema): sezioni come nel client nuovo -->
       <div class="tab" id="tab-impostazioni">
-        <details open><summary>🏰 Generale</summary>
-          <label>Nome del tavolo<input id="i-nome" name="nome-tavolo" autocomplete="off"></label>
-          <label>Indirizzo pubblico (per l'accesso con account)<input id="i-url" name="indirizzo-pubblico" type="url" inputmode="url" autocomplete="url" placeholder="https://dnd.immovilli.trade"></label>
-          <p class="aiuto">Lascia vuoto per usare l'indirizzo con cui apri la pagina. Va impostato se usi l'accesso con account dietro un proxy.</p>
-        </details>
-        <details open><summary>🚪 Accesso dei giocatori</summary>
-          <label class="switch"><input type="checkbox" id="i-ospiti"> ammetti ospiti (senza account, solo il nome)</label>
-          <label>Password del tavolo (facoltativa)<input id="i-pwg" name="password-tavolo" autocomplete="off" placeholder="vuota = nessuna password"></label>
-          <p class="aiuto">Se attivi un provider e disattivi gli ospiti, si entra solo con Discord/Google/GitHub.</p>
-        </details>
-        <details open><summary>🔑 Accesso con account (OAuth)</summary>
-          <div id="i-oauth"></div>
-        </details>
-        <details open><summary>👑 Account amministratore</summary>
-          <label>Nome utente<input id="i-adm-utente" name="admin-utente" autocomplete="off" data-lpignore="true"></label>
-          <label>Nuova password (almeno 8 caratteri)<input id="i-adm-nuova" type="password" autocomplete="new-password"></label>
-          <label>Ripeti la nuova password<input id="i-adm-nuova2" type="password" autocomplete="new-password"></label>
-          <label>Password attuale (per confermare)<input id="i-adm-attuale" type="password" autocomplete="current-password"></label>
-          <button id="i-adm-salva" class="primario">Aggiorna account admin</button>
-        </details>
-        <details open><summary>👥 Utenti</summary>
-          <p class="aiuto">Abilita come Master chi deve poter condurre le partite: entrerà come Master senza password.</p>
-          <div id="i-utenti"></div>
-        </details>
-        <details><summary>💾 Dati e partite salvate</summary>
-          <p class="aiuto">Tutto è salvato nel database <code>dati/tavolo.db</code> (SQLite): partite, utenti, impostazioni.</p>
-          <div id="i-partite"></div>
-          <a id="i-backup" class="btn" href="#" style="display:block;margin-top:8px">⬇️ Scarica backup del database</a>
-        </details>
-        <button id="i-salva" class="primario grande">💾 Salva impostazioni</button>
+        <div class="sis">
+          <nav class="sis-nav" id="sis-nav" aria-label="Sezioni">
+            <button data-sez="generale"><span class="ic">🏰</span><span class="t">Generale</span></button>
+            <button data-sez="oauth"><span class="ic">🔑</span><span class="t">Accesso con account</span></button>
+            <button data-sez="utenti"><span class="ic">👥</span><span class="t">Utenti e permessi</span><span class="bolla" id="sis-bolla" hidden></span></button>
+            <button data-sez="dati"><span class="ic">💾</span><span class="t">Partite e backup</span></button>
+            <button data-sez="audit"><span class="ic">📋</span><span class="t">Registro</span></button>
+            <button data-sez="account"><span class="ic">🔐</span><span class="t">Account di sistema</span></button>
+          </nav>
+          <div class="sis-corpo">
+            <div class="sis-pagina">
+              <section class="sis-sez" data-sez="generale">
+                <h2>🏰 Generale</h2>
+                <p class="aiuto">Sei l'<b>account di sistema</b>: configuri il tavolo e decidi chi è amministratore. Il tavolo lo aprono e lo conducono gli amministratori, entrando con il loro account.</p>
+                <div class="blocco">
+                  <label>Nome del tavolo<input id="i-nome" name="nome-tavolo" autocomplete="off"></label>
+                  <label>Indirizzo pubblico (per l'accesso con account)<input id="i-url" name="indirizzo-pubblico" type="url" inputmode="url" autocomplete="url" placeholder="https://dnd.immovilli.trade"></label>
+                  <p class="aiuto">Lascia vuoto per usare l'indirizzo con cui apri la pagina. Va impostato se usi l'accesso con account dietro un proxy.</p>
+                </div>
+                <h3>🚪 Accesso dei giocatori</h3>
+                <div class="blocco">
+                  <label class="switch"><input type="checkbox" id="i-ospiti"> ammetti ospiti (senza account, solo il nome)</label>
+                  <label>Password del tavolo (facoltativa)<input id="i-pwg" name="password-tavolo" autocomplete="off" placeholder="vuota = nessuna password"></label>
+                  <p class="aiuto">Se attivi un provider e disattivi gli ospiti, si entra solo con Discord/Google/GitHub.</p>
+                </div>
+                <div class="salva-barra"><span class="aiuto">Tutto salvato.</span><button class="primario" data-salva disabled>💾 Salva</button></div>
+              </section>
+              <section class="sis-sez" data-sez="oauth" hidden>
+                <h2>🔑 Accesso con account</h2>
+                <p class="aiuto">Discord, Google e GitHub: attiva quelli che vuoi e incolla le credenziali dell'app registrata sulla loro console.</p>
+                <div id="i-oauth"></div>
+                <div class="salva-barra"><span class="aiuto">Tutto salvato.</span><button class="primario" data-salva disabled>💾 Salva</button></div>
+              </section>
+              <section class="sis-sez" data-sez="utenti" hidden>
+                <h2>👥 Utenti e permessi</h2>
+                <p class="aiuto"><b>Admin</b> = amministratore del tavolo: apre il tavolo, sceglie il Master e può fare il Master. <b>Master</b> = può condurre le partite.</p>
+                <div class="pulizia" id="i-pulizia">
+                  <div><b class="titolo">🧹 Pulizia</b><small><span id="i-pulizia-testo"></span>
+                    <select id="i-giorni" aria-label="giorni"><option value="1">1 giorno</option><option value="7">7 giorni</option><option value="30" selected>30 giorni</option><option value="90">90 giorni</option></select></small></div>
+                  <button class="primario" id="i-pulisci">Elimina</button>
+                </div>
+                <div class="riga filtri">
+                  <input type="search" id="i-cerca" placeholder="🔎 Cerca per nome o account">
+                  <div class="gruppo-btn" id="i-filtri">
+                    <button data-filtro="tutti" class="attivo">Tutti <small></small></button><button data-filtro="admin">Admin <small></small></button><button data-filtro="account">Con account <small></small></button><button data-filtro="ospiti">Ospiti <small></small></button>
+                  </div>
+                </div>
+                <div id="i-utenti"></div>
+              </section>
+              <section class="sis-sez" data-sez="dati" hidden>
+                <h2>💾 Partite e backup</h2>
+                <p class="aiuto">Tutto è salvato nel database <code>dati/tavolo.db</code> (SQLite): partite, utenti, impostazioni.</p>
+                <a id="i-backup" class="btn primario" href="#" style="display:block;margin:8px 0 14px">⬇️ Scarica backup del database</a>
+                <div id="i-partite"></div>
+              </section>
+              <section class="sis-sez" data-sez="audit" hidden>
+                <h2>📋 Registro di audit</h2>
+                <div class="riga"><span class="aiuto" style="flex:1">Accessi di sistema, permessi, impostazioni e cancellazioni, dal più recente.</span><button id="i-audit-aggiorna">🔄 Aggiorna</button></div>
+                <div id="i-audit"></div>
+              </section>
+              <section class="sis-sez" data-sez="account" hidden>
+                <h2>🔐 Account di sistema</h2>
+                <p class="aiuto">Nome utente e password con cui entri qui. Per cambiarli serve la password attuale.</p>
+                <div class="blocco">
+                  <label>Nome utente<input id="i-adm-utente" name="admin-utente" autocomplete="off" data-lpignore="true"></label>
+                  <label>Nuova password (almeno 8 caratteri)<input id="i-adm-nuova" type="password" autocomplete="new-password"></label>
+                  <label>Ripeti la nuova password<input id="i-adm-nuova2" type="password" autocomplete="new-password"></label>
+                  <label>Password attuale (per confermare)<input id="i-adm-attuale" type="password" autocomplete="current-password"></label>
+                  <button id="i-adm-salva" class="primario">Aggiorna account di sistema</button>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
       </div>
     </aside>
   </main>

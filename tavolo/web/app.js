@@ -59,9 +59,9 @@ async function avvio() {
   const u = new URLSearchParams(location.search);
   let cred = null;
   try { cred = JSON.parse(localStorage.getItem("tv_cred") || "null"); } catch (e) { /* */ }
-  if (location.pathname.replace(/\/$/, "") === "/admin" || u.has("admin")) {
+  if (/\/admin\/?$/.test(location.pathname) || u.has("admin")) {
     // ingresso di riserva per l'amministratore: sempre disponibile, qualunque cosa sia salvata nel browser
-    history.replaceState(null, "", "/");
+    history.replaceState(null, "", location.pathname.replace(/admin\/?$/, ""));
     mostraLoginAdmin();
     return;
   }
@@ -326,6 +326,7 @@ function evento(ev) {
     case "online":
       st.online = ev.online;
       disegnaGruppo();
+      aggiornaUtentiPresto();
       if (st.sessione !== "in_corso") disegnaSala();
       break;
     case "catalogo":
@@ -1420,9 +1421,41 @@ function salaGiocatore(online, ilMaster, persone) {
     <h3>Al tavolo</h3><ul class="online persone">${persone}</ul>`;
 }
 
-/* ============================================================ impostazioni (admin) */
+/* ============================================================ amministrazione (account di sistema) */
+const AZIONI_AUDIT = {
+  login_admin: "🔑 accesso di sistema", login_admin_fallito: "⛔ password di sistema sbagliata", login_oauth: "👤 accesso con account",
+  login_admin_oauth: "👤 accesso di un amministratore", password_admin_convertita_argon2: "🔒 password convertita ad Argon2",
+  imp_salva: "⚙️ impostazioni salvate", imp_admin: "🔑 account di sistema cambiato", imp_admin_password_errata: "⛔ password attuale sbagliata",
+  utente_permessi: "👥 permessi cambiati", utente_eliminato: "🗑️ utente eliminato", utenti_eliminati: "🧹 pulizia degli utenti",
+  sessione_apri: "🚪 tavolo aperto", nomina_master: "👑 Master scelto", reset_partita: "♻️ partita ricominciata",
+  imp_partita_azzera: "♻️ partita azzerata", importa_partita: "📥 partita importata", carica_avventura: "📦 avventura caricata",
+  avventura_elimina: "🗑️ avventura eliminata", mappa_elimina: "🗑️ mappa eliminata", backup: "💾 backup scaricato",
+};
+const SEZIONI = ["generale", "oauth", "utenti", "dati", "audit", "account"];
+const quando = (t) => (t ? new Date(t * 1000).toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—");
+const qCred = () => `c=${encodeURIComponent(S.cred.id)}&s=${encodeURIComponent(S.cred.secret)}`;
+
+function mostraSezione(id) {
+  if (!SEZIONI.includes(id)) id = "generale";
+  S.sezione = id;
+  try { localStorage.setItem("tv_sistema_sezione", id); } catch (e) { /* */ } // stessa chiave del client nuovo
+  $$("#sis-nav button").forEach((b) => b.classList.toggle("attivo", b.dataset.sez === id));
+  $$(".sis-sez").forEach((x) => (x.hidden = x.dataset.sez !== id));
+  if (id === "audit") disegnaAudit();
+}
+
+function modificato(si) {
+  S.impModificate = si;
+  $$(".salva-barra").forEach((b) => {
+    b.classList.toggle("sporco", si);
+    $("span", b).textContent = si ? "Ci sono modifiche non salvate." : "Tutto salvato.";
+    $("button", b).disabled = !si;
+  });
+}
+
 async function disegnaImpostazioni() {
   if (!S.me?.sistema) return;
+  S.lettoAlle = Date.now();
   const r = await op({ op: "imp_leggi" });
   if (!r.ok) return;
   const c = r.config;
@@ -1436,38 +1469,129 @@ async function disegnaImpostazioni() {
     <label>Client Secret<input data-k="secret" name="oauth-secret-${k}" type="text" class="segreto" placeholder="${v.secret_impostato ? "•••••• (impostato: scrivi solo per cambiarlo)" : "incolla qui il secret"}" autocomplete="off" spellcheck="false"></label>
     <span class="aiuto">Redirect URI da registrare su <a href="${esc(v.console)}" target="_blank" rel="noopener">${esc(v.nome)}</a>:</span>
     <code>${esc(base)}/auth/${k}/callback</code></div>`).join("");
-  const quando = (t) => (t ? new Date(t * 1000).toLocaleString("it-IT", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—");
-  $("#i-utenti").innerHTML = r.utenti.map((x) => `<div class="utente">${x.avatar ? `<img src="${esc(x.avatar)}" alt="">` : '<span class="av">👤</span>'}
-    <div class="n"><b>${esc(x.nome)}</b>${x.io ? " (tu)" : ""} ${x.online ? "🟢" : ""}<small>${esc(x.provider)}${x.account ? " · " + esc(x.account) : ""} · visto ${quando(x.visto)}</small></div>
-    <label class="switch" title="Può entrare come Master"><input type="checkbox" data-master="${x.id}" ${x.master ? "checked" : ""} ${x.admin ? "disabled" : ""}> Master</label>
-    ${x.io ? "" : `<label class="switch" title="Può cambiare le impostazioni"><input type="checkbox" data-admin="${x.id}" ${x.admin ? "checked" : ""}> Admin</label><button class="link" data-del="${x.id}" title="Elimina">🗑️</button>`}</div>`).join("");
-  $$("[data-master]").forEach((cb) => (cb.onchange = () => op({ op: "imp_utente", id: cb.dataset.master, master: cb.checked })));
-  $$("[data-admin]").forEach((cb) => (cb.onchange = async () => { await op({ op: "imp_utente", id: cb.dataset.admin, admin: cb.checked }); disegnaImpostazioni(); }));
+  modificato(false);
+  S.utentiImp = r.utenti;
+  disegnaUtenti();
   const rp = await op({ op: "imp_partite" });
   if (rp.ok) {
-    const q = `c=${encodeURIComponent(S.cred.id)}&s=${encodeURIComponent(S.cred.secret)}`;
     $("#i-partite").innerHTML = rp.partite.length ? rp.partite.map((x) => `<div class="utente"><span class="av">📜</span><div class="n"><b>${esc(x.titolo)}</b>${x.in_gioco ? ' <span class="chip attivo">in gioco</span>' : ""}<small>salvata ${quando(x.aggiornata)} · ${x.pedine} pedine · ${x.tiri} tiri · round ${x.round}</small></div>
-      <a class="btn" href="/api/esporta?id=${encodeURIComponent(x.id)}&${q}" title="Scarica">⬇️</a><button class="link" data-azzera="${esc(x.id)}" title="Ricomincia da zero">♻️</button></div>`).join("") : '<p class="aiuto">Nessuna partita salvata.</p>';
+      <a class="btn" href="/api/esporta?id=${encodeURIComponent(x.id)}&${qCred()}" title="Scarica">⬇️</a><button class="link" data-azzera="${esc(x.id)}" title="Ricomincia da zero">♻️</button></div>`).join("") : '<p class="aiuto">Nessuna partita salvata.</p>';
     $$("[data-azzera]").forEach((b) => (b.onclick = async () => { if (await conferma("Pedine, nebbia, schede e cronologia verranno cancellate.", { titolo: "Azzerare questa partita?", pericolo: true, ok: "Azzera" })) { await op({ op: "imp_partita_azzera", id: b.dataset.azzera }); disegnaImpostazioni(); } }));
-    $("#i-backup").href = `/api/backup?${q}`;
+    $("#i-backup").href = `/api/backup?${qCred()}`;
   }
-  $$("[data-del]").forEach((b) => (b.onclick = async () => { if (await conferma("Dovrà rifare l'accesso da capo.", { titolo: "Eliminare questo utente?", pericolo: true, ok: "Elimina" })) { await op({ op: "imp_utente", id: b.dataset.del, elimina: true }); disegnaImpostazioni(); } }));
 }
+
+/** Ricarica solo gli utenti (chi entra o esce): una volta sola anche se arrivano tanti eventi insieme. */
+function aggiornaUtentiPresto() {
+  if (!S.me?.sistema) return;
+  clearTimeout(S.timerUtenti);
+  S.timerUtenti = setTimeout(async () => {
+    if (Date.now() - (S.lettoAlle || 0) < 1500) return;
+    const r = await op({ op: "imp_leggi" });
+    if (r.ok) { S.utentiImp = r.utenti; disegnaUtenti(); }
+  }, 1000);
+}
+
+function filtroUtente(x, f) {
+  if (f === "admin") return x.admin && !x.sistema;
+  if (f === "account") return !!x.account && !x.sistema;
+  if (f === "ospiti") return !x.account && !x.sistema;
+  return true;
+}
+
+function daPulire() {
+  const ut = S.utentiImp || [];
+  const limite = Date.now() / 1000 - (+$("#i-giorni").value || 30) * 86400;
+  const doppioni = ut.filter((x) => x.sistema && !x.io && !x.online);
+  const vecchi = ut.filter((x) => !x.sistema && !x.account && !x.admin && !x.master && !x.online && !x.io && (x.visto || 0) < limite);
+  return { doppioni, vecchi, tutti: [...doppioni, ...vecchi] };
+}
+
+function disegnaUtenti() {
+  const ut = S.utentiImp || [];
+  const f = S.filtroUtenti || "tutti";
+  const q = ($("#i-cerca").value || "").trim().toLowerCase();
+  const p = daPulire();
+  const via = new Set(p.tutti.map((x) => x.id));
+  // pulizia
+  const pl = $("#i-pulizia");
+  pl.classList.toggle("ok", !p.tutti.length);
+  const parti = [];
+  if (p.doppioni.length) parti.push(`${p.doppioni.length} ${p.doppioni.length === 1 ? "vecchia copia" : "vecchie copie"} dell'account di sistema`);
+  if (p.vecchi.length || !p.tutti.length) parti.push(p.tutti.length ? `${p.vecchi.length} ${p.vecchi.length === 1 ? "ospite non visto" : "ospiti non visti"} da più di` : "✨ Niente da pulire: nessuna copia dell'account di sistema e nessun ospite fermo da più di");
+  $("#i-pulizia-testo").textContent = parti.join(" · ");
+  $("#i-giorni").hidden = !!p.tutti.length && !p.vecchi.length;
+  $("#i-pulisci").textContent = `Elimina ${p.tutti.length}`;
+  $("#sis-bolla").hidden = !p.tutti.length;
+  $("#sis-bolla").textContent = p.tutti.length;
+  // filtri con i conteggi
+  $$("#i-filtri button").forEach((b) => {
+    b.classList.toggle("attivo", b.dataset.filtro === f);
+    $("small", b).textContent = ut.filter((x) => filtroUtente(x, b.dataset.filtro)).length;
+  });
+  const lista = [...ut]
+    .sort((a, b) => b.io - a.io || b.admin - a.admin || !!b.account - !!a.account || b.online - a.online || (b.visto || 0) - (a.visto || 0))
+    .filter((x) => filtroUtente(x, f) && (!q || x.nome.toLowerCase().includes(q) || (x.account || "").toLowerCase().includes(q)));
+  $("#i-utenti").innerHTML = lista.map((x) => `<div class="utente ${via.has(x.id) ? "da-pulire" : ""}">${x.avatar ? `<img src="${esc(x.avatar)}" alt="">` : `<span class="av">${x.sistema ? "⚙️" : "👤"}</span>`}
+    <div class="n"><b>${esc(x.nome)}</b>${x.io ? " (tu)" : ""} ${x.online ? "🟢" : ""}${x.sistema ? ` <span class="chip">${x.io ? "sistema" : "copia vecchia"}</span>` : x.admin ? ' <span class="chip attivo">admin</span>' : ""}<small>${x.sistema ? "account di sistema" : esc(x.provider)}${x.account ? " · " + esc(x.account) : ""} · visto ${quando(x.visto)}</small></div>
+    ${x.sistema ? "" : `<label class="switch" title="Può condurre le partite"><input type="checkbox" data-master="${x.id}" ${x.master ? "checked" : ""} ${x.admin ? "disabled" : ""}> Master</label>
+    <label class="switch" title="Apre il tavolo e sceglie il Master"><input type="checkbox" data-admin="${x.id}" ${x.admin ? "checked" : ""}> Admin</label>`}
+    ${x.io ? "" : `<button class="link" data-del="${x.id}" title="Elimina">🗑️</button>`}</div>`).join("") || '<p class="aiuto">Nessun utente.</p>';
+  $$("#i-utenti [data-master]").forEach((cb) => (cb.onchange = async () => { await op({ op: "imp_utente", id: cb.dataset.master, master: cb.checked }); disegnaImpostazioni(); }));
+  $$("#i-utenti [data-admin]").forEach((cb) => (cb.onchange = async () => { await op({ op: "imp_utente", id: cb.dataset.admin, admin: cb.checked }); disegnaImpostazioni(); }));
+  $$("#i-utenti [data-del]").forEach((b) => (b.onclick = async () => {
+    const x = ut.find((u) => u.id === b.dataset.del);
+    if (await conferma("Dovrà rifare l'accesso da capo.", { titolo: `Eliminare «${x?.nome || "questo utente"}»?`, pericolo: true, ok: "Elimina" })) { await op({ op: "imp_utente", id: b.dataset.del, elimina: true }); disegnaImpostazioni(); }
+  }));
+}
+
+async function disegnaAudit() {
+  const r = await fetch(`/api/audit?${qCred()}`).then((x) => (x.ok ? x.json() : null)).catch(() => null);
+  const voci = r?.audit || [];
+  const dettagli = (d) => {
+    if (!d || typeof d !== "object") return "";
+    const parti = Object.entries(d).filter(([, v]) => v !== null && v !== false && !(Array.isArray(v) && !v.length)).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`);
+    return parti.length ? " · " + parti.join(" · ") : "";
+  };
+  $("#i-audit").innerHTML = voci.map((a) => `<div class="utente"><div class="n"><b>${esc(AZIONI_AUDIT[a.azione] || a.azione)}</b><small>${quando(a.ora)} · ${esc(a.nome || a.utente || "—")} · ${esc(a.ip || "—")}${esc(dettagli(a.dettagli))}</small></div></div>`).join("") || '<p class="aiuto">Nessuna voce.</p>';
+}
+
 function preparaImpostazioni() {
-  $("#i-salva").onclick = async () => {
+  let sez = "generale";
+  try { sez = localStorage.getItem("tv_sistema_sezione") || sez; } catch (e) { /* */ }
+  $$("#sis-nav button").forEach((b) => (b.onclick = () => mostraSezione(b.dataset.sez)));
+  mostraSezione(sez);
+  $$('.sis-sez[data-sez="generale"], .sis-sez[data-sez="oauth"]').forEach((x) => {
+    x.addEventListener("input", () => modificato(true));
+    x.addEventListener("change", () => modificato(true));
+  });
+  $$("[data-salva]").forEach((b) => (b.onclick = async () => {
     const oauth = {};
     $$("#i-oauth .prov").forEach((d) => {
       oauth[d.dataset.prov] = { attivo: $('[data-k="attivo"]', d).checked, id: $('[data-k="id"]', d).value.trim(), secret: $('[data-k="secret"]', d).value.trim() };
     });
     const r = await op({ op: "imp_salva", config: { nome_tavolo: $("#i-nome").value, public_url: $("#i-url").value.trim(), ospiti: $("#i-ospiti").checked, password_giocatori: $("#i-pwg").value, oauth } });
     if (r.ok) { toast("💾 Impostazioni salvate"); disegnaImpostazioni(); }
+  }));
+  $("#i-cerca").oninput = disegnaUtenti;
+  $("#i-giorni").onchange = disegnaUtenti;
+  $$("#i-filtri button").forEach((b) => (b.onclick = () => { S.filtroUtenti = b.dataset.filtro; disegnaUtenti(); }));
+  $("#i-pulisci").onclick = async () => {
+    const via = daPulire().tutti;
+    if (!via.length) return;
+    const nomi = via.slice(0, 8).map((x) => x.nome).join(", ") + (via.length > 8 ? ` e altri ${via.length - 8}` : "");
+    if (!(await conferma(`${nomi}. Chi rientra dovrà rifare l'accesso da capo.`, { titolo: `Eliminare ${via.length} ${via.length === 1 ? "utente" : "utenti"}?`, icona: "🧹", pericolo: true, ok: "Elimina" }))) return;
+    const r = await op({ op: "imp_utenti_elimina", ids: via.map((x) => x.id) });
+    if (r.ok) toast(`🧹 ${r.eliminati ?? via.length} utenti eliminati`);
+    disegnaImpostazioni();
   };
+  $("#i-audit-aggiorna").onclick = disegnaAudit;
   $("#i-adm-salva").onclick = async () => {
     const nuova = $("#i-adm-nuova").value;
     if (nuova && nuova !== $("#i-adm-nuova2").value) { avviso("Scrivi la stessa nuova password in tutti e due i campi.", { titolo: "Le password non coincidono", icona: "🔑" }); return; }
     if (!$("#i-adm-attuale").value) { avviso("Per sicurezza, per cambiare utente o password serve la password attuale.", { titolo: "Manca la password attuale", icona: "🔑" }); return; }
     const r = await op({ op: "imp_admin", utente: $("#i-adm-utente").value, nuova, attuale: $("#i-adm-attuale").value });
-    if (r.ok) { toast("✅ Account admin aggiornato"); ["#i-adm-nuova", "#i-adm-nuova2", "#i-adm-attuale"].forEach((q) => ($(q).value = "")); }
+    if (r.ok) { toast("✅ Account di sistema aggiornato"); ["#i-adm-nuova", "#i-adm-nuova2", "#i-adm-attuale"].forEach((q) => ($(q).value = "")); }
   };
 }
 
