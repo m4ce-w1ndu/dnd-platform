@@ -241,10 +241,7 @@ impl Tavolo {
                     if uid == id {
                         return Risposta::no("non puoi eliminare te stesso");
                     }
-                    self.account.retain(|_, v| *v != uid);
-                    self.utenti.shift_remove(&uid);
-                    self.invia_a(Evento::Esci, Some(&uid));
-                    self.clienti.remove(&uid); // il browser riceve «esci» e poi lo stream si chiude
+                    self.elimina_utente(&uid);
                     self.db
                         .audit(
                             Some(id),
@@ -290,8 +287,44 @@ impl Tavolo {
                 Risposta::si()
             }
 
+            Op::ImpUtentiElimina { ids } => {
+                let mut eliminati = Vec::new();
+                for uid in ids {
+                    // se stessi no; gli sconosciuti (già eliminati da un'altra scheda) si saltano
+                    if uid == id || eliminati.contains(&uid) {
+                        continue;
+                    }
+                    if self.utenti.contains_key(&uid) {
+                        self.elimina_utente(&uid);
+                        eliminati.push(uid);
+                    }
+                }
+                if !eliminati.is_empty() {
+                    self.db
+                        .audit(
+                            Some(id),
+                            Some(nome_u),
+                            Some(ip),
+                            "utenti_eliminati",
+                            &json!({"utenti": eliminati, "quanti": eliminati.len()}),
+                        )
+                        .await;
+                    self.online_dopo();
+                    self.salva_presto();
+                }
+                Risposta::ok(json!({"ok": true, "eliminati": eliminati.len()}))
+            }
+
             _ => Risposta::no("impostazione sconosciuta"),
         }
+    }
+
+    /// Toglie un utente (e i suoi account esterni); se è collegato, il browser riceve «esci».
+    fn elimina_utente(&mut self, uid: &str) {
+        self.account.retain(|_, v| v != uid);
+        self.utenti.shift_remove(uid);
+        self.invia_a(Evento::Esci, Some(uid));
+        self.clienti.remove(uid); // il browser riceve «esci» e poi lo stream si chiude
     }
 }
 

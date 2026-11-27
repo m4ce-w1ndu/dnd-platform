@@ -84,6 +84,7 @@ Le risposte sono `{"ok": true}` salvo dove indicato.
 | `imp_partite` | A | | `{ok,partite[{id,titolo,aggiornata,pedine,tiri,round,in_gioco}]}`. |
 | `imp_partita_azzera` | A | `id` | Cancella la partita salvata. |
 | `imp_utente` | A | `id`, `master?`, `admin?`, `elimina?` | Non su se stessi per `admin`/`elimina`. Eliminato → evento `esci`. |
+| `imp_utenti_elimina` | A | `ids: [id]` | Pulizia in blocco (server Rust): salta se stessi, doppioni e id sconosciuti; risposta `eliminati: n`. Ogni eliminato → `esci`. |
 | `scena` | M | `id`, `porta_gruppo?` (predefinito true) | Cambia mappa; i PG vengono spostati (posizione azzerata). |
 | `griglia` | M | `id`, `griglia{cella,ox,oy,mostra}` | Riscrive `<mappa>.json`. |
 | `nebbia` | M | `scena?`, `attiva?`, `azione` `rivela`/`copri`/`copri_tutto`, `celle[]` | Evento `nebbia`. |

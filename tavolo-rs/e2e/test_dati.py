@@ -6,7 +6,7 @@ import time
 import unittest
 import zipfile
 
-from harness import PW_ADMIN, Base, Client, Server, apri_tavolo
+from harness import PW_ADMIN, Base, Client, Server, apri_tavolo, solo_rust
 from test_permessi import PNG
 
 
@@ -235,6 +235,20 @@ class TestImpostazioni(Base):
         self.sistema.ok("imp_utente", id=h.id, elimina=True)
         self.assertTrue(h.aspetta(lambda e: e.get("t") == "esci"))
         self.assertEqual(h.get("/api/io?" + h.qs()).status, 401)
+
+    @solo_rust
+    def test_utenti_elimina_in_blocco(self):
+        g, h = self.giocatore(), self.giocatore()
+        self.assertFalse(g.op("imp_utenti_elimina", ids=[h.id]).json["ok"])            # solo il sistema
+        self.assertFalse(self.admin.op("imp_utenti_elimina", ids=[h.id]).json["ok"])
+        r = self.sistema.ok("imp_utenti_elimina", ids=[g.id, h.id, g.id, "non-esiste", self.sistema.id])
+        self.assertEqual(r["eliminati"], 2)                                            # niente doppi, sconosciuti, se stesso
+        self.assertTrue(g.aspetta(lambda e: e.get("t") == "esci"))
+        self.assertEqual(h.get("/api/io?" + h.qs()).status, 401)
+        self.assertEqual(self.sistema.get("/api/io?" + self.sistema.qs()).status, 200)
+        utenti = {u["id"] for u in self.sistema.ok("imp_leggi")["utenti"]}
+        self.assertNotIn(g.id, utenti)
+        self.assertEqual(self.sistema.ok("imp_utenti_elimina", ids=[])["eliminati"], 0)
 
     def test_nomina_master(self):
         g, h = self.giocatore(), self.giocatore()

@@ -249,9 +249,12 @@ function applicaStato(st, mantieniVista) {
   S.st = st;
   S.me = st.io;
   document.body.classList.toggle("master", S.me.role === "master");
-  document.body.classList.toggle("admin", !!S.me.admin);
+  // L'account di sistema configura e basta: niente sala, niente mappa, solo ⚙️ Impostazioni.
+  const sistema = !!S.me.sistema;
+  document.body.classList.toggle("admin", !!S.me.admin && !sistema);
+  document.body.classList.toggle("sistema", sistema);
   $("#btn-logout-nome").innerHTML = S.me.avatar ? `<img src="${esc(S.me.avatar)}" alt="">` : `<b>${esc((S.me.name || "?").slice(0, 14))}</b>`;
-  $("#io-chi").innerHTML = `${S.me.avatar ? `<img src="${esc(S.me.avatar)}" style="width:18px;height:18px;border-radius:50%;vertical-align:middle"> ` : ""}${esc(S.me.name)}${S.me.provider ? ` · ${esc(S.me.provider)}` : " · ospite"}${S.me.admin ? " · admin" : ""}`;
+  $("#io-chi").innerHTML = `${S.me.avatar ? `<img src="${esc(S.me.avatar)}" style="width:18px;height:18px;border-radius:50%;vertical-align:middle"> ` : ""}${esc(S.me.name)}${S.me.provider ? ` · ${esc(S.me.provider)}` : " · ospite"}${sistema ? " · sistema" : S.me.admin ? " · admin" : ""}`;
   $("#segreto-lbl").textContent = S.me.role === "master" ? "tiro nascosto ai giocatori" : "tiro privato (solo tu e il Master)";
   S.avv = st.avv;
   S.pg = {}; S.mostri = {};
@@ -372,7 +375,7 @@ function cellaPx() { return griglia()?.cella || 50; }
 
 function caricaScena(adatta) {
   const sc = scenaCorrente();
-  $("#nome-scena").textContent = sc.titolo;
+  $("#nome-scena").textContent = S.me?.sistema ? "⚙️ Amministrazione" : sc.titolo;
   const img = $("#mappa");
   const W = sc.larghezza, H = sc.altezza;
   img.hidden = !sc.file;
@@ -1302,11 +1305,19 @@ function disegnaSala() {
   const box = $("#sala");
   const st = S.st.sessione || "chiusa";
   const master = S.me.role === "master";
-  const admin = !!S.me.admin;
+  const admin = !!S.me.admin && !S.me.sistema;
+  if (S.me.sistema) {
+    box.hidden = true;
+    $("#btn-pausa").hidden = true;
+    $("#nome-scena").textContent = "⚙️ Amministrazione";
+    const tab = $('#schede-nav [data-tab="impostazioni"]');
+    if (!tab.classList.contains("attivo")) tab.click();
+    return;
+  }
   if (st === "in_corso") { box.hidden = true; $("#btn-pausa").hidden = !master; return; }
   box.hidden = false;
   $("#btn-pausa").hidden = true;
-  const online = S.st.online || [];
+  const online = (S.st.online || []).filter((u) => !u.sistema); // l'account di sistema non gioca
   const ilMaster = online.find((u) => u.role === "master");
   const persone = online.map((u) => {
     const pg = u.char && S.pg[u.char] ? `${S.pg[u.char].icona} ${esc(S.pg[u.char].nome)}` : u.admin ? "🔑 admin" : (st === "chiusa" ? "in attesa" : "sceglie il personaggio…");
@@ -1411,7 +1422,7 @@ function salaGiocatore(online, ilMaster, persone) {
 
 /* ============================================================ impostazioni (admin) */
 async function disegnaImpostazioni() {
-  if (!S.me?.admin) return;
+  if (!S.me?.sistema) return;
   const r = await op({ op: "imp_leggi" });
   if (!r.ok) return;
   const c = r.config;

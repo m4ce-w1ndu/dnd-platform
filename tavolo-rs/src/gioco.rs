@@ -475,7 +475,8 @@ impl Tavolo {
             | Op::ImpAdmin { .. }
             | Op::ImpPartite {}
             | Op::ImpPartitaAzzera { .. }
-            | Op::ImpUtente { .. }) => self.impostazioni(id, &nome_u, ip, op).await,
+            | Op::ImpUtente { .. }
+            | Op::ImpUtentiElimina { .. }) => self.impostazioni(id, &nome_u, ip, op).await,
 
             // ------------------------------------------------------------ solo Master
             Op::Scena { id: sid, porta_gruppo } => {

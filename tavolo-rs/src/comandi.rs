@@ -283,6 +283,12 @@ pub enum Op {
         #[ts(optional = nullable)]
         admin: Option<bool>,
     },
+    /// Elimina più utenti in una volta (pulizia dei vecchi ospiti e dei doppioni dell'account di sistema).
+    ImpUtentiElimina {
+        #[ts(as = "Option<Vec<String>>", optional = nullable)]
+        #[serde(default, deserialize_with = "lenient::strings")]
+        ids: Vec<String>,
+    },
     Scena {
         #[ts(as = "Option<String>", optional = nullable)]
         #[serde(default, deserialize_with = "lenient::string")]
@@ -395,6 +401,7 @@ pub const NOMI: &[&str] = &[
     "imp_partite",
     "imp_partita_azzera",
     "imp_utente",
+    "imp_utenti_elimina",
     "scena",
     "griglia",
     "nebbia",
@@ -459,6 +466,7 @@ impl Op {
             Op::ImpPartite {} => "imp_partite",
             Op::ImpPartitaAzzera { .. } => "imp_partita_azzera",
             Op::ImpUtente { .. } => "imp_utente",
+            Op::ImpUtentiElimina { .. } => "imp_utenti_elimina",
             Op::Scena { .. } => "scena",
             Op::Griglia { .. } => "griglia",
             Op::Nebbia { .. } => "nebbia",

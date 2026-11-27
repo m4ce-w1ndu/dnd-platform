@@ -254,6 +254,12 @@ summary{cursor:pointer;font-weight:700;color:var(--oro2);padding:2px 0}
 .solo-mobile{display:none}
 body:not(.master) .solo-master{display:none!important}
 body:not(.admin) .solo-admin{display:none!important}
+body:not(.sistema) .solo-sistema{display:none!important}
+/* account di sistema: solo le impostazioni, a tutta pagina */
+body.sistema #strumenti,body.sistema #viewport,body.sistema #btn-pannello,body.sistema #sala,
+body.sistema #schede-nav button:not([data-tab="impostazioni"]){display:none!important}
+body.sistema #laterale{position:static;flex:1;width:auto;max-width:none;height:auto;transform:none;border:none;border-radius:0;box-shadow:none}
+body.sistema .tab{width:100%;max-width:760px;margin:0 auto}
 
 /* ---------- mobile ---------- */
 @media (max-width:860px){

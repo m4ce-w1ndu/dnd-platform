@@ -4,7 +4,13 @@ import { firstValueFrom } from 'rxjs';
 
 import { CredService } from '../core/cred.service';
 import { UiService } from '../core/ui.service';
-import type { ConfigPubblica, PartitaSalvata, UtenteImpostazioni, VoceAudit, VoceTiro } from './avventura';
+import type {
+  ConfigPubblica,
+  PartitaSalvata,
+  UtenteImpostazioni,
+  VoceAudit,
+  VoceTiro,
+} from './avventura';
 import type { Info } from './generati/Info';
 import type { Io } from './generati/Io';
 import type { Op } from './generati/Op';
@@ -26,9 +32,11 @@ interface RisposteOp {
   imp_leggi: { config: ConfigPubblica; utenti: UtenteImpostazioni[] };
   imp_salva: { config: ConfigPubblica };
   imp_partite: { partite: PartitaSalvata[] };
+  imp_utenti_elimina: { eliminati: number };
 }
 export type NomeOp = Op['op'];
-export type RispostaOp<K extends NomeOp> = Esito & (K extends keyof RisposteOp ? Partial<RisposteOp[K]> : unknown);
+export type RispostaOp<K extends NomeOp> = Esito &
+  (K extends keyof RisposteOp ? Partial<RisposteOp[K]> : unknown);
 
 export interface Login {
   id: string;
@@ -68,13 +76,21 @@ export class ApiService {
     return this.post('/api/login', c ? { ...corpo, id: c.id, secret: c.secret } : corpo);
   }
 
-  async entra(dati: { ruolo: string; personaggio: string | null; colore?: string; nome?: string }): Promise<Esito & { login?: boolean }> {
+  async entra(dati: {
+    ruolo: string;
+    personaggio: string | null;
+    colore?: string;
+    nome?: string;
+  }): Promise<Esito & { login?: boolean }> {
     const c = this.cred.cred();
     return this.post('/api/entra', { ...dati, id: c?.id, secret: c?.secret });
   }
 
   /** Un comando di gioco. Gli errori vengono mostrati all'utente; 401 = si torna all'accesso. */
-  async op<K extends NomeOp>(o: Extract<Op, { op: K }>, opz: { silenzioso?: boolean } = {}): Promise<RispostaOp<K>> {
+  async op<K extends NomeOp>(
+    o: Extract<Op, { op: K }>,
+    opz: { silenzioso?: boolean } = {},
+  ): Promise<RispostaOp<K>> {
     const r = await this.post<RispostaOp<K>>('/api/op', o);
     if (!r.ok && r.errore && !opz.silenzioso) void this.ui.avviso(r.errore.replace(/^⚠️\s*/, ''));
     if (r.status === 401) this.disconnesso();
@@ -87,13 +103,21 @@ export class ApiService {
 
   /** Caricamento di un file (avventura .zip, mappa, documento). */
   async carica(url: string, file: Blob): Promise<Esito & { id?: string; titolo?: string }> {
-    const r = await this.post<Esito & { id?: string; titolo?: string }>(`${url}${url.includes('?') ? '&' : '?'}${this.cred.query()}`, file);
-    if (!r.ok) void this.ui.avviso(r.errore || 'Il caricamento non è riuscito.', { titolo: 'Caricamento non riuscito' });
+    const r = await this.post<Esito & { id?: string; titolo?: string }>(
+      `${url}${url.includes('?') ? '&' : '?'}${this.cred.query()}`,
+      file,
+    );
+    if (!r.ok)
+      void this.ui.avviso(r.errore || 'Il caricamento non è riuscito.', {
+        titolo: 'Caricamento non riuscito',
+      });
     return r;
   }
 
   async audit(): Promise<VoceAudit[]> {
-    const r = await this.get<{ ok: boolean; audit: VoceAudit[] }>(`/api/audit?${this.cred.query()}`);
+    const r = await this.get<{ ok: boolean; audit: VoceAudit[] }>(
+      `/api/audit?${this.cred.query()}`,
+    );
     return r?.audit ?? [];
   }
 
@@ -117,7 +141,8 @@ export class ApiService {
     } catch (e) {
       if (e instanceof HttpErrorResponse) {
         const corpo = (e.error && typeof e.error === 'object' ? e.error : {}) as Partial<T>;
-        const errore = corpo.errore ?? (e.status === 0 ? 'Server non raggiungibile' : `Errore ${e.status}`);
+        const errore =
+          corpo.errore ?? (e.status === 0 ? 'Server non raggiungibile' : `Errore ${e.status}`);
         return { ...corpo, ok: false, errore, status: e.status } as T;
       }
       return { ok: false, errore: 'Errore inatteso', status: 0 } as T;

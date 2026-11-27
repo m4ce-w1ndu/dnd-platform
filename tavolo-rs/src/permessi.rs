@@ -81,7 +81,8 @@ pub fn richiesto(op: &Op) -> (Chi, &'static str) {
         | Op::ImpAdmin { .. }
         | Op::ImpPartite {}
         | Op::ImpPartitaAzzera { .. }
-        | Op::ImpUtente { .. } => (Sistema, "impostazioni e permessi si cambiano solo dall'account di sistema «Admin»"),
+        | Op::ImpUtente { .. }
+        | Op::ImpUtentiElimina { .. } => (Sistema, "impostazioni e permessi si cambiano solo dall'account di sistema «Admin»"),
         Op::Scena { .. }
         | Op::Griglia { .. }
         | Op::Nebbia { .. }
@@ -179,6 +180,7 @@ mod test {
         ("imp_partite", "no", false, false, true),
         ("imp_partita_azzera", "no", false, false, true),
         ("imp_utente", "no", false, false, true),
+        ("imp_utenti_elimina", "no", false, false, true),
         ("scena", "no", true, false, false),
         ("griglia", "no", true, false, false),
         ("nebbia", "no", true, false, false),
@@ -236,6 +238,7 @@ mod test {
             "imp_leggi",
             "imp_salva",
             "imp_utente",
+            "imp_utenti_elimina",
             "imp_admin",
             "imp_partite",
             "imp_partita_azzera",

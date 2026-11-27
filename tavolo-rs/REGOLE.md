@@ -67,4 +67,5 @@ Approvate il 27/11/2026, con la modifica sugli amministratori.
 - Ogni accesso con la password dell'admin e ogni cambio di permessi o impostazioni viene scritto nel
   **registro di audit** (chi, quando, da quale indirizzo).
 - I vecchi utenti «Admin» creati dal server Python (uno per ogni browser) vengono riconosciuti come account di
-  sistema: non possono più aprire il tavolo e si possono eliminare da ⚙️ → Utenti.
+  sistema: non possono più aprire il tavolo. Da ⚙️ → Utenti e permessi → 🧹 Pulizia si eliminano in un colpo solo,
+  insieme agli ospiti senza permessi non visti da più di N giorni (scelti lì: 1, 7, 30 o 90).
