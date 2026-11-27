@@ -3,9 +3,9 @@ name: tavolo-rs
 on:
   push:
     branches: [main]
-    paths: ["tavolo-rs/**", "tavolo/**", ".github/workflows/tavolo-rs.yml"]
+    paths: ["tavolo-rs/**", "tavolo/**", "tavolo-web/**", ".github/workflows/tavolo-rs.yml"]
   pull_request:
-    paths: ["tavolo-rs/**", "tavolo/**", ".github/workflows/tavolo-rs.yml"]
+    paths: ["tavolo-rs/**", "tavolo/**", "tavolo-web/**", ".github/workflows/tavolo-rs.yml"]
   workflow_dispatch:
 
 permissions:
@@ -35,6 +35,8 @@ jobs:
         run: cargo clippy --all-targets --locked -- -D warnings
       - name: Test unitari e fuzzing leggero
         run: cargo test --release --locked
+      - name: I tipi TypeScript generati dal server sono aggiornati
+        run: git diff --exit-code -- ../tavolo-web/src/app/api/generati
       - name: Test end-to-end contro il server Python (il riferimento)
         run: ./e2e/run.sh python
       - name: Test end-to-end contro il server Rust
@@ -44,6 +46,25 @@ jobs:
           tool: cargo-audit
       - name: Vulnerabilità note nelle dipendenze
         run: cargo audit
+
+  client:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: tavolo-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: tavolo-web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Test unitari (Vitest)
+        run: npx ng test --watch=false
+      - name: Build di produzione (strict, budget)
+        run: npx ng build
 
   immagine:
     runs-on: ubuntu-latest
@@ -60,6 +81,7 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8095/healthz && break; sleep 1; done
           curl -fsS http://127.0.0.1:8095/api/info
           curl -fsS http://127.0.0.1:8095/ | grep -q "<html"
+          curl -fsS http://127.0.0.1:8095/beta/ | grep -q "<app-root>"
           docker exec tavolo /app/tavolo --healthcheck
           docker exec tavolo /app/tavolo verifica-db /app/dati/tavolo.db
           docker images tavolo-virtuale-rs

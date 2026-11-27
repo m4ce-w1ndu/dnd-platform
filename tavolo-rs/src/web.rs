@@ -42,6 +42,8 @@ pub struct App {
     pub accessi: LimiteAccessi,
     pub percorsi: Arc<Percorsi>,
     pub web_reale: Arc<PathBuf>,
+    /// Client nuovo (Angular) servito sotto /beta/, se configurato (WEB_BETA_DIR).
+    pub web_beta: Option<Arc<PathBuf>>,
     pub avv_reale: Arc<PathBuf>,
     pub versione: Arc<String>,
     pub metriche: Arc<Metriche>,
@@ -298,6 +300,9 @@ pub fn router(app: App) -> Router {
         .route("/api/carica_documento", post(carica_documento))
         .route("/auth/{prov}/{fase}", get(oauth))
         .route("/avventure/{*resto}", get(file_avventura))
+        .route("/beta", get(|| async { axum::response::Redirect::permanent("/beta/") }))
+        .route("/beta/", get(beta))
+        .route("/beta/{*resto}", get(beta))
         .route("/healthz", get(salute))
         .route("/metrics", get(metriche))
         .fallback(statico)
@@ -903,6 +908,29 @@ async fn statico(State(app): State<App>, method: Method, uri: Uri, h: HeaderMap)
         return r;
     }
     servi_file(&full, &h, false).await
+}
+
+/// Il client nuovo sotto /beta/: i file se esistono, altrimenti index.html (applicazione a pagina singola).
+async fn beta(State(app): State<App>, uri: Uri, h: HeaderMap) -> Response {
+    let Some(base) = app.web_beta.clone() else { return non_trovato() };
+    let rel = uri.path().strip_prefix("/beta").unwrap_or("");
+    if let Some(full) = match relativo(rel) {
+        Some(r) if !r.as_os_str().is_empty() => dentro(&base, &r).await,
+        _ => None,
+    } {
+        if full.file_name().is_none_or(|n| n != "index.html") {
+            return servi_file(&full, &h, false).await;
+        }
+    }
+    // a /beta/ i percorsi relativi di index.html (main-*.js, styles-*.css) si risolvono già sotto /beta/
+    let Ok(testo) = tokio::fs::read_to_string(base.join("index.html")).await else {
+        return non_trovato();
+    };
+    let mut r = testo.into_response();
+    r.headers_mut()
+        .insert(header::CONTENT_TYPE, HeaderValue::from_static("text/html; charset=utf-8"));
+    r.headers_mut().insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
+    r
 }
 
 async fn salute(State(app): State<App>) -> Response {

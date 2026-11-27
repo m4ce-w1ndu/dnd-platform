@@ -133,7 +133,15 @@ async fn main() -> Result<()> {
     std::fs::create_dir_all(&percorsi.avventure).context("cartella avventure")?;
     let web_reale = std::fs::canonicalize(&percorsi.web).with_context(|| format!("cartella web {}", percorsi.web.display()))?;
     let avv_reale = std::fs::canonicalize(&percorsi.avventure)?;
-    let versione = calcola_versione(&web_reale);
+    let web_beta = match std::env::var("WEB_BETA_DIR").ok().filter(|d| !d.is_empty()) {
+        Some(d) => Some(std::fs::canonicalize(&d).with_context(|| format!("cartella del client beta {d}"))?),
+        None => None,
+    };
+    // la versione cambia se cambia uno dei due client: i browser aperti si ricaricano
+    let versione = match &web_beta {
+        Some(b) => calcola_versione(&web_reale)[..6].to_string() + &calcola_versione(b)[..6],
+        None => calcola_versione(&web_reale),
+    };
     let db_file = percorsi.dati.join("tavolo.db");
     let db = tavolo::db::Db::apri(&db_file).await?;
     let metriche = Arc::new(tavolo::metriche::Metriche::default());
@@ -170,6 +178,7 @@ async fn main() -> Result<()> {
         accessi: tavolo::limiti::LimiteAccessi::nuovo(),
         percorsi: Arc::new(percorsi.clone()),
         web_reale: Arc::new(web_reale),
+        web_beta: web_beta.map(Arc::new),
         avv_reale: Arc::new(avv_reale),
         versione: Arc::new(versione),
         metriche,

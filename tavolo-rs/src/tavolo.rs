@@ -24,6 +24,7 @@ use crate::util::{adesso, colore_valido, id_casuale, nome_riservato, tronca, ugu
 
 pub const MAX_LOG: usize = 400;
 const CODA_CLIENTE: usize = 1024;
+const MAX_CONNESSIONI_UTENTE: usize = 5;
 
 #[derive(Clone, Debug)]
 pub struct Percorsi {
@@ -205,7 +206,8 @@ pub struct Tavolo {
     pub stato: Stato,
     pub catalogo: BTreeMap<String, Avventura>,
     pub sessione: &'static str,
-    pub clienti: HashMap<String, Cliente>,
+    /// Stream SSE aperti, per utente (anche più schede o dispositivi dello stesso utente).
+    pub clienti: HashMap<String, Vec<Cliente>>,
     pub stati_oauth: HashMap<String, StatoOAuth>,
     pub limiti: Limiti,
     pub metriche: Arc<Metriche>,
@@ -318,10 +320,13 @@ impl Tavolo {
                 let _ = reply.send(r);
             }
             Cmd::Disconnetti { id, conn } => {
-                if self.clienti.get(&id).is_some_and(|c| c.conn == conn) {
-                    self.clienti.remove(&id);
-                    self.metriche.clienti(self.clienti.len());
-                    self.online_da_mandare = true;
+                if let Some(l) = self.clienti.get_mut(&id) {
+                    l.retain(|c| c.conn != conn);
+                    if l.is_empty() {
+                        self.clienti.remove(&id);
+                        self.online_da_mandare = true;
+                    }
+                    self.metriche.clienti(self.clienti.values().map(Vec::len).sum());
                 }
             }
             Cmd::Op { cred, op, ip, reply } => {
@@ -574,8 +579,8 @@ impl Tavolo {
         let ev = serde_json::to_value(&ev).unwrap_or(Value::Null);
         let ev = &ev;
         let tutto: Arc<str> = Arc::from(ev.to_string());
-        let mut lenti = Vec::new();
-        for (id, c) in &self.clienti {
+        let mut lenti: Vec<(String, u64)> = Vec::new();
+        for (id, conns) in &self.clienti {
             if solo.is_some_and(|s| s != id) {
                 continue;
             }
@@ -589,14 +594,21 @@ impl Tavolo {
                     Visibile::No => continue,
                 }
             };
-            if c.tx.try_send(msg).is_err() {
-                lenti.push(id.clone());
+            for c in conns {
+                if c.tx.try_send(msg.clone()).is_err() {
+                    lenti.push((id.clone(), c.conn));
+                }
             }
         }
         // chi non riesce a stare al passo (o ha chiuso) viene scollegato: il browser si ricollega da solo
-        for id in lenti {
-            self.clienti.remove(&id);
-            self.online_da_mandare = true;
+        for (id, conn) in lenti {
+            if let Some(l) = self.clienti.get_mut(&id) {
+                l.retain(|c| c.conn != conn);
+                if l.is_empty() {
+                    self.clienti.remove(&id);
+                    self.online_da_mandare = true;
+                }
+            }
         }
         self.metriche.eventi(1);
     }
@@ -691,9 +703,14 @@ impl Tavolo {
     fn connetti(&mut self, id: &str) -> Connessione {
         self.conn_seq += 1;
         let (tx, rx) = mpsc::channel(CODA_CLIENTE);
-        // una nuova connessione dello stesso utente sostituisce la vecchia (che così si chiude)
-        self.clienti.insert(id.to_string(), Cliente { conn: self.conn_seq, tx });
-        self.metriche.clienti(self.clienti.len());
+        // Più schede o dispositivi dello stesso utente restano collegati insieme (prima la nuova chiudeva la
+        // vecchia, e due schede aperte si scollegavano a vicenda ogni 2 secondi). Oltre 5 si chiude la più vecchia.
+        let l = self.clienti.entry(id.to_string()).or_default();
+        l.push(Cliente { conn: self.conn_seq, tx });
+        if l.len() > MAX_CONNESSIONI_UTENTE {
+            l.remove(0);
+        }
+        self.metriche.clienti(self.clienti.values().map(Vec::len).sum());
         self.online_da_mandare = true;
         Connessione { conn: self.conn_seq, rx }
     }

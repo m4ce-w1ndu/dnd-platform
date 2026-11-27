@@ -41,7 +41,7 @@ Oltre il limite: **429** `{"ok": false, "errore": "..."}`. Corpo massimo di una 
 | `POST /api/entra` | con credenziali nel corpo (limite IP) | Si siede al tavolo: `{id,secret,ruolo,personaggio?,nome?,colore?}`. Master solo se `master_ok`/`admin`; colore validato (`#rgb…#rrggbbaa`, altrimenti quello precedente o `#c0392b`); PG inesistente ignorato; PG di un altro giocatore collegato → **409**. Crea/riassegna la pedina del PG. Annuncio in chat se la sessione non è `chiusa`. → `{ok,id,secret}`; 401 `{login:true}` senza credenziali. |
 | `GET /api/io` | credenziali | `{ok,nome,admin,master,provider,avatar,char,colore,ruolo}`; 401 altrimenti. |
 | `GET /api/stato` | credenziali | Partita filtrata per ruolo: `versione,avventura,scena,nebbia,pedine,log,iniziativa,schede,note_master` + `online[]`, `io{id,name,color,role,char,avatar,provider,admin}`, `avv` (avventura attiva filtrata), `sessione`; per Master/admin anche `catalogo[]` e `attiva`. |
-| `GET /api/eventi` | credenziali (query) | Server-Sent Events: `retry: 2000`, poi `data: <json>` per evento, `: ping` ogni 15 s. Una nuova connessione dello stesso utente sostituisce la precedente. Aprire/chiudere manda `online` a tutti. |
+| `GET /api/eventi` | credenziali (query) | Server-Sent Events: `retry: 2000`, poi `data: <json>` per evento, `: ping` ogni 15 s. Python: una nuova connessione dello stesso utente sostituisce la precedente; Rust: restano collegate insieme (max 5). Aprire/chiudere manda `online` a tutti. |
 | `POST /api/op` | credenziali | Un comando `{"op": "...", ...}` (vedi sotto). 400 se i dati non sono validi. |
 | `POST /api/carica_avventura` | Master | Corpo = zip del pacchetto. → `{ok,id,titolo}`. Vedi «Pacchetti». |
 | `POST /api/carica_mappa?nome&titolo&cella` | Master | Corpo = immagine (svg/png/jpg/jpeg/webp). Salvata in `mappe/` dell'avventura attiva con `<stem>.json` (`gruppo:"Caricate"`, `ordine:500`, griglia se `cella>0`). → `{ok,id}`. |
@@ -133,4 +133,5 @@ Master; `sessione_inizia`/`sessione_chiudi`: Master o amministratore del tavolo.
 - Password admin con Argon2id; il vecchio hash PBKDF2 viene accettato e convertito al primo accesso.
 - `GET /healthz`, `GET /metrics` (Prometheus, solo da localhost o con token), registro di audit (accessi admin, cambi di permessi e impostazioni).
 - Corpi JSON malformati o con tipi sbagliati → 400 invece di chiudere la connessione.
-- Una nuova connessione SSE chiude subito quella vecchia; un giocatore che esce libera il suo PG subito, non al ping successivo.
+- Più schede o dispositivi dello stesso utente possono restare collegati insieme (fino a 5); un giocatore che esce libera il suo PG subito, non al ping successivo.
+- Chi riceve o perde un permesso riceve subito `ricarica`.

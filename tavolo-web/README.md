@@ -1,0 +1,22 @@
+# Tavolo Virtuale · client nuovo (Angular + TypeScript)
+
+Riscrittura di `tavolo/web/app.js` con lo stesso aspetto (stesso foglio di stile) e la stessa API.
+In produzione è servito dal server Rust sotto **`/beta/`**; il client vecchio resta su `/` finché questo non lo sostituisce.
+
+- **Tipi generati dal server**: `src/app/api/generati/` viene scritto da `cargo test esporta_tipi_typescript`
+  in `tavolo-rs/` (ts-rs). Se il server cambia un campo, il client non compila più. Non modificare a mano.
+- **Stato**: un solo store a signal (`stato/tavolo.store.ts`) aggiornato dagli eventi SSE; i componenti leggono valori derivati.
+- **Servizi**: `api/api.service.ts` (HTTP tipizzato), `core/connessione.service.ts` (accesso, SSE, riconnessione,
+  ricarica alla nuova versione), `stato/azioni.service.ts` (azioni di gioco condivise).
+- **Logica pura** in `util/` (geometria, nebbia, dadi, scheda) con test Vitest.
+
+```bash
+npm ci
+npx ng test --watch=false     # test unitari
+npx ng build                  # dist/tavolo-web/browser
+npx ng serve                  # sviluppo su :4200, con /api inoltrato al server su :8080 (proxy.conf.json)
+```
+
+Novità rispetto al client vecchio: l'account di sistema «Admin» ha una sua pagina (impostazioni, permessi,
+partite, backup, registro di audit) invece della mappa; la sala d'attesa mostra apertura del tavolo e scelta del
+Master solo agli amministratori del tavolo; le note non perdono testo se arriva un aggiornamento mentre si scrive.

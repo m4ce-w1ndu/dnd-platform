@@ -8,6 +8,7 @@ import type { Voce } from "./Voce";
 
 /**
  * Un evento mandato sullo stream `/api/eventi` (`data: {"t": ...}`).
+ * (Vive un istante: viene subito serializzato, quindi la dimensione delle varianti non conta.)
  */
 export type Evento = { "t": "pedina", pedina: Pedina, da?: string, 
 /**

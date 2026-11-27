@@ -10,8 +10,10 @@ HOST="${HOST:-immauri@192.168.0.2}"
 cd "$(dirname "$0")/../.."
 
 echo "→ copio i sorgenti su $HOST"
-tar --exclude='target' --exclude='__pycache__' -czf - \
+tar --exclude='target' --exclude='__pycache__' --exclude='node_modules' --exclude='dist' -czf - \
     tavolo-rs/Cargo.toml tavolo-rs/Cargo.lock tavolo-rs/Containerfile tavolo-rs/migrations tavolo-rs/src tavolo-rs/deploy tavolo/web \
+    tavolo-web/package.json tavolo-web/package-lock.json tavolo-web/angular.json tavolo-web/tsconfig.json tavolo-web/tsconfig.app.json \
+    tavolo-web/public tavolo-web/src \
   | ssh "$HOST" 'sudo rm -rf /opt/tavolo-virtuale-rs.new && sudo mkdir -p /opt/tavolo-virtuale-rs.new && sudo tar -xzf - -C /opt/tavolo-virtuale-rs.new \
                  && sudo rm -rf /opt/tavolo-virtuale-rs && sudo mv /opt/tavolo-virtuale-rs.new /opt/tavolo-virtuale-rs'
 

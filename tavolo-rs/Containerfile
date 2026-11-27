@@ -1,6 +1,16 @@
 # Tavolo Virtuale · server Rust. Contesto di build: la radice del repository (servono tavolo-rs/ e tavolo/web/).
 #   podman build -f tavolo-rs/Containerfile -t tavolo-virtuale-rs .
-# Risultato: un binario statico (musl) e i file del client, in un'immagine FROM scratch (~15 MB).
+# Risultato: un binario statico (musl) e i due client, in un'immagine FROM scratch (~20 MB).
+# Il client nuovo (Angular), servito sotto /beta/ finché non sostituisce quello vecchio.
+FROM docker.io/library/node:24-alpine AS web
+WORKDIR /web
+COPY tavolo-web/package.json tavolo-web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY tavolo-web/angular.json tavolo-web/tsconfig.json tavolo-web/tsconfig.app.json ./
+COPY tavolo-web/public ./public
+COPY tavolo-web/src ./src
+RUN npx ng build
+
 FROM docker.io/library/rust:1-alpine AS build
 RUN apk add --no-cache musl-dev
 WORKDIR /src
@@ -13,12 +23,13 @@ RUN cargo build --release --locked \
  && chown -R 1000:1000 /out/app/dati /out/app/avventure \
  && chmod 1777 /out/tmp
 COPY tavolo/web /out/app/web
+COPY --from=web /web/dist/tavolo-web/browser /out/app/web-beta
 
 FROM scratch
 COPY --from=build /out/ /
 USER 1000:1000
 WORKDIR /app
-ENV PORT=8000 DATI_DIR=/app/dati AVVENTURE_DIR=/app/avventure WEB_DIR=/app/web RUST_LOG=info
+ENV PORT=8000 DATI_DIR=/app/dati AVVENTURE_DIR=/app/avventure WEB_DIR=/app/web WEB_BETA_DIR=/app/web-beta RUST_LOG=info
 EXPOSE 8000
 HEALTHCHECK --interval=60s --timeout=5s CMD ["/app/tavolo", "--healthcheck"]
 ENTRYPOINT ["/app/tavolo"]

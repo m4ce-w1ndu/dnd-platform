@@ -273,6 +273,8 @@ impl Tavolo {
                             }
                         }
                     }
+                    // chi ha appena ricevuto (o perso) un permesso vede subito i pulsanti giusti
+                    self.invia_a(Evento::Ricarica, Some(&uid));
                     self.db
                         .audit(
                             Some(id),

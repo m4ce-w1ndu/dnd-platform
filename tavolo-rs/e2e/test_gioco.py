@@ -2,7 +2,7 @@
 import re
 import unittest
 
-from harness import Base, solo_rust
+from harness import Base, rust, solo_rust
 
 
 class TestDadi(Base):
@@ -284,7 +284,11 @@ class TestVisibilita(Base):
         g.svuota()
         secondo.ok("chat", testo="ancora qui")
         self.assertTrue(secondo.aspetta(lambda e: e.get("t") == "log"))
-        self.assertIsNone(g.aspetta(lambda e: e.get("t") == "log", 1))   # la vecchia scheda non riceve più nulla
+        if rust():
+            # due schede dello stesso utente restano collegate insieme (niente scollegamenti a ripetizione)
+            self.assertTrue(g.aspetta(lambda e: e.get("t") == "log", 3))
+        else:
+            self.assertIsNone(g.aspetta(lambda e: e.get("t") == "log", 1))   # Python: la vecchia scheda resta muta
         secondo.scollega()
 
     def test_eventi_senza_credenziali(self):
